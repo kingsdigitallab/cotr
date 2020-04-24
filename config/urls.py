@@ -15,9 +15,6 @@ urlpatterns = [
 
     path('wagtail/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
-
-    path('viewer/', TemplateView.as_view(
-        template_name='viewer/mocks/viewer.html')),
     path('', include('ctrs_texts.urls')),
     path('', include(wagtail_urls)),
     # Your stuff: custom urls includes go here
