@@ -15,16 +15,14 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased] - yyyy-mm-dd
 --------------------
 
-Added
-~~~~~
-* Heatmap: add popup with readings.
-
 Changed
 ~~~~~~~
-* Heatmap: move reading section to bottom of the image.
+* Convert the project to cookie cutter.
+* Change to new source control repository.
 
 
-[0.1.0] - TODO: date
+[1.11.0] - 2020-04-24
 --------------------
 
-* Initial release
+* Last release based on the bare bones initial set up, available at
+https://github.com/kingsdigitallab/ctrs-django.
