@@ -17,7 +17,7 @@
 
   .card-section {
     height: 0; // It doesn't really matter the value, but height needs
-               // to be declared for overflow to work.
+    // to be declared for overflow to work.
 
     line-height: 2.25;
 
@@ -96,6 +96,17 @@
       padding-top: .25rem;
     }
   }
+
+  .variant,
+  .custom-tooltip {
+    .label {
+      margin-left: 0;
+
+      &+.label {
+        margin-right: .5rem;
+      }
+    }
+  }
 }
 
 .canvas-trigger {
@@ -152,19 +163,6 @@
 .off-canvas-wrapper,
 #text-search {
   .label {
-    color: $black;
-  }
-}
-
-.label {
-  &.manuscript {
-    background: scale-color($secondary-color, $lightness: 20%);
-    color: $black;
-  }
-
-  &.version,
-  &.work {
-    background: scale-color($primary-color, $lightness: 75%);
     color: $black;
   }
 }
@@ -246,6 +244,19 @@
 
   .text-display {
     padding: 1rem;
+
+    .view-type {
+      background: rgba(white, 0.2);
+      border: 1px solid $dark-gray;
+      color: $rich-black;
+      font-size: .75rem;
+      margin-right: .5rem;
+      padding: 0 .25rem;
+
+      &:hover {
+        background: rgba(white, 1);
+      }
+    }
   }
 
   .toggle-off {
@@ -261,6 +272,11 @@
 
     // Hide empty symbol if w-regions are hidden
     .no-text {
+      display: none;
+    }
+
+    // Hide work region label with toggling off
+    .view-type-work {
       display: none;
     }
   }
@@ -331,6 +347,25 @@ $highlighted-background-color: #ee0;
     &:after {
       content: ') ';
     }
+
+    &.highlighted {
+      // GN: ac-142: user has clicked on region/reading in other block
+      // we highlight it in this block.
+      // TODO: remove !important
+      background-color: $highlighted-background-color;
+    }
+
+    // TODO: use <a> instead?
+    cursor: pointer;
+
+  }
+
+  span[data-copies="1"] {
+    font-weight: bold;
+  }
+
+  span[data-copies="0"] {
+    font-weight: normal;
   }
 
   span[data-dpt-type=unsettled] {
@@ -342,22 +377,15 @@ $highlighted-background-color: #ee0;
     // pointer-events: none;
 
     &::before {
-        color: $primary-color;
-        content: "?: ";
-        font-size: .75rem;
-        padding-left: .25rem;
-        padding-right: .125rem;
-        // GN: experiment with clickable label to open parent text
-        // see ac-144
-        cursor: pointer;
-        pointer-events: all;
-    }
-
-    &:hover:before {
+      color: $primary-color;
+      // content: "?: ";
+      font-size: .75rem;
+      padding-left: .25rem;
+      padding-right: .125rem;
       // GN: experiment with clickable label to open parent text
       // see ac-144
-      // TODO: remove !important
-      // background-color: #ee0 !important;
+      cursor: pointer;
+      pointer-events: all;
     }
 
     &[data-dpt-group].highlighted {
@@ -379,12 +407,11 @@ $highlighted-background-color: #ee0;
     font-style: italic;
   }
 
-  span[data-dpt-type=unsettled][data-dpt-group=version] {
-
-    &::before {
-      content: "v: ";
-    }
-  }
+  // span[data-dpt-type=unsettled][data-dpt-group=version] {
+  //   &::before {
+  //     content: "v: ";
+  //   }
+  // }
 
 
   &.version,
@@ -397,9 +424,9 @@ $highlighted-background-color: #ee0;
       background: rgba($secondary-color, 0.5);
       padding: .25rem .5rem;
 
-      &::before {
-        content: "w: ";
-      }
+      // &::before {
+      //   content: "w: ";
+      // }
 
       span[data-dpt-type=unsettled][data-dpt-group=version] {
         .no-text {
@@ -419,47 +446,41 @@ $highlighted-background-color: #ee0;
       position: relative;
     }
 
-    span[data-dpt-type=unsettled] {
+    span.variants {
+      background-color: scale-color($light-gray, $lightness: 20%);
+      border: 1px solid grey;
+      font-size: .875rem;
+      opacity: .95;
+      position: absolute;
+      padding: .5em .5em .25em;
+      width: auto;
 
-      span.variants {
-        background-color: scale-color($light-gray, $lightness: 20%);
-        border: 1px solid grey;
+      &:not(.dropdown-pane) {
         display: none;
-        font-size: .875rem;
-        opacity: .95;
-        position: absolute;
-        padding: .5em .5em .25em;
-
-        .variant {
-          display: block;
-          white-space: nowrap;
-
-          .ms {
-            background: scale-color($secondary-color, $lightness: 20%);
-            border: 1px solid $secondary-color;
-            color: $black;
-            font-size: .75rem;
-            margin-right: 4px;
-            padding: 4px 4px 0;
-          }
-
-          // GN: interaction POC, to be improved
-          cursor: pointer;
-
-          &:hover {
-            background-color: $highlighted-background-color;
-          }
-        }
+        visibility: hidden;
       }
 
-      &:hover {
-        &>span.variants {
-          display: inline-block;
-          position: absolute;
-          z-index: 10;
+      .variant {
+        display: block;
+
+        .ms {
+          background: scale-color($secondary-color, $lightness: 20%);
+          border: 1px solid $secondary-color;
+          color: $black;
+          font-size: .75rem;
+          margin-right: 4px;
+          padding: 4px 4px 0;
+        }
+
+        // GN: interaction POC, to be improved
+        cursor: pointer;
+
+        &:hover {
+          background-color: $highlighted-background-color;
         }
       }
     }
+
   }
 }
 
@@ -546,14 +567,14 @@ $highlighted-background-color: #ee0;
 }
 
 .leaflet-popup {
-    max-height: 30vw;
-    max-width: 60vw;
-    overflow-y: hidden;
+  max-height: 30vw;
+  max-width: 60vw;
+  overflow-y: hidden;
 }
 
 .leaflet-popup-content-wrapper {
-    max-height: 30vw;
-    overflow-y: auto;
+  max-height: 30vw;
+  overflow-y: auto;
 }
 
 .leaflet-interactive {
@@ -562,28 +583,68 @@ $highlighted-background-color: #ee0;
   }
 }
 
-// Using colour blind friendly palette for the versions
+// Histogram
 
-.v1-text-id {
-  border-left: 10px solid $orange;
-}
+.histogram {
+  font-size: .8125rem;
+  padding: 0 1rem;
 
-.v2-text-id {
-  border-left: 10px solid $sky-blue;
-}
+  .bar,
+  .bar-container {
+    line-height: 1;
+  }
 
-.v3-text-id {
-  border-left: 10px solid $bluish-green;
-}
+  .bar-container {
+    // TODO: use <a>
+    cursor: pointer;
+    margin-bottom: .75rem;
 
-.v4-text-id {
-  border-left: 10px solid $yellow;
-}
+    // GF: ideally padding should be 0 to avoid giving the wrong impression
+    // there is always someting. With 0 it results in a line only. It can be
+    // improved. Commenting this to achieve padding: 0;
+    // padding: 0 .25rem;
 
-.v5-text-id {
-  border-left: 10px solid $vermillion;
-}
+    &[data-dpt-group=version] {
+      .bar {
+        // GN: use same colors as regions in text
+        // TODO: avoid code duplication
+        background: rgba($primary-color, .2);
+        border: 1px solid scale-color($light-gray, $lightness: -20%);
+      }
+    }
 
-.v6-text-id {
-  border-left: 10px solid $reddish-purple;
+    &[data-dpt-group=work] {
+      .bar {
+        background: rgba($secondary-color, 0.5);
+        border: 1px dashed scale-color($secondary-color, $lightness: -40%);
+      }
+    }
+
+    &.highlighted {
+      .bar {
+        // GN: ac-142: user has clicked on region/reading in other block
+        // we highlight it in this block.
+        background-color: $highlighted-background-color;
+      }
+    }
+
+    .bar {
+      display: inline-block;
+      margin: 0.125rem 0;
+
+      &.empty {
+        background-color: $body-background;
+        border: 0;
+      }
+
+      span {
+        padding: 0 .125rem;
+      }
+    }
+  }
+
+  .bar-label {
+    font-size: .75rem;
+    font-style: italic;
+  }
 }

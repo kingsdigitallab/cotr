@@ -3,8 +3,15 @@ from __future__ import unicode_literals
 from django import forms
 from wagtail.contrib.table_block.blocks import TableBlock
 from wagtail.core.blocks import (
-    CharBlock, FieldBlock, PageChooserBlock, RawHTMLBlock, RichTextBlock,
-    StreamBlock, StructBlock, TextBlock, URLBlock
+    CharBlock,
+    FieldBlock,
+    PageChooserBlock,
+    RawHTMLBlock,
+    RichTextBlock,
+    StreamBlock,
+    StructBlock,
+    TextBlock,
+    URLBlock,
 )
 from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.embeds.blocks import EmbedBlock
@@ -104,6 +111,17 @@ class PullQuoteBlock(StructBlock):
         template = 'cms/blocks/pull_quote_block.html'
 
 
+class TextListBlock(FieldBlock):
+    field = forms.ChoiceField(choices=(
+        ('all', 'All'),
+        ('declaration', 'The Declaration of Arbroath'),
+        ('regiam', 'Regiam Maiestatem'),
+    ))
+
+    class Meta:
+        template = 'cms/blocks/text_list_block.html'
+
+
 class CMSStreamBlock(StreamBlock):
     # home = HomePageBlock(icon='grip', label='Homepage Block')
 
@@ -125,3 +143,5 @@ class CMSStreamBlock(StreamBlock):
     html = AlignedHTMLBlock(icon='code', label='Raw HTML')
 
     table = TableBlock(icon='table', label='Table')
+
+    text_list = TextListBlock(icon='table', label='Text List')

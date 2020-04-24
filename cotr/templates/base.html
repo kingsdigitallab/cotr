@@ -92,7 +92,8 @@
 
     {% if not settings.DEBUG %}
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ GA_ID }}">
+    <script async
+      src="https://www.googletagmanager.com/gtag/js?id={{ settings.GA_ID }}">
     </script>
     <script>
       window.dataLayer = window.dataLayer || [];
