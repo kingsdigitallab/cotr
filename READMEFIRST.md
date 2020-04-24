@@ -1,7 +1,5 @@
 # Migrating from Vagrant
 
-This documents highlights the steps on how to set up the `Docker` stack for those migrating from the `Vagrant` stack.
-
 <!-- https://github.com/pydanny/cookiecutter-django/issues/2444 -->
 
 - Get a database dump, and store it in `.volumes/local_elasticsearch_data`
