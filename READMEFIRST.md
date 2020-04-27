@@ -70,7 +70,7 @@ exit
 
 - Browse to <http://localhost:8000/>
 
-- Before commiting changes, install the [pre-commit](https://pre-commit.com) hooks. After installin `pre-commit` run:
+- Before commiting changes, install the [pre-commit](https://pre-commit.com) hooks. After installing `pre-commit` run:
 
 ```bash
 pre-commit install
