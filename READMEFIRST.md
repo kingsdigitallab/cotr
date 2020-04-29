@@ -68,6 +68,12 @@ exit
 ./bake.py manage createsuperuser
 ```
 
+- Install Node packages
+
+```bash
+npm install
+```
+
 - Browse to <http://localhost:8000/>
 
 - Before commiting changes, install the [pre-commit](https://pre-commit.com) hooks. After installing `pre-commit` run:
