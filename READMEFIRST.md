@@ -2,7 +2,13 @@
 
 <!-- https://github.com/pydanny/cookiecutter-django/issues/2444 -->
 
-- Get a database dump, and store it in `.volumes/local_elasticsearch_data`
+- Create and start the containers
+
+```bash
+./bake.py up --build
+```
+
+- Get a database dump, and store it in `.volumes/local_postgres_data_backups`
 
 ```bash
 pg_dump -O -E utf-8 -U app_ctrs -f ~/stg.sql -h db-stg.ctrs.cch.kcl.ac.uk app_ctrs_stg
@@ -12,12 +18,6 @@ pg_dump -O -E utf-8 -U app_ctrs -f ~/stg.sql -h db-stg.ctrs.cch.kcl.ac.uk app_ct
 
 ```bash
 gzip stg.sql
-```
-
-- Create and start the containers
-
-```bash
-./bake.py up --build
 ```
 
 - Connect to the postgres container
@@ -68,9 +68,15 @@ exit
 ./bake.py manage createsuperuser
 ```
 
+- Install Node packages
+
+```bash
+npm install
+```
+
 - Browse to <http://localhost:8000/>
 
-- Before commiting changes, install the [pre-commit](https://pre-commit.com) hooks. After installin `pre-commit` run:
+- Before commiting changes, install the [pre-commit](https://pre-commit.com) hooks. After installing `pre-commit` run:
 
 ```bash
 pre-commit install
