@@ -20,6 +20,10 @@ Changed
 * Convert the project to cookie cutter.
 * Change to new source control repository.
 
+Security
+~~~~~~~~
+* Upgrade jQuery, via https://github.com/kingsdigitallab/cotr/pull/1
+
 
 [1.11.0] - 2020-04-24
 --------------------
