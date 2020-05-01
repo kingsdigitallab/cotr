@@ -18,7 +18,9 @@ def get_xml_from_unicode(document, ishtml=False, add_root=False):
     #         <root> element before parsing. In case there is no
     #        single containing element.
 
-    if document and add_root:
+    document = document or ''
+
+    if add_root:
         document = r'<root>%s</root>' % document
 
     parser = None
