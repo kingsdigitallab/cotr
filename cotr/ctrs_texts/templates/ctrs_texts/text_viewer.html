@@ -77,7 +77,7 @@
               <a class="button hollow arrow-only canvas-trigger"
                 :data-toggle="'offCanvas-'+block_index">
 
-                <!-- fa-caret-rigth -->
+                <!-- fa-caret-right -->
                 <!--
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"/></svg>
                 -->
@@ -171,6 +171,14 @@
 
               <!-- html chunk -->
               <template v-else>
+                <!-- show link to non-standardised copy -->
+                <p class="view-link" v-if="view.view == 'transcription' && view.can_show_non_standardised">
+                  <a @click="change_view_type(block, view, 'non-standardised')">Read the non-standardised text</a>
+                </p>
+                <p class="view-link" v-if="view.view == 'non-standardised'">
+                  <a @click="change_view_type(block, view, 'transcription')">Read the standardised text</a>
+                </p>
+
                 <!-- show list of MS texts in a version -->
                 <ul v-if="block.text && block.text.type!='manuscript'"
                   class="group-members">
