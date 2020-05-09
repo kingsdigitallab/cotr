@@ -277,3 +277,10 @@ cotr/media/
 !.envs/.local/
 .vagrant
 .volumes
+
+# Eclipse IDE
+/.project
+/.pydevproject
+
+arc-content.json
+
