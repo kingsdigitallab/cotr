@@ -1,6 +1,8 @@
 The community of the realm in Scotland, 1249–1424
 =================================================
 
+Note: this repository was created from https://github.com/kingsdigitallab/ctrs-django in May 2020 while migrating the environment from bare-bone (Vagrant over VBox) to cookie-cutter (Docker).
+
 TODO: The community of the realm in Scotland, 1249–1424 description...
 
 .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
