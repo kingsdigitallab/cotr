@@ -328,6 +328,11 @@ $highlighted-background-color: #ee0;
 
 .card-section,
 .text-view {
+  // GN: inelegant way to align the para with the rest of the content in the view
+  p.view-link {
+      margin-left: 1rem;
+  }
+
   p {
     line-height: 2.25;
   }
