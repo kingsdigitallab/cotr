@@ -289,6 +289,8 @@ WAGTAILSEARCH_BACKENDS = {
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+# any encodedtext.content smaller than that will be ignored
+COTR_MIN_CONTENT_LEN = 10
 
 # CMS
 # ------------------------------------------------------------------------------

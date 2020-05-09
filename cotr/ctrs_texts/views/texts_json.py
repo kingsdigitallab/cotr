@@ -117,6 +117,7 @@ def view_api_text_chunk(
                 ['value_max', 17],
                 ['region_type', region_type],
                 ['description', 'number of unsettled regions per sentence'],
+                ['can_show_non_standardised', encoded_text.can_show_non_standardised()],
                 ['chunk', utils.get_text_chunk(
                     encoded_text, view, region_type)],
             ])],

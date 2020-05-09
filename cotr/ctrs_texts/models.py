@@ -8,6 +8,8 @@ from wagtail.snippets.models import register_snippet
 from . import utils
 from .models_abstract import ImportedModel, NamedModel, TimestampedModel
 
+from django.conf import settings
+
 
 class EncodedTextStatus(NamedModel):
     sort_order = models.IntegerField(
@@ -84,6 +86,24 @@ class EncodedText(index.Indexed, TimestampedModel, ImportedModel):
             self.plain = utils.get_plain_text(self)
 
         super().save(*args, **kwargs)
+
+    def can_show_non_standardised(self):
+        '''returns True if the non-standardised copy can be shown
+        True iff there is an EncodedText with type 'non-standardised'
+            AND we are in debug mode or the copy status is 'live'
+        '''
+        filters = {}
+        from django.db.models.functions import Length
+        if not settings.DEBUG:
+            filters['status__slug'] = 'live'
+        ret = EncodedText.objects.annotate(content_len=Length('plain')).filter(
+            content_len__gt=settings.COTR_MIN_CONTENT_LEN,
+            abstracted_text=self.abstracted_text,
+            type__slug='non-standardised',
+            **filters
+        ).exists()
+
+        return ret
 
     def get_content_with_readings(self):
         '''
