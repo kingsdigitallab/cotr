@@ -272,28 +272,34 @@ def get_annotations_from_archetype():
 
 def get_text_chunk(encoded_text, view, region_type):
     if view in ['histogram']:
-        '''Returns a list of sentences; for each one, the number of regions'''
-        ret = []
-
-        xml = get_xml_from_unicode(
-            encoded_text.content, add_root=True, ishtml=True)
-        for para in xml.findall('.//p'):
-            for sentence_element in para.findall('.//span[@data-dpt="sn"]'):
-                number = re.sub(r'^s-(\d+)$', r'\1',
-                                sentence_element.attrib.get('data-rid', ''))
-                if not number:
-                    continue
-
-                regions = para.findall(
-                    './/span[@data-dpt-group="' + region_type + '"]')
-
-                res = {
-                    'key': number,
-                    'value': len(regions),
-                }
-                ret.append(res)
+        ret = get_text_viz_data(encoded_text, region_type)
     else:
         ret = encoded_text.get_content_with_readings()
+
+    return ret
+
+
+def get_text_viz_data(encoded_text, region_type):
+    '''Returns a list of sentences; for each one, the number of regions
+    Also called 'histogram' '''
+    ret = []
+
+    xml = get_xml_from_unicode(encoded_text.content, add_root=True, ishtml=True)
+    for para in xml.findall('.//p'):
+        for sentence_element in para.findall('.//span[@data-dpt="sn"]'):
+            number = re.sub(r'^s-(\d+)$', r'\1',
+                            sentence_element.attrib.get('data-rid', ''))
+            if not number:
+                continue
+
+            regions = para.findall(
+                './/span[@data-dpt-group="' + region_type + '"]')
+
+            res = {
+                'key': number,
+                'value': len(regions),
+            }
+            ret.append(res)
 
     return ret
 
