@@ -15,6 +15,10 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased] - yyyy-mm-dd
 --------------------
 
+Added
+~~~~~
+* nginx to serve media files.
+
 Changed
 ~~~~~~~
 * Convert the project to cookie cutter.
