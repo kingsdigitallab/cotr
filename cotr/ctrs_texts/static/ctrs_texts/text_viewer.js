@@ -442,6 +442,11 @@ $(() => {
 
         for (let other_block of this.blocks) {
           if (other_block != source_block) {
+            if (!other_text && !other_block.text) {
+                // in case other block has no text selected yet,
+                // we select the same text as source
+                other_text = source_block.text;
+            }
             this.on_change_text(other_block, other_text, region_id)
             break
           }
