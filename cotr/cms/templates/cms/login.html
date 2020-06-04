@@ -1,5 +1,6 @@
 {% extends "cms/base.html" %}
-{% load cms_tags wagtailcore_tags wagtailroutablepage_tags %}
+{# % load cms_tags wagtailcore_tags wagtailroutablepage_tags % #}
+{% load cms_tags wagtailcore_tags %}
 
 {% block meta_title %}Log in{% endblock %}
 
@@ -22,7 +23,7 @@
     {% csrf_token %}
     {{ form.username.label_tag }}
     {{ form.username }}
-    
+
     {{ form.password.label_tag }}
     {{ form.password }}
 
