@@ -23,11 +23,7 @@ certificatesResolvers:
 http:
   routers:
     web-router:
-<<<<<<< HEAD
       rule: 'Host(`ctrs2.cch.kcl.ac.uk`)'
-=======
-      rule: 'Host(`cotr.ac.uk`)'
->>>>>>> develop
       entryPoints:
         - web
       middlewares:
@@ -47,7 +43,7 @@ http:
         certResolver: letsencrypt
 
     web-media-router:
-      rule: 'Host(`ctrs.cch.kcl.ac.uk`) && PathPrefix(`/media/`)'
+      rule: 'Host(`ctrs2.cch.kcl.ac.uk`) && PathPrefix(`/media/`)'
       entryPoints:
         - web-secure
       middlewares:
