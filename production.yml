@@ -2,6 +2,7 @@ version: '3'
 
 volumes:
   production_django_media: {}
+  production_django_static: {}
   production_postgres_data: {}
   production_postgres_data_backups: {}
   production_traefik: {}
@@ -14,7 +15,8 @@ services:
       dockerfile: ./compose/production/django/Dockerfile
     image: cotr_production_django
     volumes:
-      - production_django_media:/app/radical_translations/media
+      - production_django_media:/app/cotr/media
+      - production_django_static:/app/staticfiles
     depends_on:
       - postgres
       - redis
@@ -28,11 +30,12 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/nginx/Dockerfile
-    image: radical_translations_production_nginx
+    image: cotr_production_nginx
     depends_on:
       - django
     volumes:
       - production_django_media:/usr/share/nginx/media:ro
+      - production_django_static:/usr/share/nginx/static:ro
 
   postgres:
     build:
