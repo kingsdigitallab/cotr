@@ -36,6 +36,10 @@ RUN chmod +x /start
 RUN chown django /start
 COPY --chown=django:django . /app
 
+# GN: Fix static & media volume permission
+RUN mkdir -p /app/staticfiles && chmod -R ugo+rwx /app/staticfiles && chown -R django:django /app/staticfiles
+RUN mkdir -p /app/cotr/media && chmod -R ugo+rwx /app/cotr/media && chown -R django:django /app/cotr/media
+
 USER django
 
 WORKDIR /app
