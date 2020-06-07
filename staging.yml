@@ -5,60 +5,61 @@ volumes:
   staging_postgres_data: {}
   staging_postgres_data_backups: {}
   staging_traefik: {}
-  #production_elasticsearch_data: {}
+  #staging_elasticsearch_data: {}
 
 services:
-  django:
+  stg_django:
     build:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
-    image: cotr_production_django
+    image: cotr_staging_django
     volumes:
       - staging_django_media:/app/cotr/media:rw
     depends_on:
-      - postgres
-      - redis
+      - stg_postgres
+      - stg_redis
       #- elasticsearch
     env_file:
       - ./.envs/.staging/.django
       - ./.envs/.staging/.postgres
     command: /start
 
-  nginx:
+  stg_nginx:
     build:
       context: .
       dockerfile: ./compose/production/nginx/Dockerfile
-    image: cotr_production_nginx
+    image: cotr_staging_nginx
     depends_on:
-      - django
+      - stg_django
     volumes:
       - staging_django_media:/usr/share/nginx/media:ro
 
-  postgres:
+  stg_postgres:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: cotr_production_postgres
+    image: cotr_staging_postgres
     volumes:
       - staging_postgres_data:/var/lib/postgresql/data
       - staging_postgres_data_backups:/backups
     env_file:
       - ./.envs/.staging/.postgres
 
-  traefik:
+  stg_traefik:
     build:
       context: .
       dockerfile: ./compose/production/traefik/Dockerfile
-    image: cotr_production_traefik
+    image: cotr_staging_traefik
     depends_on:
-      - django
+      - stg_django
+      - stg_nginx
     volumes:
       - staging_traefik:/etc/traefik/acme
     ports:
       - '0.0.0.0:8202:80'
 #      - '0.0.0.0:443:443'
 
-  redis:
+  stg_redis:
     image: redis:5.0
   #elasticsearch:
   #image: elasticsearch:7.5.1
