@@ -21,6 +21,7 @@ parser.add_argument(
     choices=[
         "up",
         "stop",
+        "rmi",
         "destroy",
         "restart",
         "shell",
