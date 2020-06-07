@@ -56,7 +56,7 @@ services:
     volumes:
       - staging_traefik:/etc/traefik/acme
     ports:
-      - '0.0.0.0:8202:80'
+      - '8202:80'
 #      - '0.0.0.0:443:443'
 
   stg_redis:
