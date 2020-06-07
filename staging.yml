@@ -20,8 +20,8 @@ services:
       - redis
       #- elasticsearch
     env_file:
-      - ./.envs/.production/.django
-      - ./.envs/.production/.postgres
+      - ./.envs/.staging/.django
+      - ./.envs/.staging/.postgres
     command: /start
 
   nginx:
@@ -43,7 +43,7 @@ services:
       - staging_postgres_data:/var/lib/postgresql/data
       - staging_postgres_data_backups:/backups
     env_file:
-      - ./.envs/.production/.postgres
+      - ./.envs/.staging/.postgres
 
   traefik:
     build:
