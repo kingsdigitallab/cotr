@@ -8,7 +8,7 @@ volumes:
   #production_elasticsearch_data: {}
 
 services:
-  prod_django:
+  django:
     build:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
@@ -16,25 +16,25 @@ services:
     volumes:
       - production_django_media:/app/cotr/media:rw
     depends_on:
-      - prod_postgres
-      - prod_redis
+      - postgres
+      - redis
       #- elasticsearch
     env_file:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
     command: /start
 
-  prod_nginx:
+  nginx:
     build:
       context: .
       dockerfile: ./compose/production/nginx/Dockerfile
     image: cotr_production_nginx
     depends_on:
-      - prod_django
+      - django
     volumes:
       - production_django_media:/usr/share/nginx/media:ro
 
-  prod_postgres:
+  postgres:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
@@ -45,21 +45,21 @@ services:
     env_file:
       - ./.envs/.production/.postgres
 
-  prod_traefik:
+  traefik:
     build:
       context: .
       dockerfile: ./compose/production/traefik/Dockerfile
     image: cotr_production_traefik
     depends_on:
-      - prod_django
-      - prod_nginx
+      - django
+      - nginx
     volumes:
       - production_traefik:/etc/traefik/acme
     ports:
       - '127.0.0.1:8201:80'
 #      - '0.0.0.0:443:443'
 
-  prod_redis:
+  redis:
     image: redis:5.0
   #elasticsearch:
   #image: elasticsearch:7.5.1
