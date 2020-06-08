@@ -1,10 +1,10 @@
 version: '3'
 
 volumes:
-  production_django_media: {}
-  production_postgres_data: {}
-  production_postgres_data_backups: {}
-  production_traefik: {}
+  django_media: {}
+  postgres_data: {}
+  postgres_data_backups: {}
+  traefik: {}
   #production_elasticsearch_data: {}
 
 services:
@@ -14,7 +14,7 @@ services:
       dockerfile: ./compose/production/django/Dockerfile
     image: cotr_production_django
     volumes:
-      - production_django_media:/app/cotr/media:rw
+      - django_media:/app/cotr/media:rw
     depends_on:
       - postgres
       - redis
@@ -32,7 +32,7 @@ services:
     depends_on:
       - django
     volumes:
-      - production_django_media:/usr/share/nginx/media:ro
+      - django_media:/usr/share/nginx/media:ro
 
   postgres:
     build:
@@ -40,8 +40,8 @@ services:
       dockerfile: ./compose/production/postgres/Dockerfile
     image: cotr_production_postgres
     volumes:
-      - production_postgres_data:/var/lib/postgresql/data
-      - production_postgres_data_backups:/backups
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_backups:/backups
     env_file:
       - ./.envs/.production/.postgres
 
@@ -54,7 +54,7 @@ services:
       - django
       - nginx
     volumes:
-      - production_traefik:/etc/traefik/acme
+      - traefik:/etc/traefik/acme
     ports:
       - '127.0.0.1:8201:80'
 #      - '0.0.0.0:443:443'
