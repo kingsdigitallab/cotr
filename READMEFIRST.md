@@ -41,6 +41,7 @@ kill ID1 ...
 - Restore the database using the database dump file
 
 ```bash
+cd /backups
 restore stg.sql.gz
 ```
 
