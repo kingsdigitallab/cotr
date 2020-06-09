@@ -12,7 +12,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
-    image: cotr_production_django
+    image: cotr_staging_django
     volumes:
       - django_media:/app/cotr/media:rw
     depends_on:
@@ -20,15 +20,15 @@ services:
       - redis
       #- elasticsearch
     env_file:
-      - ./.envs/.production/.django
-      - ./.envs/.production/.postgres
+      - ./.envs/.staging/.django
+      - ./.envs/.staging/.postgres
     command: /start
 
   nginx:
     build:
       context: .
       dockerfile: ./compose/production/nginx/Dockerfile
-    image: cotr_production_nginx
+    image: cotr_staging_nginx
     depends_on:
       - django
     volumes:
@@ -38,25 +38,25 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: cotr_production_postgres
+    image: cotr_staging_postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - postgres_data_backups:/backups
     env_file:
-      - ./.envs/.production/.postgres
+      - ./.envs/.staging/.postgres
 
   traefik:
     build:
       context: .
-      dockerfile: ./compose/production/traefik/Dockerfile
-    image: cotr_production_traefik
+      dockerfile: ./compose/staging/traefik/Dockerfile
+    image: cotr_staging_traefik
     depends_on:
       - django
 #      - nginx
     volumes:
       - traefik:/etc/traefik/acme
     ports:
-      - '127.0.0.1:8201:80'
+      - '127.0.0.1:8202:80'
 #      - '0.0.0.0:443:443'
 
   redis:

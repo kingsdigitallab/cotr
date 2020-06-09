@@ -10,9 +10,10 @@ RUN apt-get update \
   && apt-get install -y libpq-dev \
   # Translations dependencies
   && apt-get install -y gettext \
-  && apt-get install -y libldap2-dev
-# cleaning up unused files
-&& apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+  # LDAP dependencies
+  && apt-get install -y libldap2-dev libsasl2-dev ldap-utils \
+  # cleaning up unused files
+  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
 
 RUN addgroup --system django \
@@ -34,6 +35,9 @@ RUN sed -i 's/\r$//g' /start
 RUN chmod +x /start
 RUN chown django /start
 COPY --chown=django:django . /app
+
+# GN: Fix static & media volume permission
+RUN mkdir -p /app/cotr/media && chmod -R ugo+rwx /app/cotr/media && chown -R django:django /app/cotr/media
 
 USER django
 

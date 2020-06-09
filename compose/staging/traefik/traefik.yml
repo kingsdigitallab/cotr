@@ -23,7 +23,7 @@ entryPoints:
 http:
   routers:
     web-router:
-      rule: 'Host(`ctrs2.cch.kcl.ac.uk`)'
+      rule: 'Host(`ctrs2-stg.kdl.kcl.ac.uk`)'
       entryPoints:
         - web
       middlewares:
@@ -32,7 +32,7 @@ http:
       service: django
 
 #    web-secure-router:
-#      rule: 'Host(`ctrs2.cch.kcl.ac.uk`)'
+#      rule: 'Host(`ctrs2-stg.kdl.kcl.ac.uk`)'
 #      entryPoints:
 #        - web-secure
 #      middlewares:
@@ -43,7 +43,7 @@ http:
 #        certResolver: letsencrypt
 
     web-media-router:
-      rule: 'Host(`ctrs2.cch.kcl.ac.uk`) && PathPrefix(`/media/`)'
+      rule: 'Host(`ctrs2-stg.kdl.kcl.ac.uk`) && PathPrefix(`/media/`)'
       entryPoints:
 #        - web-secure
         - web
