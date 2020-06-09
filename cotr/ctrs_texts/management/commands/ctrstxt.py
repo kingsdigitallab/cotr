@@ -104,14 +104,20 @@ class Command(BaseCommand):
         for parent in parents:
             regions, members = parent.get_readings_from_members()
 
-            encoded_texts = [
-                member.encoded_texts.filter(type=parent.type).first()
-                for member in members
-            ]
+            encoded_texts = []
+
+            for member in members:
+                enc_text = member.encoded_texts.filter(type=parent.type).first()
+                if enc_text is None:
+                    msg = 'WARNING: no encoded text for member #{} {} ({})'
+                    print(msg.format(member.pk, member, parent))
+                else:
+                    encoded_texts.append(enc_text)
 
             xmls = [
                 get_xml_from_unicode(text.content, ishtml=True, add_root=True)
                 for text in encoded_texts
+                if encoded_texts
             ]
 
             for ri, region in enumerate(regions):
