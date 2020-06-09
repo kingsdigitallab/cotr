@@ -21,6 +21,7 @@ parser.add_argument(
     choices=[
         "up",
         "stop",
+        "rmi",
         "destroy",
         "restart",
         "shell",
@@ -50,6 +51,8 @@ options = " ".join(args.options)
 
 if command in ["up", "stop", "restart", "exec", "run"]:
     compose_command = f"{compose_command} {command} {service}"
+elif command == "rmi":
+    compose_command = f"{compose_command} down --rmi all"
 elif command == "destroy":
     compose_command = f"{compose_command} down --volumes --rmi all"
 elif command == "shell":
