@@ -1,11 +1,11 @@
 version: '3'
 
 volumes:
-  staging_django_media: {}
-  staging_postgres_data: {}
-  staging_postgres_data_backups: {}
-  staging_traefik: {}
-  #staging_elasticsearch_data: {}
+  django_media: {}
+  postgres_data: {}
+  postgres_data_backups: {}
+  traefik: {}
+  #elasticsearch_data: {}
 
 services:
   django:
@@ -14,7 +14,7 @@ services:
       dockerfile: ./compose/production/django/Dockerfile
     image: cotr_staging_django
     volumes:
-      - staging_django_media:/app/cotr/media:rw
+      - django_media:/app/cotr/media:rw
     depends_on:
       - postgres
       - redis
@@ -32,7 +32,7 @@ services:
     depends_on:
       - django
     volumes:
-      - staging_django_media:/usr/share/nginx/media:ro
+      - django_media:/usr/share/nginx/media:ro
 
   postgres:
     build:
@@ -40,8 +40,8 @@ services:
       dockerfile: ./compose/production/postgres/Dockerfile
     image: cotr_staging_postgres
     volumes:
-      - staging_postgres_data:/var/lib/postgresql/data
-      - staging_postgres_data_backups:/backups
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_backups:/backups
     env_file:
       - ./.envs/.staging/.postgres
 
@@ -52,9 +52,9 @@ services:
     image: cotr_staging_traefik
     depends_on:
       - django
-      - nginx
+#      - nginx
     volumes:
-      - staging_traefik:/etc/traefik/acme
+      - traefik:/etc/traefik/acme
     ports:
       - '127.0.0.1:8202:80'
 #      - '0.0.0.0:443:443'
