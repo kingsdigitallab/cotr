@@ -52,7 +52,7 @@ services:
     image: cotr_production_traefik
     depends_on:
       - django
-      - nginx
+#      - nginx
     volumes:
       - traefik:/etc/traefik/acme
     ports:
