@@ -48,7 +48,7 @@ services:
   traefik:
     build:
       context: .
-      dockerfile: ./compose/production/traefik/Dockerfile
+      dockerfile: ./compose/staging/traefik/Dockerfile
     image: cotr_staging_traefik
     depends_on:
       - django
