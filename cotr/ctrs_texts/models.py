@@ -94,7 +94,7 @@ class EncodedText(index.Indexed, TimestampedModel, ImportedModel):
         '''
         filters = {}
         from django.db.models.functions import Length
-        if 0 and not settings.DEBUG:
+        if settings.DEBUG:
             filters['status__slug'] = 'live'
         ret = EncodedText.objects.annotate(content_len=Length('plain')).filter(
             content_len__gt=settings.COTR_MIN_CONTENT_LEN,
