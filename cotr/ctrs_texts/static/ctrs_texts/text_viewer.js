@@ -200,7 +200,8 @@ $(() => {
         // e.g. ?blocks=506:transcription,transcription;495:transcription
         var self = this
         let qs =
-          'blocks=' +
+          'group=' + self.group +
+          '&blocks=' +
           self.blocks
             .map(function (b) {
               let ret = ''
