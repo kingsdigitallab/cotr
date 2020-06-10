@@ -1,6 +1,7 @@
 /* jshint esversion: 6 */
 
-const API_PATH_TEXTS_LIST = '/api/texts/?group=declaration'
+const API_PATH_TEXTS_LIST = '/api/texts/?'
+const GROUP_DEFAULT = 'declaration';
 
 // Content loading statuses
 const STATUS_INITIAL = 0
@@ -34,6 +35,7 @@ $(() => {
   let app = new Vue({
     el: '#text-viewer',
     data: {
+      group: 'declaration',
       /*
       List of all available texts. Exactly as returned by /api/texts/.
 
@@ -71,7 +73,10 @@ $(() => {
     },
     mounted() {
       let self = this
-      $.getJSON(API_PATH_TEXTS_LIST).done((res) => {
+
+      self.group = this._get_group_from_query_string();
+
+      $.getJSON(API_PATH_TEXTS_LIST+'&group='+self.group).done((res) => {
         Vue.set(self, 'texts', res.data)
 
         // add direct references to parent texts
@@ -230,6 +235,19 @@ $(() => {
         let vi = block.views.indexOf(view)
         let views = $('#block-' + block.id + ' .card-section')
         return $(views[vi > -1 && vi < views.length ? vi : 0])
+      },
+
+      _get_group_from_query_string: function() {
+        // return the value of &group query string param
+        // returns 'declaration' if unspecified
+        let ret = window.location.href.replace(
+          /.*group=([^#&]+).*/,
+          '$1'
+        )
+        if (ret == window.location) {
+          ret = GROUP_DEFAULT;
+        }
+        return ret;
       },
 
       init_blocks: function () {
