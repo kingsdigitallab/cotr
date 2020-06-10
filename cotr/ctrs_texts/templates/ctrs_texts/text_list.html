@@ -5,7 +5,7 @@
     {% if version.short_name != 'HM1' and version.short_name != 'HM2' %}
       <h4>
         <a class="status-{{version.get_status.slug}}"
-          href="{% url 'text_viewer' %}?blocks={{version.id}}:transcription">
+          href="{% url 'text_viewer' %}?group={{work.slug}}&blocks={{version.id}}:transcription">
           <span class="label version large {{ version.short_name | lower }}-text-id">
             {{ version.short_name}}
           </span>
@@ -17,7 +17,7 @@
           {% if text.short_name != 'HM1' and text.short_name != 'HM2' %}
             <li>
               <a class="status-{{text.get_status.slug}}"
-                 href="{% url 'text_viewer' %}?blocks={{text.id}}:transcription">
+                 href="{% url 'text_viewer' %}?group={{work.slug}}&blocks={{text.id}}:transcription">
                 <span class="label manuscript">{{ text.short_name }}</span>
                 {{ text.name }}
               </a>
