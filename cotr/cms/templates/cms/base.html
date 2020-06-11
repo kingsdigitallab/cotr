@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block meta_title %}{{ self.title }}{% endblock %}
+{% block meta_title %}
+{% if self.seo_title %}{{ self.seo_title }}{% else %}{{ self.title }}{% endif %}
+{% endblock %}
 
 {% block main %}
 {% include "cms/includes/streamfield.html" with blocks=self.body %}

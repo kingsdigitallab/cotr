@@ -1,7 +1,8 @@
 {% load cms_tags wagtailcore_tags %}
 
-<a href="{{ menu_parent.url }}" {% if menu_parent.id == self.id %}
-  class="active" {% endif %}>{{ menu_parent.title }}</a>
+<a href="{{ menu_parent.url }}" {% if menu_parent.id == self.id %} class="active" {% endif %}>
+    {% if menu_parent.seo_title %}{{ menu_parent.seo_title }}{% else %}{{ menu_parent.title }}{% endif %}
+</a>
 {% with menu_parent.get_children.live.public as menu_children %}
 {% if menu_children.count %}
 <ul
