@@ -342,7 +342,7 @@ $highlighted-background-color: #ee0;
     content: '(Title) ';
   }
 
-  span[data-dpt=sn] {
+  span[data-dpt=sn], span[data-dpt=cn] {
     font-weight: 700;
 
     &:before {
@@ -363,6 +363,16 @@ $highlighted-background-color: #ee0;
     // TODO: use <a> instead?
     cursor: pointer;
 
+  }
+
+  span[data-dpt=cn][data-dpt-type=editorial] {
+    &:before {
+      content: '(C. ';
+    }
+  }
+
+  span[data-dpt-type=subheading] {
+    font-variant: small-caps;
   }
 
   span[data-copies="1"] {
