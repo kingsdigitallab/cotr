@@ -10,7 +10,11 @@
     <ul class="dropdown menu" data-dropdown-menu>
       <li><a href="/">Home</a></li>
       {% for page in menu_pages %}
-      <li{% if page.active %} class="active"{% endif %}><a href="{% pageurl page %}">{{ page.title }}</a></li>
+      <li{% if page.active %} class="active"{% endif %}>
+        <a href="{% pageurl page %}">
+          {% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}
+        </a>
+      </li>
       {% endfor %}
     </ul>
   </div>

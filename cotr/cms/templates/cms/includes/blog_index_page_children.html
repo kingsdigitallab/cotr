@@ -7,7 +7,7 @@
         {% comment %}
           TODO: Refactor to use home_page_block.html
         {% endcomment %}
-          <h2 class="{{ block.value.icon }} clearfix">
+          <h2 class="{% if block.value.icon %}{{ block.value.icon }} {% endif %}clearfix">
             <a href="{% pageurl page %}" class="inline">
               {{ page.title }}
             </a>
