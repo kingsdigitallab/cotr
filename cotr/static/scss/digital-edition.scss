@@ -338,11 +338,24 @@ $highlighted-background-color: #ee0;
   }
 
   span[data-dpt=head]:before {
+    text-transform: none;
+    font-variant: none;
     font-weight: 700;
-    content: '(Title) ';
+    content: '(Heading) ';
   }
 
-  span[data-dpt=sn] {
+  span[data-dpt-type=subheading] {
+    text-transform: lowercase;
+    font-variant: small-caps;
+    &:before {
+      text-transform: none;
+      font-variant: none;
+      font-weight: 700;
+      content: '(Subheading) ';
+    }
+  }
+
+  span[data-dpt=sn], span[data-dpt=cn][data-dpt-type=editorial] {
     font-weight: 700;
 
     &:before {
@@ -362,7 +375,29 @@ $highlighted-background-color: #ee0;
 
     // TODO: use <a> instead?
     cursor: pointer;
+  }
 
+  span[data-dpt=cn]:not([data-dpt-type=editorial]) {
+    &:before {
+      content: '(Chap.) '
+    }
+  }
+
+  span[data-dpt-type=auxiliary] {
+    &:before {
+      content: '(Auxiliary) '
+    }
+  }
+
+  span[data-dpt=cn][data-dpt-type=editorial] {
+    display: block;
+    &:not(:first-child) {
+      padding-top: 1rem;
+      border-top: 1px dashed grey;
+    }
+    &:before {
+      content: '(Block ';
+    }
   }
 
   span[data-copies="1"] {
