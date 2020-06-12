@@ -182,7 +182,7 @@
 {{ block.super }}
 <script>
   /* beautify preserve:start */
-  window.DEBUG = {% if settings.DEBUG %}true{% else %}false{% endif %};
+  window.DEBUG = {% if ds.DEBUG %}true{% else %}false{% endif %};
   /* beautify preserve:end */
 </script>
 

@@ -95,7 +95,7 @@ i.icon {
 
 .inline {
   display: inline-block;
-  max-width: 87%;
+  max-width: 76%;
 
   &.icon {
     border-bottom: 0;
@@ -124,6 +124,12 @@ button,
   font-weight: 700;
   line-height: 1.75em;
   padding: 5px 10px;
+
+  &.fullscreen {
+    &:hover {
+      background: lighten($primary-color, 50%);
+    }
+  }
 
   &.secondary {
     background: lighten($secondary-color, 15%);
@@ -343,6 +349,18 @@ header {
     a {
       padding: .75rem .625rem;
     }
+  }
+}
+
+.guidelines_menu {
+  margin: 0;
+
+  ul {
+    margin: 0;
+  }
+
+  li {
+    list-style: none;
   }
 }
 

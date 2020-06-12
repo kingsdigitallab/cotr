@@ -1,6 +1,6 @@
 {% load wagtailimages_tags wagtailcore_tags %}
 
-<h2 class="{{ block.value.icon }} clearfix">
+<h2 class="{% if block.value.icon %}{{ block.value.icon }} {% endif %}clearfix">
     {% if block.value.url or block.value.page %}
     <a href="{% if block.value.url %}{{ block.value.url }}{% else %}{% pageurl block.value.page %}{% endif %}" class="inline">
     {% endif %}
