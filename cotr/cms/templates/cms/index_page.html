@@ -1,5 +1,5 @@
 {% extends "cms/base.html" %}
-{% load cms_tags wagtailcore_tags %}
+{% load cms_tags menu_tags wagtailcore_tags %}
 
 {% block title %}
 <div class="grid-x grid-margin-x">
@@ -16,6 +16,9 @@
     <div class="cell medium-3 sidebar" data-equalizer-watch="sidebar">
         <ul class="vertical menu accordion-menu" data-accordion-menu data-submenu-toggle="true">
             {% include "cms/includes/index_tree.html" with menu_parent=self|get_section %}
+            {% if self.title == "Guidelines" %}
+            {% flat_menu "guidelines_menu" %}
+            {% endif %}
         </ul>
     </div>
     <div class="cell medium-9" data-equalizer-watch="sidebar">

@@ -69,6 +69,7 @@ THIRD_PARTY_APPS = [
     "compressor",
     "rest_framework",
     "wagtail.contrib.forms",
+    "wagtail.contrib.modeladmin",
     "wagtail.contrib.redirects",
     "wagtail.contrib.settings",
     "wagtail.embeds",
@@ -83,6 +84,7 @@ THIRD_PARTY_APPS = [
     "wagtail.search",
     "wagtail.admin",
     "wagtail.core",
+    "wagtailmenus",
     "modelcluster",
     "taggit",
 ]
@@ -200,6 +202,8 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
                 "cotr.utils.context_processors.settings_context",
+                "wagtail.contrib.settings.context_processors.settings",
+                "wagtailmenus.context_processors.wagtailmenus",
             ],
         },
     }

@@ -346,6 +346,18 @@ header {
   }
 }
 
+.guidelines_menu {
+  margin: 0;
+
+  ul {
+    margin: 0;
+  }
+
+  li {
+    list-style: none;
+  }
+}
+
 .menu {
   font-family: $header-font-family;
 
