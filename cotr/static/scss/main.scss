@@ -125,6 +125,12 @@ button,
   line-height: 1.75em;
   padding: 5px 10px;
 
+  &.fullscreen {
+    &:hover {
+      background: lighten($primary-color, 50%);
+    }
+  }
+
   &.secondary {
     background: lighten($secondary-color, 15%);
     color: $primary-color
