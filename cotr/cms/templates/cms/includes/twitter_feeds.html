@@ -59,7 +59,7 @@
       class="retweet" target="_blank">
       <i class="fa fa-retweet"></i>
     </a>
-    <a href="//twitter.com/{{ settings.TWITTER_SCREEN_NAME }}/status/{{ tweet.id_str }}"
+    <a href="//twitter.com/{{ ds.TWITTER_SCREEN_NAME }}/status/{{ tweet.id_str }}"
       class="float-right">
       {{ tweet.created_at|tweet_date:'d M Y' }}
     </a>
