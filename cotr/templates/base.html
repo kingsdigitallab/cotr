@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{% block meta_title %}{% endblock %} |
-      {{ settings.WAGTAIL_SITE_NAME }}</title>
+      {{ ds.WAGTAIL_SITE_NAME }}</title>
     <meta name="author" content="King's Digital Lab">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -90,10 +90,10 @@
 
     {% block footer_scripts %}{% endblock %}
 
-    {% if not settings.DEBUG %}
+    {% if not ds.DEBUG %}
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async
-      src="https://www.googletagmanager.com/gtag/js?id={{ settings.GA_ID }}">
+      src="https://www.googletagmanager.com/gtag/js?id={{ ds.GA_ID }}">
     </script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -103,7 +103,7 @@
       }
       gtag('js', new Date());
 
-      gtag('config', '{{ settings.GA_ID }}');
+      gtag('config', '{{ ds.GA_ID }}');
     </script>
     {% endif %}
     </body>
