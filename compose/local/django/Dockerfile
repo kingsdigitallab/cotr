@@ -15,13 +15,11 @@ RUN apt-get update \
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
-RUN pip install -U pip
-RUN pip install -U pip-tools \
+RUN pip install -U pip pip-tools
+RUN pip-compile --annotate --quiet /requirements/base.in \
   && pip-compile --annotate --quiet /requirements/local.in \
   && pip-compile --annotate --quiet /requirements/production.in
 RUN pip install -r /requirements/local.txt
-
-COPY /requirements/*.txt ./requirements/
 
 COPY ./compose/production/django/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint
