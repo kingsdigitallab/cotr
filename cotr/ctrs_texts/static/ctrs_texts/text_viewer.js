@@ -3,6 +3,9 @@
 const API_PATH_TEXTS_LIST = '/api/texts/?'
 const GROUP_DEFAULT = 'declaration';
 
+// which texts are displayed by default in the Viewer for Regiam and Declaration
+const DEFAULT_SIGLUMS = {'declaration': 'O', 'regiam': 'C'}
+
 // Content loading statuses
 const STATUS_INITIAL = 0
 const STATUS_TO_FETCH = 1
@@ -218,7 +221,10 @@ $(() => {
           /^([^?]+)([^#]+)(.*)$/,
           '$1?' + qs + '$3'
         )
-        history.pushState(null, '', qs)
+
+        if (qs != window.location.href) {
+            history.pushState(null, '', qs)
+        }
       },
 
       _add_block: function (block) {
@@ -327,7 +333,7 @@ $(() => {
       },
 
       get_default_text: function () {
-        return this.get_text_from_id_or_siglum('O')
+        return this.get_text_from_id_or_siglum(DEFAULT_SIGLUMS[this.group])
       },
 
       _get_new_view_data: function (view_type, chunk, status) {
