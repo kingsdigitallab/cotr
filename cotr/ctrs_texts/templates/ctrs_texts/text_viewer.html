@@ -106,7 +106,7 @@
                 </div>
               </div>
               <div class="cell small-1 text-right">
-                <button v-if="block.text" class="button tiny hollow fullscreen off disabled">
+                <button v-if="block.text" class="button tiny hollow fullscreen off" @click="toggle_fullscreen(block)">
                   <span aria-hidden="true"><i class="fas fa-expand-alt"></i></span>
                   <span class="show-for-sr">Fullscreen</span>
                 </button>

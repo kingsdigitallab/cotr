@@ -132,6 +132,12 @@ $(() => {
         this.on_view_changed(block, view)
       },
 
+      toggle_fullscreen(block) {
+        clog('fullscreen')
+        clog(block)
+        clog($(this))
+      },
+
       toggle_view_display(block, view, display_type) {
         // toggle a display setting for this view
         // all display setttings are prefixed with display_
