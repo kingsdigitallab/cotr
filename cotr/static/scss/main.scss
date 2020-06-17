@@ -350,6 +350,10 @@ header {
       padding: .75rem .625rem;
     }
   }
+
+  &:first-child {
+    border-bottom: 1px dotted white;
+  }
 }
 
 .flat-menu {
@@ -391,11 +395,11 @@ header {
     padding: .75rem .25rem;
   }
 
-  .second-line {
-    li {
-      background: darken($primary-color, 3%);
-    }
-  }
+  // .second-line {
+  //   li {
+  //     background: darken($primary-color, 3%);
+  //   }
+  // }
 }
 
 .top-nav {

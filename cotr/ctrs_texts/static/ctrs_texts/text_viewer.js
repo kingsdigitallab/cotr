@@ -30,6 +30,8 @@ const TYPES_LABEL = {
 const HISTOGRAM_VIEW = 'histogram'
 const WINDOW_INNER_WIDTH = window.innerWidth
 
+const FULLSCREEN_BLOCK = 'show-fullscreen'
+
 function clog(...messages) {
   window.console.log(...messages)
 }
@@ -133,9 +135,16 @@ $(() => {
       },
 
       toggle_fullscreen(block) {
-        clog('fullscreen')
-        clog(block)
-        clog($(this))
+        // toggle fullscreen for this block
+        let $block = this._get_block_div(block)
+        // clog($block)
+        // clog('fullscreen')
+        // block_id = '#block-' + block.id
+        // clog(block_id)
+        // $block.find('#block-' + block.id).toggle.fullscreen
+        // this.fullscreen_class = !this.fullscreen_class
+        clog(FULLSCREEN_BLOCK)
+        $block.find('#block-' + block.id).addClass(FULLSCREEN_BLOCK)
       },
 
       toggle_view_display(block, view, display_type) {
