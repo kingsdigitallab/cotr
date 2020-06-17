@@ -136,15 +136,11 @@ $(() => {
 
       toggle_fullscreen(block) {
         // toggle fullscreen for this block
-        let $block = this._get_block_div(block)
-        // clog($block)
-        // clog('fullscreen')
-        // block_id = '#block-' + block.id
-        // clog(block_id)
-        // $block.find('#block-' + block.id).toggle.fullscreen
-        // this.fullscreen_class = !this.fullscreen_class
-        clog(FULLSCREEN_BLOCK)
-        $block.find('#block-' + block.id).addClass(FULLSCREEN_BLOCK)
+
+        block_id = '#block-' + block.id
+
+        const name_class = document.querySelector(block_id);
+        name_class.classList.toggle('fullscreen-view')
       },
 
       toggle_view_display(block, view, display_type) {
