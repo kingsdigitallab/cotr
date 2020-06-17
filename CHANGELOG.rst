@@ -18,11 +18,14 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Added
 ~~~~~
 * nginx to serve media files.
+* Fullscreen option for text viewer.
+* Wagtailmenus.
 
 Changed
 ~~~~~~~
 * Convert the project to cookie cutter.
 * Change to new source control repository.
+* Expanded top level navigation.
 
 Security
 ~~~~~~~~
