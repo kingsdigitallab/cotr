@@ -138,8 +138,13 @@ $(() => {
         // toggle fullscreen for this block
 
         block_id = '#block-' + block.id
+        canvas_id = "#wrapper-" + block.id
 
-        const name_class = document.querySelector(block_id);
+        // Make the off-canvas-wrapper fixed as well
+        const off_canvas = document.querySelector(canvas_id)
+        off_canvas.classList.toggle('off-canvas-fixed')
+
+        const name_class = document.querySelector(block_id)
         name_class.classList.toggle('fullscreen-view')
       },
 

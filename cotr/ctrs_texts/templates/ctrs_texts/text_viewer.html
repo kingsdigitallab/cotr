@@ -18,7 +18,7 @@
 <div id="text-viewer" class="grid-x grid-margin-x">
 
   <div v-for="(block, block_index) in blocks" class="cell medium-6">
-    <div class="off-canvas-wrapper">
+    <div class="off-canvas-wrapper" :id="'wrapper-'+block.id">
       <div class="off-canvas-absolute position-left"
         :id="'offCanvas-'+block_index" data-off-canvas>
         <h3>Texts</h3>
