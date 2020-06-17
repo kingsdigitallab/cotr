@@ -3,7 +3,7 @@
   {% if works.count >= 1 %}
   <h3>
     <a href="{% url 'text_viewer' %}?group={{work.slug}}&blocks={{work.id}}:transcription;">
-      <span class="label version large {{ work.short_name | lower }}-text-id">
+      <span class="label version large">
         {{ work.short_name }}
       </span>
       {{ work.name }}
