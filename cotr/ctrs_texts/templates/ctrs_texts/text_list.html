@@ -1,13 +1,23 @@
 {% for work in works %}
   {% if not forloop.first %}<hr>{% endif %}
-  {% if works.count > 1 %}<h3>{{ work.name }}</h3>{% endif %}
+  {% if works.count >= 1 %}
+  <h3>
+    <a href="{% url 'text_viewer' %}?group={{work.slug}}&blocks={{work.id}}:transcription;">
+      <span class="label version large {{ work.short_name | lower }}-text-id">
+        {{ work.short_name }}
+      </span>
+      {{ work.name }}
+    </a>
+  </h3>
+  {% endif %}
+
   {% for version in work.members.all %}
     {% if version.short_name != 'HM1' and version.short_name != 'HM2' %}
       <h4>
         <a class="status-{{version.get_status.slug}}"
           href="{% url 'text_viewer' %}?group={{work.slug}}&blocks={{version.id}}:transcription;">
           <span class="label version large {{ version.short_name | lower }}-text-id">
-            {{ version.short_name}}
+            {{ version.short_name }}
           </span>
           {{ version.name }}
         </a>
