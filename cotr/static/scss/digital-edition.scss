@@ -115,7 +115,7 @@
   position: fixed;
   top: 0;
   width: 100vw;
-  z-index: 99;
+  z-index: 9999;
 }
 
 .canvas-trigger {
@@ -141,6 +141,18 @@
 }
 
 .off-canvas-wrapper {
+
+  &.off-canvas-fixed {
+
+    .is-open,
+    .off-canvas-content.is-open-left {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 9999;
+    }
+  }
+
   .menu a.button {
     margin: 0 .5rem;
 
