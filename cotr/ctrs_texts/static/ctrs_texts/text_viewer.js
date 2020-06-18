@@ -376,7 +376,7 @@ $(() => {
 
           // If in fullscreen, exit fullscreen
           // Force fullscreen classes off
-          $view.parent().parent().removeClass('off-canvas-fixed')
+          $view.parent().parent().parent().removeClass('off-canvas-fixed')
           $view.parent().removeClass('fullscreen-view')
 
           let text = self.get_text_from_id_or_siglum(text_id)
