@@ -143,13 +143,21 @@
 .off-canvas-wrapper {
 
   &.off-canvas-fixed {
-
     .is-open,
     .off-canvas-content.is-open-left {
       position: fixed;
       left: 0;
       top: 0;
       z-index: 9999;
+    }
+
+    .is-overlay-absolute {
+      &.is-visible,
+      &.is-closable {
+        height: 100vh;
+        width: 100vw;
+        z-index: 9999;
+      }
     }
   }
 
