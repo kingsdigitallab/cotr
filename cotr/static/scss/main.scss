@@ -56,6 +56,19 @@ blockquote {}
   margin-bottom: .75rem;
 }
 
+.help-text,
+button.help-text,
+.button.help-text {
+  background: none;
+  display: inline-block;
+  line-height: 4;
+  vertical-align: text-top;
+
+  svg {
+    width: 16px;
+  }
+}
+
 .hide {
   display: none;
 }
@@ -110,6 +123,20 @@ i.icon {
 
 small {
   font-size: .625em;
+}
+
+.text-with-icon {
+  svg {
+    fill: $primary-color;
+    width: 24px;
+  }
+
+  button:hover,
+  .button:hover {
+    svg {
+      fill: darken($primary-color, 30%);
+    }
+  }
 }
 
 // 2.1 Buttons
@@ -350,6 +377,10 @@ header {
       padding: .75rem .625rem;
     }
   }
+
+  &:first-child {
+    border-bottom: 1px dotted white;
+  }
 }
 
 .flat-menu {
@@ -391,11 +422,11 @@ header {
     padding: .75rem .25rem;
   }
 
-  .second-line {
-    li {
-      background: darken($primary-color, 3%);
-    }
-  }
+  // .second-line {
+  //   li {
+  //     background: darken($primary-color, 3%);
+  //   }
+  // }
 }
 
 .top-nav {
@@ -696,6 +727,11 @@ main {
         padding-bottom: 1rem;
       }
     }
+  }
+
+  h1.no-container {
+    margin-left: 0;
+    margin-top: 0;
   }
 
   .top-header {
