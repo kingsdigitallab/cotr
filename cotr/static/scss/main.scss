@@ -108,7 +108,6 @@ i.icon {
 
 .inline {
   display: inline-block;
-  max-width: 76%;
 
   &.icon {
     border-bottom: 0;
@@ -119,6 +118,10 @@ i.icon {
       }
     }
   }
+}
+
+.short {
+  max-width: 76%;
 }
 
 small {
@@ -155,6 +158,10 @@ button,
   &.fullscreen {
     &:hover {
       background: lighten($primary-color, 50%);
+    }
+
+    svg {
+      width: 8px;
     }
   }
 
@@ -282,6 +289,13 @@ header {
     &:hover {
       color: $secondary-color;
     }
+  }
+}
+
+footer {
+  svg {
+    fill: $light-gray;
+    max-width: 24px;
   }
 }
 
@@ -515,6 +529,12 @@ main {
 
   img {
     width: 250px;
+  }
+}
+
+.title-icon {
+  svg {
+    width: 24px;
   }
 }
 
