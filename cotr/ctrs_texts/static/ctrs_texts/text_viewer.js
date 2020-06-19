@@ -30,6 +30,8 @@ const TYPES_LABEL = {
 const HISTOGRAM_VIEW = 'histogram'
 const WINDOW_INNER_WIDTH = window.innerWidth
 
+const FULLSCREEN_BLOCK = 'show-fullscreen'
+
 function clog(...messages) {
   window.console.log(...messages)
 }
@@ -130,6 +132,20 @@ $(() => {
       change_view_type: function (block, view, view_type) {
         view.type = view_type
         this.on_view_changed(block, view)
+      },
+
+      toggle_fullscreen(block) {
+        // toggle fullscreen for this block
+
+        block_id = '#block-' + block.id
+        canvas_id = "#wrapper-" + block.id
+
+        // Make the off-canvas-wrapper fixed as well
+        const off_canvas = document.querySelector(canvas_id)
+        off_canvas.classList.toggle('off-canvas-fixed')
+
+        const name_class = document.querySelector(block_id)
+        name_class.classList.toggle('fullscreen-view')
       },
 
       toggle_view_display(block, view, display_type) {
@@ -357,6 +373,11 @@ $(() => {
 
           // e.g. v-4 (4th v-region)
           let region_id = $(this).parent().data('parent-rid')
+
+          // If in fullscreen, exit fullscreen
+          // Force fullscreen classes off
+          $view.parent().parent().parent().removeClass('off-canvas-fixed')
+          $view.parent().removeClass('fullscreen-view')
 
           let text = self.get_text_from_id_or_siglum(text_id)
           self._load_other_text_in_other_block(block, text, region_id)

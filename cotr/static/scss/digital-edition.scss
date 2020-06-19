@@ -109,6 +109,15 @@
   }
 }
 
+.fullscreen-view {
+  height: 100vh;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  z-index: 9999;
+}
+
 .canvas-trigger {
   padding-bottom: 0;
   padding-top: .5rem;
@@ -125,6 +134,26 @@
 }
 
 .off-canvas-wrapper {
+
+  &.off-canvas-fixed {
+    .is-open,
+    .off-canvas-content.is-open-left {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 9999;
+    }
+
+    .is-overlay-absolute {
+      &.is-closable,
+      &.is-visible {
+        height: 100vh;
+        width: 100vw;
+        z-index: 9999;
+      }
+    }
+  }
+
   .menu a.button {
     margin: 0 .5rem;
 
