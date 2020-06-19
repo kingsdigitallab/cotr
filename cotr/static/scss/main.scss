@@ -181,6 +181,7 @@ button,
     button,
     .button {
       border: 1px solid $secondary-color;
+      line-height: 1;
 
       &:hover {
         color: $white;
@@ -196,6 +197,11 @@ button,
       input {
         max-width: 90px;
       }
+    }
+
+    svg {
+      fill: $primary-color;
+      width: 14px;
     }
   }
 }
