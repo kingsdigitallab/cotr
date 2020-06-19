@@ -56,6 +56,19 @@ blockquote {}
   margin-bottom: .75rem;
 }
 
+.help-text,
+button.help-text,
+.button.help-text {
+  background: none;
+  display: inline-block;
+  line-height: 4;
+  vertical-align: text-top;
+
+  svg {
+    width: 16px;
+  }
+}
+
 .hide {
   display: none;
 }
@@ -95,7 +108,6 @@ i.icon {
 
 .inline {
   display: inline-block;
-  max-width: 76%;
 
   &.icon {
     border-bottom: 0;
@@ -108,8 +120,26 @@ i.icon {
   }
 }
 
+.short {
+  max-width: 76%;
+}
+
 small {
   font-size: .625em;
+}
+
+.text-with-icon {
+  svg {
+    fill: $primary-color;
+    width: 24px;
+  }
+
+  button:hover,
+  .button:hover {
+    svg {
+      fill: darken($primary-color, 30%);
+    }
+  }
 }
 
 // 2.1 Buttons
@@ -128,6 +158,10 @@ button,
   &.fullscreen {
     &:hover {
       background: lighten($primary-color, 50%);
+    }
+
+    svg {
+      width: 8px;
     }
   }
 
@@ -255,6 +289,13 @@ header {
     &:hover {
       color: $secondary-color;
     }
+  }
+}
+
+footer {
+  svg {
+    fill: $light-gray;
+    max-width: 24px;
   }
 }
 
@@ -491,6 +532,12 @@ main {
   }
 }
 
+.title-icon {
+  svg {
+    width: 24px;
+  }
+}
+
 // 4.4 Sidebar
 
 .sidebar {
@@ -700,6 +747,11 @@ main {
         padding-bottom: 1rem;
       }
     }
+  }
+
+  h1.no-container {
+    margin-left: 0;
+    margin-top: 0;
   }
 
   .top-header {
