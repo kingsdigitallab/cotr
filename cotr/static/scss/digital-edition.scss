@@ -16,8 +16,8 @@
   }
 
   .card-section {
-    height: 0; // It doesn't really matter the value, but height needs
-    // to be declared for overflow to work.
+    height: 0;  // It doesn't really matter the value, but height needs
+                // to be declared for overflow to work.
 
     line-height: 2.25;
 
@@ -122,13 +122,6 @@
   padding-bottom: 0;
   padding-top: .5rem;
 
-  &::before {
-    content: "\f0da";
-    display: none;
-    font-family: "Font Awesome 5 Pro";
-    font-weight: 900;
-  }
-
   &:hover {
     // Needs important! to avoid polluting other buttons
     background: $secondary-color !important;
@@ -196,13 +189,27 @@
   }
 }
 
-// Repetition below due to nesting
+.is-closed,
+.is-open {
+  &+.off-canvas-content {
+    .canvas-trigger {
+      &::before {
+        display: inline-block;
+        height: 12px;
+        width: 12px;
+      }
+    }
+  }
+}
 
 .is-closed {
   &+.off-canvas-content {
     .canvas-trigger {
       &::before {
-        content: "\f0da";
+        // fa fa-caret-right
+        content: url("data:image/svg+xml; utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 512'><path d='M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z' fill='rgba(47, 72, 88, 1)'/></svg>");
+        height: 8px;
+        width: 8px;
       }
     }
   }
@@ -214,7 +221,8 @@
       background: scale-color($secondary-color, $lightness: 20%);
 
       &::before {
-        content: "\f0d7";
+        // fa fa-caret-down
+        content: url("data:image/svg+xml; utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'><path d='M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z'/></svg>");
       }
     }
   }
@@ -441,13 +449,9 @@ $highlighted-background-color: #ee0;
     // GN: added some margin to prevent the box from sticking to the
     // previous of next word.
     border: 1px dashed scale-color($secondary-color, $lightness: -40%);
-    // margin: 0 .25rem;
-
-    // pointer-events: none;
 
     &::before {
       color: $primary-color;
-      // content: "?: ";
       font-size: .75rem;
       padding-left: .25rem;
       padding-right: .125rem;
@@ -476,13 +480,6 @@ $highlighted-background-color: #ee0;
     font-style: italic;
   }
 
-  // span[data-dpt-type=unsettled][data-dpt-group=version] {
-  //   &::before {
-  //     content: "v: ";
-  //   }
-  // }
-
-
   &.version,
   &.work {
     span[data-dpt-type=unsettled][data-dpt-group=work] {
@@ -492,10 +489,6 @@ $highlighted-background-color: #ee0;
 
       background: rgba($secondary-color, 0.5);
       padding: 0 .5rem 0 0;
-
-      // &::before {
-      //   content: "w: ";
-      // }
 
       span[data-dpt-type=unsettled][data-dpt-group=version] {
         .no-text {
@@ -614,25 +607,6 @@ $highlighted-background-color: #ee0;
       margin-left: 1rem;
     }
   }
-
-  // GN: prototype/temporary tooltip
-  //   #heatmap-tooltip {
-  //     background-color: rgba(47, 72, 88, 0.95);
-  //     border: 1px solid #2f4858;
-  //     position: fixed;
-  //     // top: 1rem;
-  //     left: 1rem;
-  //     padding: 0.5rem;
-  //     z-index: 1100; // higher than leaflet controls (1000)
-  //     color: #eee;
-  //     max-height: 80vh;
-  //     max-width: 80vw;
-  //     -webkit-box-shadow: 7px 7px 10px 0px rgba(50, 50, 50, 0.75);
-  //     -moz-box-shadow: 7px 7px 10px 0px rgba(50, 50, 50, 0.75);
-  //     box-shadow: 7px 7px 10px 0px rgba(50, 50, 50, 0.75);
-  //     overflow-y: auto; // in case user selects a lot of texts
-  //     font-size: 0.8rem; // some regions can be very long...
-  //   }
 }
 
 .leaflet-popup {
