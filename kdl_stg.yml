@@ -1,0 +1,64 @@
+version: '3'
+
+volumes:
+  django_media: {}
+  postgres_data: {}
+  postgres_data_backups: {}
+  traefik: {}
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/production/django/Dockerfile
+    image: cotr_stg_django
+    volumes:
+      - django_media:/app/cotr/media
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./.envs/.stg/.django
+      - ./.envs/.stg/.postgres
+    command: /start
+    restart: unless-stopped
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./compose/production/nginx/Dockerfile
+    image: cotr_stg_nginx
+    volumes:
+      - django_media:/usr/share/nginx/media:ro
+    depends_on:
+      - django
+    restart: unless-stopped
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: cotr_stg_postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.stg/.postgres
+    restart: unless-stopped
+
+  traefik:
+    build:
+      context: .
+      dockerfile: ./compose/stg/traefik/Dockerfile
+    image: cotr_stg_traefik
+    depends_on:
+      - django
+    volumes:
+      - traefik:/etc/traefik/acme
+    ports:
+      - '127.0.0.1:8202:80'
+    restart: unless-stopped
+
+  redis:
+    image: redis:5.0
+    restart: unless-stopped
