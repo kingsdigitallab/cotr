@@ -68,6 +68,7 @@ HELP = {
 
 
 connection: Connection = None
+password: str = None
 
 
 @task(help=HELP)
@@ -190,20 +191,39 @@ def get_connection(user: str, host: str) -> Connection:
     if connection:
         return connection
 
-    password = getpass.getpass(prompt=f"Password for {user}@{host}: ")
+    try:
+        connection = Connection(host, user=user, gateway=get_gateway(user))
+        if not connection.is_connected:
+            raise AuthenticationException
+    except AuthenticationException:
+        password = get_password(user, host)
 
-    connection = Connection(
-        host,
-        user=user,
-        connect_kwargs={"password": password},
-        gateway=get_gateway(user, password),
-    )
+        connection = Connection(
+            host,
+            user=user,
+            connect_kwargs={"password": password},
+            gateway=get_gateway(user, password),
+        )
 
     return connection
 
 
-def get_gateway(user: str, password: str) -> Connection:
-    return Connection(GATEWAY, user=user, connect_kwargs={"password": password})
+def get_gateway(user: str, password: Optional[str] = None) -> Connection:
+    if password:
+        return Connection(GATEWAY, user=user, connect_kwargs={"password": password})
+
+    return Connection(GATEWAY, user=user)
+
+
+def get_password(user: str, host: str) -> str:
+    global password
+
+    if password:
+        return password
+
+    password = getpass.getpass(prompt=f"Password for {user}@{host}: ")
+
+    return password
 
 
 @task(help=HELP)
@@ -398,4 +418,14 @@ def test(
         command = f"coverage run -m {command}"
 
     command = f"run django {command}"
+    run_command(context, user, remote, instance, stack, command)
+
+
+@task(help=HELP)
+def compose(
+    context, command, user=get_local_user(), remote=False, instance=None, stack=None
+):
+    """
+    Run a raw compose command.
+    """
     run_command(context, user, remote, instance, stack, command)
