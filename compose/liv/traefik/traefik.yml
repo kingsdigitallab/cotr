@@ -9,7 +9,7 @@ entryPoints:
 http:
   routers:
     web-router:
-      rule: 'Host(`cotr.ac.uk`)'
+      rule: 'Host(`cotr.ac.uk`) || Host(`ctrs2.cch.kcl.ac.uk`)'
       entryPoints:
         - web
       middlewares:
@@ -17,7 +17,7 @@ http:
       service: django
 
     web-media-router:
-      rule: 'Host(`cotr.ac.uk`) && PathPrefix(`/media/`)'
+      rule: '(Host(`cotr.ac.uk`) || Host(`ctrs2.cch.kcl.ac.uk`)) && PathPrefix(`/media/`)'
       entryPoints:
         - web
       middlewares:

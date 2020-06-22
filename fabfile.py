@@ -13,11 +13,15 @@ from paramiko.ssh_exception import AuthenticationException
 COLOUR_OFF: str = "\033[0m"
 
 
-def error(message: str):
+def error(message: str, acontinue=False):
+    """acontinue: True to avoid the interruption of the fab script"""
     red: str = "\033[31m"
 
     print()
     print(f"{red}{message}{COLOUR_OFF}")
+
+    if not acontinue:
+        sys.exit(-1)
 
 
 def info(message: str):
@@ -44,7 +48,6 @@ try:
     STACK = fabric_cfg["default_stack"]
 except KeyError:
     error("Invalid fabric configuration in `setup.cfg`")
-    sys.exit(-1)
 
 HELP = {
     "app": "App to run the tests. Omit to run all the project tests.",
@@ -102,7 +105,12 @@ def clone(context, instance, user=get_local_user(), branch=BRANCH):
     env_path = f"{HOST_PATH}/{instance}/.envs"
     env_file = f"{instance}.tar.gz"
 
-    command = f"tar czvf .envs/{env_file} .envs/.{instance}"
+    env_path_inst = f".envs/.{instance}"
+    import os
+    if not os.path.exists(env_path_inst):
+        error(f"Instance folder not found: {env_path_inst}")
+
+    command = f"tar czvf .envs/{env_file} {env_path_inst}"
     run_command(context, user, local, instance, no_stack, command, no_compose)
 
     with get_connection(user, HOST) as c:
