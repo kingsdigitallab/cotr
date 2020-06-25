@@ -6,20 +6,6 @@ entryPoints:
     # http
     address: ':80'
 
-#  web-secure:
-#    # https
-#    address: ':443'
-
-#certificatesResolvers:
-#  letsencrypt:
-#    # https://docs.traefik.io/master/https/acme/#lets-encrypt
-#    acme:
-#      email: 'kdl-info@kcl.ac.uk'
-#      storage: /etc/traefik/acme/acme.json
-#      # https://docs.traefik.io/master/https/acme/#httpchallenge
-#      httpChallenge:
-#        entryPoint: web
-
 http:
   routers:
     web-router:
@@ -27,38 +13,18 @@ http:
       entryPoints:
         - web
       middlewares:
-#        - redirect
         - csrf
       service: django
-
-#    web-secure-router:
-#      rule: 'Host(`ctrs2-stg.kdl.kcl.ac.uk`)'
-#      entryPoints:
-#        - web-secure
-#      middlewares:
-#        - csrf
-#      service: django
-#      tls:
-#        # https://docs.traefik.io/master/routing/routers/#certresolver
-#        certResolver: letsencrypt
 
     web-media-router:
       rule: 'Host(`ctrs2-stg.kdl.kcl.ac.uk`) && PathPrefix(`/media/`)'
       entryPoints:
-#        - web-secure
         - web
       middlewares:
         - csrf
       service: django-media
-#      tls:
-#        certResolver: letsencrypt
 
   middlewares:
-#    redirect:
-#      # https://docs.traefik.io/master/middlewares/redirectscheme/
-#      redirectScheme:
-#        scheme: https
-#        permanent: true
     csrf:
       # https://docs.traefik.io/master/middlewares/headers/#hostsproxyheaders
       # https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
