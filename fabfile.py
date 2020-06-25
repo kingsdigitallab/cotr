@@ -107,6 +107,7 @@ def clone(context, instance, user=get_local_user(), branch=BRANCH):
 
     env_path_inst = f".envs/.{instance}"
     import os
+
     if not os.path.exists(env_path_inst):
         error(f"Instance folder not found: {env_path_inst}")
 
@@ -249,9 +250,12 @@ def update(context, user=get_local_user(), remote=False, instance=None, branch=B
     Update the host instance from source control.
     """
     no_stack = None
-    command = f"git checkout {branch} || git pull && git checkout {branch}"
     no_compose = False
 
+    command = f"git checkout {branch} || git pull && git checkout {branch}"
+    run_command(context, user, remote, instance, no_stack, command, no_compose)
+
+    command = f"git pull"
     run_command(context, user, remote, instance, no_stack, command, no_compose)
 
 
