@@ -63,8 +63,3 @@ INSTALLED_APPS += ["django_extensions"]  # noqa F405
 
 # Your stuff...
 # ------------------------------------------------------------------------------
-
-TWITTER_API_KEY = '8BaClrrIfA2p6BtjzfFNHqED9'
-TWITTER_API_SECRET = 'Rx1Z9j6cKKhZSRi6L6gksig0dR8rP3WAtisf9vgQwstJprv9wX'
-TWITTER_ACCESS_TOKEN = '773832807017742336-rKKiq5N0WBUzKgAg3NDDrGrmrJJ5v7P'
-TWITTER_ACCESS_TOKEN_SECRET = 'g4wocfIhmv77gVqUIr1kREYcHpFQ3dGrebbz2TZeehC50'
