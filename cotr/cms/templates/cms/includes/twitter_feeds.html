@@ -1,6 +1,6 @@
 {% load twitterhut_tags %}
 
-{% user_timeline TWITTER_SCREEN_NAME as timeline %}
+{% user_timeline ds.TWITTER_SCREEN_NAME as timeline %}
 {% for tweet in timeline %}
 <div class="cell social">
   {% if tweet.retweeted_status %}
