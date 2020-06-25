@@ -5,76 +5,60 @@ volumes:
   postgres_data: {}
   postgres_data_backups: {}
   traefik: {}
-  #elasticsearch_data: {}
 
 services:
   django:
     build:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
-    image: cotr_staging_django
+    image: cotr_stg_django
     volumes:
-      - django_media:/app/cotr/media:rw
+      - django_media:/app/cotr/media
     depends_on:
       - postgres
       - redis
-      #- elasticsearch
     env_file:
-      - ./.envs/.staging/.django
-      - ./.envs/.staging/.postgres
+      - ./.envs/.stg/.django
+      - ./.envs/.stg/.postgres
     command: /start
+    restart: unless-stopped
 
   nginx:
     build:
       context: .
       dockerfile: ./compose/production/nginx/Dockerfile
-    image: cotr_staging_nginx
-    depends_on:
-      - django
+    image: cotr_stg_nginx
     volumes:
       - django_media:/usr/share/nginx/media:ro
+    depends_on:
+      - django
+    restart: unless-stopped
 
   postgres:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: cotr_staging_postgres
+    image: cotr_stg_postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - postgres_data_backups:/backups
     env_file:
-      - ./.envs/.staging/.postgres
+      - ./.envs/.stg/.postgres
+    restart: unless-stopped
 
   traefik:
     build:
       context: .
-      dockerfile: ./compose/staging/traefik/Dockerfile
-    image: cotr_staging_traefik
+      dockerfile: ./compose/stg/traefik/Dockerfile
+    image: cotr_stg_traefik
     depends_on:
       - django
-#      - nginx
     volumes:
       - traefik:/etc/traefik/acme
     ports:
       - '127.0.0.1:8202:80'
-#      - '0.0.0.0:443:443'
+    restart: unless-stopped
 
   redis:
     image: redis:5.0
-  #elasticsearch:
-  #image: elasticsearch:7.5.1
-  #volumes:
-  #- production_elasticsearch_data:/usr/share/elasticsearch/data
-  #env_file:
-  #- ./.envs/.production/.elasticsearch
-  #ports:
-  #- '127.0.0.1:9200:9200'
-  #- '127.0.0.1:9300:9300'
-  #kibana:
-  #image: kibana:7.5.1
-  #depends_on:
-  #- elasticsearch
-  #env_file:
-  #- ./.envs/.production/.kibana
-  #ports:
-  #- '5601:5601'
+    restart: unless-stopped
