@@ -16,6 +16,8 @@ def view_api_texts(request):
 
     Output format must follow https://jsonapi.org/
 
+    Used for both Text Viewer & Search page
+
     The list is FLAT.
     Information about hierarchy (MS->V->W)
     is conveyed with the 'group' field.
@@ -45,7 +47,10 @@ def view_api_texts(request):
     )
 
     texts = []
+    work = None
     for text in abstracted_texts:
+        if text.slug == group_slug:
+            work = text
         text_data = [
             ['id', text.id],
             ['type', text.type.slug],
@@ -70,6 +75,9 @@ def view_api_texts(request):
     ret = OrderedDict([
         ['jsonapi', '1.0'],
         ['data', texts],
+        ['meta', {
+            'sentence_numbers': utils.get_sentence_numbers(work)
+        }]
     ])
 
     return JsonResponse(ret)

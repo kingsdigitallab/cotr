@@ -349,3 +349,19 @@ def get_plain_text(encoded_text):
         return None
 
     return text.strip()
+
+
+def get_sentence_numbers(work=None):
+    '''return all sentence numbers for the given work
+    work is a an AbstractedText'''
+    ret = [str(n) for n in range(1, 28)]
+
+    if work.slug == 'regiam':
+        encoded = work.encoded_texts.filter(type__slug='transcription').first()
+        if encoded:
+            ret = re.findall(
+                r'<span data-dpt="sn"[^>]*>(\d+(?:\.\d+)?)',
+                encoded.content
+            )
+
+    return ret

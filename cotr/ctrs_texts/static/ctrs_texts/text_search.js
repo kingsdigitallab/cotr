@@ -55,6 +55,7 @@ $(() => {
       facets: {
         result_type: DEFAULT_RESULT_TYPE,
         sentence_number: 1,
+        sentence_numbers: ['1'],
         encoding_type: 'transcription',
         /*
         List of all available texts. Exactly as returned by /api/texts/.
@@ -97,7 +98,9 @@ $(() => {
           self.on_tick_text(text, true)
         }
 
-        // self.init_blocks();
+        Vue.set(self.facets, 'sentence_numbers', res.meta.sentence_numbers)
+        self.facets.sentence_number = res.meta.sentence_numbers[0]
+
         self.fetch_results()
       })
     },
@@ -231,10 +234,18 @@ $(() => {
       },
 
       move_sentence_number: function (increment) {
-        let ret = (parseInt(this.facets.sentence_number) || 1) + increment
-        if (ret < 1) ret = 1
-        if (ret > this.sentence_number_max) ret = this.sentence_number_max
-        this.facets.sentence_number = ret
+        let idx = this.facets.sentence_numbers.indexOf(this.facets.sentence_number)
+        if (idx == -1) {
+            idx = 0
+        }
+
+        idx += increment
+        if (idx < 0) idx = 0
+        if (idx >= this.facets.sentence_numbers.length) {
+            idx = this.facets.sentence_numbers.length - 1
+        }
+        // TODO: remove this.sentence_number_max
+        this.facets.sentence_number = this.facets.sentence_numbers[idx]
       }
     }
   })
