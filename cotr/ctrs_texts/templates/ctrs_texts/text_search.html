@@ -22,7 +22,7 @@
     <h2>Type</h2>
 
     <div class="grid-x grid-margin-x">
-      <div class="cell small-4">
+      <div class="cell small-4" v-if="is_heatmap_visible">
         <p>Heatmap</p>
         <div class="switch tiny">
           <input class="switch-input" v-model="facets.result_type" type="radio"
@@ -32,7 +32,7 @@
           </label>
         </div>
       </div>
-      <div class="cell small-4">
+      <div :class="{cell: 1, 'small-4': is_heatmap_visible, 'small-6': !is_heatmap_visible}">
         <p>Sentences</p>
         <div class="switch tiny">
           <input class="switch-input" v-model="facets.result_type" type="radio"
@@ -42,7 +42,7 @@
           </label>
         </div>
       </div>
-      <div class="cell small-4">
+      <div :class="{cell: 1, 'small-4': is_heatmap_visible, 'small-6': !is_heatmap_visible}">
         <p>Text</p>
         <div class="switch tiny">
           <input class="switch-input" v-model="facets.result_type" type="radio"

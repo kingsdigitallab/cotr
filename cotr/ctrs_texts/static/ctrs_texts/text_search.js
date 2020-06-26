@@ -1,5 +1,8 @@
 /*jshint esversion: 6 */
 
+
+const GROUP_DEFAULT = 'declaration';
+
 // Content loading statuses
 const STATUS_INITIAL = 0
 const STATUS_TO_FETCH = 1
@@ -48,6 +51,7 @@ $(() => {
     el: '#text-search',
     data: {
       status: STATUS_TO_FETCH,
+      group: GROUP_DEFAULT,
       facets: {
         result_type: DEFAULT_RESULT_TYPE,
         sentence_number: 1,
@@ -74,7 +78,10 @@ $(() => {
     },
     mounted() {
       let self = this
-      $.getJSON('/api/texts/?group=declaration').done((res) => {
+
+      self.group = this._get_group_from_query_string();
+
+      $.getJSON('/api/texts/?group='+self.group).done((res) => {
         Vue.set(self.facets, 'texts', res.data)
         // clog(res);
 
@@ -95,6 +102,9 @@ $(() => {
       })
     },
     computed: {
+      is_heatmap_visible: function () {
+        return (this.group === 'declaration')
+      },
       text_types: function () {
         return [
           // {label: 'Work', type: 'work'},
@@ -145,6 +155,19 @@ $(() => {
         }
 
         if (!silent) this.fetch_results()
+      },
+      _get_group_from_query_string: function() {
+        // TODO: move this to utils.js as copied from text_viewer.js
+        // return the value of &group query string param
+        // returns 'declaration' if unspecified
+        let ret = window.location.href.replace(
+          /.*group=([^#&]+).*/,
+          '$1'
+        )
+        if (ret == window.location) {
+          ret = GROUP_DEFAULT;
+        }
+        return ret;
       },
       on_select_all_texts: function () {
         for (let t of this.facets.texts) {
