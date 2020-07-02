@@ -137,6 +137,11 @@ def view_api_text_chunk(
 
     ret = OrderedDict([
         ['jsonapi', '1.0'],
+        ['meta', {
+            'page': 1,
+            'page_count': 1,
+            'hit_count': 1,
+        }],
         ['data', data],
     ])
 
@@ -178,11 +183,6 @@ def view_api_text_search_sentences(request):
         }
         texts.append(text_data)
 
-    ret = OrderedDict([
-        ['jsonapi', '1.0'],
-        ['data', texts],
-    ])
-
     ret = utils.get_page_response_from_list(texts, request)
 
     return JsonResponse(ret)
@@ -211,6 +211,11 @@ def view_api_text_search_regions(request):
 
     ret = OrderedDict([
         ['jsonapi', '1.0'],
+        ['meta', {
+            'page': 1,
+            'page_count': 1,
+            'hit_count': len(hits),
+        }],
         ['data', hits],
     ])
 
