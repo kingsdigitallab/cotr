@@ -183,6 +183,8 @@ def view_api_text_search_sentences(request):
         ['data', texts],
     ])
 
+    ret = utils.get_page_response_from_list(texts, request)
+
     return JsonResponse(ret)
 
 
@@ -233,7 +235,8 @@ def view_api_text_search_text(request):
     # needs to use PSQL regex syntax, not Python's
     # https://www.postgresql.org/docs/9.4/functions-matching.html#POSIX-CONSTRAINT-ESCAPES-TABLE
     encoded_texts = encoded_texts.filter(
-        plain__iregex=r'\m{}'.format(q)).order_by(
+        plain__iregex=r'\m{}'.format(q)
+    ).order_by(
         'abstracted_text__group__short_name',
         'abstracted_text__short_name'
     )
@@ -264,10 +267,8 @@ def view_api_text_search_text(request):
 
             sentences.append(sentence_data)
 
-    ret = OrderedDict([
-        ['jsonapi', '1.0'],
-        ['q', q],
-        ['data', sentences],
-    ])
+    ret = utils.get_page_response_from_list(sentences, request)
+
+    ret['meta']['q'] = q
 
     return JsonResponse(ret)

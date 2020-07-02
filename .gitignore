@@ -284,3 +284,8 @@ cotr/media/
 
 arc-content.json
 
+# PyCharm IDE
+/.idea
+
+# dev venv
+/venv

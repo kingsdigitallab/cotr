@@ -148,16 +148,38 @@
   </div>
 
   <div class="cell medium-9" id="results">
-    <h2>Results<span v-if="facets.result_type !== 'regions'"><span
-          v-if="response.data">: {{response.data.length}} sentences</span>
+    <h2>Results
+      <span v-if="facets.result_type !== 'regions'">
+        <span v-if="response.data">: {{response.meta.hit_count}} sentences</span>
       </span>
       <span v-if="response.q">with <strong>{{response.q}}</strong></span>
     </h2>
+
+    <ul v-if="response.meta.page_count" class="pagination" role="navigation" aria-label="Pagination" id="pagination-top">
+      <li class="arrow {% if facets.page > 1 %}unavailable{% endif %}">
+        <a href="#pagination-top" @click="on_click_previous_page">&laquo;</a>
+      </li>
+      <li>Page <strong>{{ facets.page }}</strong> of {{ response.meta.page_count }}</li>
+      <li class="arrow {% if facets.page < response.meta.page_count %}unavailable{% endif %}">
+        <a href="#pagination-top" @click="on_click_next_page">&raquo;</a>
+      </li>
+    </ul>
 
     <template v-if="response.data && response.data.length > 0">
       <div class="hit" v-for="hit in response.data" v-html="hit.html">
       </div>
     </template>
+
+    <!-- Remove code duplication, pagination code is there twice -->
+    <ul v-if="response.meta.page_count" class="pagination" role="navigation" aria-label="Pagination">
+      <li class="arrow {% if facets.page > 1 %}unavailable{% endif %}">
+        <a href="#pagination-top" @click="on_click_previous_page">&laquo;</a>
+      </li>
+      <li>Page <strong>{{ facets.page }}</strong> of {{ response.meta.page_count }}</li>
+      <li class="arrow {% if facets.page < response.meta.page_count %}unavailable{% endif %}">
+        <a href="#pagination-top" @click="on_click_next_page">&raquo;</a>
+      </li>
+    </ul>
 
     <div v-if="selected_region" id="heatmap-tooltip" class="custom-tooltip">
       <ul class="no-bullet">

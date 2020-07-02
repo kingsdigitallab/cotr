@@ -365,3 +365,38 @@ def get_sentence_numbers(work=None):
             )
 
     return ret
+
+
+def get_page_from_list(alist, request, per_page=None):
+    '''returns a Page object from a list a 'page' param in the GET request
+    if per_page is None, we use settings.ITEMS_PER_PAGE
+    '''
+    # &page=1 is first page
+    page_number = get_int(request.GET.get('page', 1))
+
+    from django.core.paginator import Paginator
+    paginator = Paginator(alist, per_page or settings.ITEMS_PER_PAGE)
+    return paginator.get_page(page_number)
+
+
+def get_page_response_from_list(alist, request):
+    '''returns a json api dictionary from a list of results and a request'''
+    page = get_page_from_list(alist, request)
+
+    return OrderedDict([
+        ['jsonapi', '1.0'],
+        ['meta', {
+            'page_count': page.paginator.num_pages,
+            'hit_count': page.paginator.count,
+            'page': page.number,
+        }],
+        ['data', page.object_list],
+    ])
+
+
+def get_int(string, default=0):
+    '''returns int from string, or default if invalid number'''
+    try:
+        return int(string)
+    except ValueError:
+        return default

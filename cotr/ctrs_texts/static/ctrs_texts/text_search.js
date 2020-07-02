@@ -54,6 +54,7 @@ $(() => {
       group: GROUP_DEFAULT,
       facets: {
         result_type: DEFAULT_RESULT_TYPE,
+        page: 1,
         sentence_number: 1,
         sentence_numbers: ['1'],
         encoding_type: 'transcription',
@@ -74,7 +75,11 @@ $(() => {
         texts: []
       },
       blocks: [],
-      response: {},
+      response: {
+        meta: {
+          page_count: 1,
+        }
+      },
       selected_region: null
     },
     mounted() {
@@ -131,6 +136,9 @@ $(() => {
       },
       'facets.encoding_type': function () {
         this.fetch_results()
+      },
+      'facets.page': function () {
+        this.fetch_results()
       }
     },
     filters: {
@@ -158,6 +166,16 @@ $(() => {
         }
 
         if (!silent) this.fetch_results()
+      },
+      on_click_next_page: function() {
+        if (this.facets.page < this.response.meta.page_count) {
+          this.facets.page += 1
+        }
+      },
+      on_click_previous_page: function() {
+        if (this.facets.page > 1) {
+          this.facets.page -= 1
+        }
       },
       _get_group_from_query_string: function() {
         // TODO: move this to utils.js as copied from text_viewer.js
@@ -199,7 +217,8 @@ $(() => {
           texts: text_ids.join(','),
           et: self.facets.encoding_type,
           sn: self.facets.sentence_number,
-          q: self.facets.q
+          q: self.facets.q,
+          page: self.facets.page,
         })
           .done((res) => {
             // clog(res);
