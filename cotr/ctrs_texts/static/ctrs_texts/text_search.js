@@ -137,9 +137,6 @@ $(() => {
       'facets.encoding_type': function () {
         this.fetch_results()
       },
-      'facets.page': function () {
-        this.fetch_results()
-      }
     },
     filters: {
       view_type_label: function (value) {
@@ -170,11 +167,13 @@ $(() => {
       on_click_next_page: function() {
         if (this.facets.page < this.response.meta.page_count) {
           this.facets.page += 1
+          this.fetch_results(true)
         }
       },
       on_click_previous_page: function() {
         if (this.facets.page > 1) {
           this.facets.page -= 1
+          this.fetch_results(true)
         }
       },
       _get_group_from_query_string: function() {
@@ -197,7 +196,12 @@ $(() => {
 
         this.fetch_results()
       },
-      fetch_results: function (block, view) {
+      fetch_results: function (keep_page) {
+        if (!keep_page) {
+          // any change in the query should reset the page to 1
+          this.facets.page = 1
+        }
+
         if (this.status == STATUS_FETCHING) return
 
         // hide readings section
