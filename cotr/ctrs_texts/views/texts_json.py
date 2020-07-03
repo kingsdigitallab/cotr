@@ -4,7 +4,7 @@ from _collections import OrderedDict
 from ctrs_texts.models import AbstractedText, EncodedText
 from django.db.models import Q
 from django.http import JsonResponse
-from django.template.loader import render_to_string
+from django.template.loader import render_to_string, get_template
 
 from .. import utils
 
@@ -241,6 +241,9 @@ def view_api_text_search_text(request):
     # https://www.postgresql.org/docs/9.4/functions-matching.html#POSIX-CONSTRAINT-ESCAPES-TABLE
     encoded_texts = encoded_texts.filter(
         plain__iregex=r'\m{}'.format(q)
+    ).select_related(
+        'abstracted_text',
+        'abstracted_text__type'
     ).order_by(
         'abstracted_text__group__short_name',
         'abstracted_text__short_name'
@@ -253,13 +256,17 @@ def view_api_text_search_text(request):
     highlight_pattern = re.compile(
         '({})(?=(?:[^>]|<[^>]*>)*$)'.format(escaped), re.I)
 
+    # major optimisation: load the template outside the loop
+    hit_template = get_template('ctrs_texts/search_sentence.html')
+
     sentences = []
     for encoded_text in encoded_texts:
         for sentence in utils.search_text(encoded_text, q):
-            html = render_to_string('ctrs_texts/search_sentence.html', {
+            context = {
                 'text': encoded_text.abstracted_text,
                 'sentence': sentence,
-            })
+            }
+            html = hit_template.render(context)
 
             # highlight the search results
             if q:
