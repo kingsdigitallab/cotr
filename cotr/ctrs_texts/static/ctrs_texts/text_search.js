@@ -1,7 +1,17 @@
 /*jshint esversion: 6 */
 
-
-const GROUP_DEFAULT = 'declaration';
+// the query parameters in the vuejs app
+// and their mapping to the query string
+// of teh web page or the ajax request
+// [VUE_DATA_NAME, QUERY_STRING_NAME, TYPE, DEFAULT_VALUE]
+const VUE_QS_MAPPING = [
+  ['group', 'group', '', 'declaration'],
+  ['page', 'page', 'int', 1],
+  ['result_type', 'rt', '', 'sentences'],
+  ['sentence_number', 'sn', 'int', 1],
+  ['encoding_type', 'et', '', 'transcription'],
+  ['q', 'q', '', ''],
+]
 
 // Content loading statuses
 const STATUS_INITIAL = 0
@@ -21,7 +31,7 @@ const ARCHETYPE_IMAGE_DIMENSIONS = [3212, 4392]
 // https://bl.ocks.org/mejackreed/raw/2724146adfe91233c74120b9056fba06/
 // https://bl.ocks.org/mejackreed/raw/2724146adfe91233c74120b9056fba06/app.js
 // https://github.com/mejackreed/Leaflet-IIIF/blob/master/leaflet-iiif.js#L45
-const LEAFLET_ZOOM_TRANFORM = 3
+const LEAFLET_ZOOM_TRANSFORM = 3
 
 const TYPES_LABEL = {
   transcription: 'Latin',
@@ -31,7 +41,7 @@ const TYPES_LABEL = {
 
 const PRESELECTED_TEXT_SIGLA = ['V1']
 
-const DEFAULT_RESULT_TYPE = window.DEBUG ? 'text' : 'sentences'
+// const DEFAULT_RESULT_TYPE = window.DEBUG ? 'text' : 'sentences'
 // const DEFAULT_RESULT_TYPE = 'sentences';
 
 const SENTENCE_NUMBER_MAX = 27
@@ -50,14 +60,16 @@ $(() => {
   let app = new Vue({
     el: '#text-search',
     data: {
-      status: STATUS_TO_FETCH,
-      group: GROUP_DEFAULT,
+      // prevent accidental requests to the api until the text list os loaded
+      status: STATUS_FETCHING,
       facets: {
-        result_type: DEFAULT_RESULT_TYPE,
-        page: 1,
-        sentence_number: 1,
+        group: '',
+        result_type: '',
+        page: '',
+        sentence_number: '',
+        encoding_type: '',
+
         sentence_numbers: ['1'],
-        encoding_type: 'transcription',
         /*
         List of all available texts. Exactly as returned by /api/texts/.
 
@@ -74,7 +86,6 @@ $(() => {
         */
         texts: []
       },
-      blocks: [],
       response: {
         meta: {
           page_count: 1,
@@ -85,9 +96,11 @@ $(() => {
     mounted() {
       let self = this
 
-      self.group = this._get_group_from_query_string();
+      this._set_vue_from_query_string()
 
-      $.getJSON('/api/texts/?group='+self.group).done((res) => {
+      // self.group = this._get_group_from_query_string();
+
+      $.getJSON('/api/texts/?group='+self.facets.group).done((res) => {
         Vue.set(self.facets, 'texts', res.data)
         // clog(res);
 
@@ -97,16 +110,29 @@ $(() => {
           text.parent = this.get_text_from_id_or_siglum(text.attributes.group)
         }
 
-        for (let siglum of PRESELECTED_TEXT_SIGLA) {
+        // select the texts from the query string
+        const params = new URLSearchParams(window.location.search);
+        let qs_text_ids = params.get('texts')
+        if (qs_text_ids) {
+            qs_text_ids = qs_text_ids.split(',')
+        } else {
+            qs_text_ids = PRESELECTED_TEXT_SIGLA
+        }
+
+        for (let siglum of qs_text_ids) {
           let text = self.get_text_from_id_or_siglum(siglum)
-          text.selected = true
-          self.on_tick_text(text, true)
+          if (text) {
+              text.selected = true
+              self.on_tick_text(text, true)
+          }
         }
 
         Vue.set(self.facets, 'sentence_numbers', res.meta.sentence_numbers)
         self.facets.sentence_number = res.meta.sentence_numbers[0]
 
-        self.fetch_results()
+        // change from fetching to initial so we can actually fetch
+        self.status = STATUS_INITIAL
+        self.fetch_results(true)
       })
     },
     computed: {
@@ -176,19 +202,6 @@ $(() => {
           this.fetch_results(true)
         }
       },
-      _get_group_from_query_string: function() {
-        // TODO: move this to utils.js as copied from text_viewer.js
-        // return the value of &group query string param
-        // returns 'declaration' if unspecified
-        let ret = window.location.href.replace(
-          /.*group=([^#&]+).*/,
-          '$1'
-        )
-        if (ret == window.location) {
-          ret = GROUP_DEFAULT;
-        }
-        return ret;
-      },
       on_select_all_texts: function () {
         for (let t of this.facets.texts) {
           Vue.set(t, 'selected', true)
@@ -197,46 +210,35 @@ $(() => {
         this.fetch_results()
       },
       fetch_results: function (keep_page) {
+        if (this.status === STATUS_FETCHING) return
+
         if (!keep_page) {
           // any change in the query should reset the page to 1
           this.facets.page = 1
         }
-
-        if (this.status == STATUS_FETCHING) return
 
         // hide readings section
         _on_rect_popupclose(null)
 
         this.status = STATUS_FETCHING
         let self = this
+        let query_params = this._get_query_params_from_vue()
 
-        let text_ids = []
-        for (let t of self.facets.texts) {
-          if (t.selected) {
-            text_ids.push(t.id)
-          }
-        }
+        $.getJSON(
+          '/api/texts/search/' + self.facets.result_type + '/',
+          query_params,
+        ).done((res) => {
+          // clog(res);
+          self.status = STATUS_FETCHED
+          Vue.set(self, 'response', res)
+          self._update_query_string(query_params);
 
-        $.getJSON('/api/texts/search/' + self.facets.result_type + '/', {
-          texts: text_ids.join(','),
-          et: self.facets.encoding_type,
-          sn: self.facets.sentence_number,
-          q: self.facets.q,
-          page: self.facets.page,
+          Vue.nextTick(function () {
+            init_leaflet(res)
+          })
+        }).fail((res) => {
+          self.status = STATUS_ERROR
         })
-          .done((res) => {
-            // clog(res);
-            self.status = STATUS_FETCHED
-            Vue.set(self, 'response', res)
-            // self.update_query_string();
-
-            Vue.nextTick(function () {
-              init_leaflet(res)
-            })
-          })
-          .fail((res) => {
-            self.status = STATUS_ERROR
-          })
       },
 
       get_text_from_id_or_siglum: function (id_or_siglum) {
@@ -269,7 +271,57 @@ $(() => {
         }
         // TODO: remove this.sentence_number_max
         this.facets.sentence_number = this.facets.sentence_numbers[idx]
-      }
+      },
+
+      _set_vue_from_query_string: function() {
+        // initialise facet selection from the query string
+        // Except the texts (see mounted)
+        const params = new URLSearchParams(window.location.search);
+        for (const m of VUE_QS_MAPPING) {
+          let val = params.get(m[1])
+          val = (val === undefined || val === null) ? m[3] : val;
+          if (m[2] === 'int') {
+            val = parseInt(val)
+            if (isNaN(val)) val = m[3]
+          }
+          this.facets[m[0]] = val
+        }
+      },
+
+      _get_query_params_from_vue: function() {
+        let ret = {}
+        for (m of VUE_QS_MAPPING) {
+          ret[m[1]] = this.facets[m[0]]
+        }
+
+        // array of of selected text ids
+        let text_ids = this.facets.texts.map(function(t) {
+          if (t.selected) return t.id
+        }).filter(aid => aid)
+        ret.texts = text_ids.join(',')
+
+        return ret
+      },
+
+      _update_query_string: function (query_params) {
+        // update query string with current state of viewer
+        // e.g. ?
+        let qs = ['texts='+query_params.texts]
+        for (const m of VUE_QS_MAPPING) {
+          if (query_params[m[1]] != m[3]) qs.push(''+m[1]+'='+query_params[m[1]])
+        }
+        qs = qs.join('&');
+
+        qs = window.location.href.replace(
+          /^([^?]+)([^#]+)(.*)$/,
+          '$1?' + qs + '$3'
+        )
+
+        if (qs != window.location.href) {
+          history.pushState(null, '', qs)
+        }
+      },
+
     }
   })
 
@@ -435,7 +487,7 @@ $(() => {
         (p[0] / ARCHETYPE_IMAGE_DIMENSIONS[0]) * image_layer.x,
         image_layer.y - (p[1] / ARCHETYPE_IMAGE_DIMENSIONS[1]) * image_layer.y
       ),
-      LEAFLET_ZOOM_TRANFORM
+      LEAFLET_ZOOM_TRANSFORM
     )
   }
   // returns coordinate pair from [[x0, y0], [x1, y1]]

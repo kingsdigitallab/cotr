@@ -155,7 +155,7 @@
       <span v-if="response.q">with <strong>{{response.q}}</strong></span>
     </h2>
 
-    <ul v-if="response.meta.page_count" class="pagination" role="navigation" aria-label="Pagination">
+    <ul v-if="response.meta.page_count > 1" class="pagination" role="navigation" aria-label="Pagination">
       <li class="arrow {% if facets.page > 1 %}unavailable{% endif %}">
         <a href="#results" @click="on_click_previous_page">&laquo;</a>
       </li>
