@@ -7,7 +7,7 @@ redis==3.4.1  # https://github.com/antirez/redis
 
 # Django
 # ------------------------------------------------------------------------------
-django==2.2.10  # pyup: < 3.0  # https://www.djangoproject.com/
+django==2.2.13  # pyup: < 3.0  # https://www.djangoproject.com/
 django-environ==0.4.5  # https://github.com/joke2k/django-environ
 django-model-utils==4.0.0  # https://github.com/jazzband/django-model-utils
 django-compressor==2.4  # https://github.com/django-compressor/django-compressor
@@ -22,7 +22,7 @@ coreapi==2.3.3  # https://github.com/core-api/python-client
 django-libsass  # https://github.com/torchbox/django-libsass
 elasticsearch-dsl>=7.0.0,<8.0.0  # https://github.com/elastic/elasticsearch-dsl-py
 
-wagtail==2.7.1  # https://github.com/wagtail/wagtail
+wagtail==2.7.2  # https://github.com/wagtail/wagtail
 twython>=3.8,<4  # https://twython.readthedocs.io
 lxml  # https://github.com/lxml/lxml/
 wagtailmenus>=3.0,<3.1  # https://github.com/rkhleics/wagtailmenus/
