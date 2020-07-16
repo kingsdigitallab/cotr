@@ -276,11 +276,6 @@ cotr/media/
 # Those files may contain secret config settings
 # do not add them to github
 .envs/*
-# exceptions
-!.envs/.local/
-# This file may contain secret config settings
-# do not add it to github
-.envs/.local/.django
 .vagrant
 .volumes
 
