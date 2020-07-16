@@ -274,7 +274,6 @@ cotr/media/
 .ipython/
 .env
 .envs/*
-!.envs/.local/
 .vagrant
 .volumes
 
