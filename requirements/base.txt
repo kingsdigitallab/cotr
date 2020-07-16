@@ -44,7 +44,7 @@ twython==3.8.2
 unidecode==1.1.1
 uritemplate==3.0.1
 urllib3==1.25.9
-wagtail==2.7.1
+wagtail==2.7.2
 webencodings==0.5.1
 whitenoise==5.0.1
 willow==1.3
