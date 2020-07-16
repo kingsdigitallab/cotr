@@ -137,7 +137,7 @@ $(() => {
     },
     computed: {
       is_heatmap_visible: function () {
-        return (this.group === 'declaration')
+        return (this.facets.group === 'declaration')
       },
       text_types: function () {
         return [

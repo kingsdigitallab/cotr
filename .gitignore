@@ -273,8 +273,9 @@ cotr/media/
 
 .ipython/
 .env
+# Those files may contain secret config settings
+# do not add them to github
 .envs/*
-!.envs/.local/
 .vagrant
 .volumes
 
