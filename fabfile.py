@@ -1,5 +1,6 @@
 import configparser
 import getpass
+import os
 import sys
 from configparser import ConfigParser, SectionProxy
 from typing import Optional
@@ -48,6 +49,7 @@ try:
     STACK = fabric_cfg["default_stack"]
 except KeyError:
     error("Invalid fabric configuration in `setup.cfg`")
+    sys.exit(-1)
 
 HELP = {
     "app": "App to run the tests. Omit to run all the project tests.",
@@ -106,7 +108,6 @@ def clone(context, instance, user=get_local_user(), branch=BRANCH):
     env_file = f"{instance}.tar.gz"
 
     env_path_inst = f".envs/.{instance}"
-    import os
 
     if not os.path.exists(env_path_inst):
         error(f"Instance folder not found: {env_path_inst}")
@@ -240,7 +241,7 @@ def backup(context, user=get_local_user(), remote=False, instance=None, stack=No
     """
     Create a database backup.
     """
-    command = f"run postgres backup"
+    command = f"run --rm postgres backup"
     run_command(context, user, remote, instance, stack, command)
 
 
@@ -377,7 +378,7 @@ def restore(
     command = f"exec postgres pkill -f {PROJECT}"
     run_command(context, user, remote, instance, stack, command)
 
-    command = f"run postgres restore {backup}"
+    command = f"run --rm postgres restore {backup}"
     run_command(context, user, remote, instance, stack, command)
 
 
@@ -386,14 +387,14 @@ def shell(
     context,
     user=get_local_user(),
     remote=False,
-    instance=INSTANCE,
-    stack=STACK,
+    instance=None,
+    stack=None,
     service="django",
 ):
     """
     Connect to a running service.
     """
-    command = f"run {service} bash"
+    command = f"run --rm {service} bash"
     run_command(context, user, remote, instance, stack, command)
 
 
@@ -404,7 +405,7 @@ def django(
     """
     Run a Django management command.
     """
-    command = f"run django python manage.py {command}"
+    command = f"run --rm django python manage.py {command}"
     run_command(context, user, remote, instance, stack, command)
 
 
@@ -429,7 +430,7 @@ def test(
     if coverage:
         command = f"coverage run -m {command}"
 
-    command = f"run django {command}"
+    command = f"run --rm django {command}"
     run_command(context, user, remote, instance, stack, command)
 
 
