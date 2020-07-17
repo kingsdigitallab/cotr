@@ -385,26 +385,46 @@ $highlighted-background-color: #ee0;
     line-height: 2.25;
   }
 
-  span[data-dpt=head]:before {
-    text-transform: none;
-    font-variant: none;
-    font-weight: 700;
-    content: '(Heading) ';
+  [data-dpt-type=editorial] {
+    // background: linear-gradient($light-gray, white);
+    border-left: 1px solid $medium-gray;
+    border-right: 1px solid $medium-gray;
+    border-top: 1px solid $medium-gray;
+    color: $dark-gray;
+    font-family: "Open Sans Condensed", sans-serif;
+    font-size: 24px;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 
+  span[data-dpt=head],
   span[data-dpt-type=subheading] {
-    text-transform: lowercase;
-    font-variant: small-caps;
     &:before {
+      background: $light-gray;
+      border-left: 10px solid $medium-gray;
+      font-family: "Open Sans Condensed", sans-serif;
+      font-size: 14px;
+      font-weight: normal;
+      padding: 4px 8px 4px 4px;
       text-transform: none;
-      font-variant: none;
-      font-weight: 700;
-      content: '(Subheading) ';
     }
   }
 
-  span[data-dpt=sn], span[data-dpt=cn][data-dpt-type=editorial] {
-    font-weight: 700;
+  span[data-dpt=head]:before {
+    content: 'Heading';
+  }
+
+  span[data-dpt-type=subheading] {
+    font-variant: small-caps;
+    text-transform: lowercase;
+    &:before {
+      content: 'Subheading';
+    }
+  }
+
+  span[data-dpt=sn],
+  span[data-dpt=cn][data-dpt-type=editorial] {
+    // font-weight: 700;
 
     &:before {
       content: '(';
@@ -444,7 +464,7 @@ $highlighted-background-color: #ee0;
       border-top: 1px dashed grey;
     }
     &:before {
-      content: '(Block ';
+      content: 'Block ';
     }
   }
 
