@@ -238,7 +238,17 @@
     }
   }
 }
+.legend-text-viewer {
+  .text-view > .text-display {
+    padding: 0;
+  }
 
+  [data-dpt-group="work"] {
+    background: scale-color($secondary-color, $lightness: 80%);
+  }
+}
+
+.legend-text-viewer,
 #text-viewer {
   .menu {
     a {

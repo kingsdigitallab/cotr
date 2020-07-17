@@ -91,6 +91,12 @@ hr {
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
+// special case for Blocks
+.offset-neg-margin {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
 
 // Using it to display the Wagtail icon
 
