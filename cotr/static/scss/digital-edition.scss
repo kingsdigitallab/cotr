@@ -402,9 +402,9 @@ $highlighted-background-color: #ee0;
     &:before {
       background: $light-gray;
       border-left: 10px solid $medium-gray;
-      font-family: "Open Sans Condensed", sans-serif;
+      // font-family: "Open Sans Condensed", sans-serif;
       font-size: 14px;
-      font-weight: normal;
+      font-weight: 700;
       padding: 4px 8px 4px 4px;
       text-transform: none;
     }
@@ -422,17 +422,40 @@ $highlighted-background-color: #ee0;
     }
   }
 
-  span[data-dpt=sn],
+  span[data-dpt=sn] {
+    border: 1px solid $medium-gray;
+    font-family: "Open Sans Condensed", sans-serif;
+    padding: 0 8px;
+
+    &::before {
+      // fa fa-paragraph
+      content: url("/static/images/icons/fontawesome-pro/svgs/solid/paragraph.svg");
+      display: inline-block;
+      height: 14px;
+      width: 14px;
+      opacity: 0.4;
+      padding-right: 4px;
+    }
+
+    &.highlighted {
+      // GN: ac-142: user has clicked on region/reading in other block
+      // we highlight it in this block.
+      // TODO: remove !important
+      background-color: $highlighted-background-color;
+    }    
+  }
+
+  // span[data-dpt=sn],
   span[data-dpt=cn][data-dpt-type=editorial] {
     // font-weight: 700;
 
-    &:before {
-      content: '(';
-    }
+    // &:before {
+    //   content: '(';
+    // }
 
-    &:after {
-      content: ') ';
-    }
+    // &:after {
+    //   content: ') ';
+    // }
 
     &.highlighted {
       // GN: ac-142: user has clicked on region/reading in other block
