@@ -22,7 +22,7 @@ coreapi==2.3.3  # https://github.com/core-api/python-client
 django-libsass  # https://github.com/torchbox/django-libsass
 elasticsearch-dsl>=7.0.0,<8.0.0  # https://github.com/elastic/elasticsearch-dsl-py
 
-wagtail==2.7.2  # https://github.com/wagtail/wagtail
+wagtail==2.7.4  # https://github.com/wagtail/wagtail
 twython>=3.8,<4  # https://twython.readthedocs.io
 lxml  # https://github.com/lxml/lxml/
 wagtailmenus>=3.0,<3.1  # https://github.com/rkhleics/wagtailmenus/
