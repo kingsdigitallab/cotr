@@ -36,7 +36,7 @@ const LEAFLET_ZOOM_TRANSFORM = 3
 const TYPES_LABEL = {
   transcription: 'Latin',
   translation: 'English',
-  histogram: 'Histogram'
+  histogram: 'Bar chart'
 }
 
 const PRESELECTED_TEXT_SIGLA = ['V1']
