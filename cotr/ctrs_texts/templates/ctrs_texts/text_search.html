@@ -11,13 +11,25 @@
 {% endblock %}
 
 {% block title %}
-<h1 class="no-container">Search</h1>
 {% endblock %}
 
 {% block main %}
 {% verbatim %}
 
 <div id="text-search" class="grid-x grid-margin-x">
+  <div class="cell small-12 medium-9">
+    <h1 class="no-container">
+      <span class="capitalize label secondary large-title">{{ facets.group }}</span> Search
+      <small>for <span class="capitalize">{{ facets.result_type }}</span></small>
+    </h1>
+  </div>
+  <div class="cell small-12 medium-3">
+    <p class="text-right">
+      <a :href="facets.group == 'declaration' ? '/search/?group=regiam' : '/search/?group=declaration'" class="button secondary">
+        {{ facets.group == 'declaration' ? 'Switch to Regiam Maiestatem' : 'Switch to The Declaration of Arbroath' }}
+      </a>
+    </p>
+  </div>
   <div class="cell medium-3 controls">
     <h2>Type</h2>
 
