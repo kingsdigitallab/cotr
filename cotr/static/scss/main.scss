@@ -52,6 +52,10 @@ body {
 
 blockquote {}
 
+.capitalize {
+  text-transform: capitalize;
+}
+
 .extra-margin {
   margin-top: 1.5rem;
   margin-bottom: .75rem;
@@ -89,6 +93,15 @@ hr {
   height: 0;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.large-title {
+  font-size: 1em;
+  line-height: 1;
+
+  &.label.secondary {
+    background: lighten($secondary-color, 15%);
+  }
 }
 
 // special case for Blocks
