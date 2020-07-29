@@ -158,6 +158,7 @@ def view_api_text_search_sentences(request):
     text_ids = text_ids.split(',')
     sentence_number = request.GET.get('sn', '1')
     encoding_type = request.GET.get('et', 'transcription')
+    work_slug = request.GET.get('group', 'declaration').strip()
 
     encoded_texts = EncodedText.objects.filter(
         abstracted_text__id__in=text_ids,
@@ -176,6 +177,9 @@ def view_api_text_search_sentences(request):
         html = render_to_string('ctrs_texts/search_sentence.html', {
             'text': encoded_text.abstracted_text,
             'sentence': sentence,
+            'sentence_number': 's-'+sentence_number,
+            'work_slug': work_slug,
+            'encoding_type': encoding_type
         })
 
         text_data = {
@@ -223,9 +227,9 @@ def view_api_text_search_regions(request):
 
 
 def view_api_text_search_text(request):
-    q = request.GET.get('q', '')
-    if q:
-        q = q.strip()
+    q = request.GET.get('q', '').strip()
+
+    work_slug = request.GET.get('group', 'declaration').strip()
 
     text_ids = request.GET.get('texts', None)
     encoding_type = request.GET.get('et', 'transcription')
@@ -264,9 +268,13 @@ def view_api_text_search_text(request):
         for sentence in utils.search_text(encoded_text, q):
             context = {
                 'text': encoded_text.abstracted_text,
-                'sentence': sentence,
+                'sentence': sentence[1],
+                'sentence_number': sentence[0],
+                'work_slug': work_slug,
+                'encoding_type': encoding_type
             }
             html = hit_template.render(context)
+            # print(sentence)
 
             # highlight the search results
             if q:

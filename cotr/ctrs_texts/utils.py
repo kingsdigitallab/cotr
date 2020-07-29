@@ -305,6 +305,12 @@ def get_text_viz_data(encoded_text, region_type):
 
 
 def search_text(encoded_text, query=''):
+    '''Returns a list of sentences that contains the 'query' pattern.
+    Each entry in the list is a tuple [sentence_id, sentence_string]
+    Where 'sentence_string' is a string of the complete html for the sentence.
+    'sentence_id' is the value of the data-rid attribute, e.g. s-1.1 for
+    sentence 1.1.
+    '''
     if not encoded_text:
         return None
 
@@ -322,13 +328,25 @@ def search_text(encoded_text, query=''):
     )
 
     xml = get_xml_from_unicode(
-        encoded_text.content, ishtml=True, add_root=True)
+        encoded_text.content, ishtml=True, add_root=True
+    )
 
-    results = [get_unicode_from_xml(sentence)
-               for sentence in xml.xpath(
-                   search_xpath,
-                   namespaces={'re': 'http://exslt.org/regular-expressions'})
-               ]
+    results = []
+    for sentence in xml.xpath(
+            search_xpath,
+            namespaces={'re': 'http://exslt.org/regular-expressions'}
+    ):
+        sentence_string = get_unicode_from_xml(sentence)
+        sentence_numbers = re.findall(
+            r'<span\s+data-dpt="sn"\s+data-rid="([^"]+)',
+            sentence_string
+        )
+        if sentence_numbers:
+            sentence_number = sentence_numbers[0]
+        else:
+            sentence_number = ''
+            # print(sentence_string)
+        results.append([sentence_number, sentence_string])
 
     return results
 
