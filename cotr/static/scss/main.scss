@@ -232,6 +232,31 @@ button,
   }
 }
 
+.label-sticky {
+  position: absolute;
+  left: -60px;
+  top: 50px;
+  transform: rotate(90deg);
+
+  &.link {
+    svg {
+      fill: $dark-gray;
+      height: 12px;
+      width: 12px;
+    }
+  }
+
+  &.button {
+    &:hover {
+      color: white;
+
+      svg {
+        fill: white;
+      }
+    }
+  }
+}
+
 // 2.2 Forms
 
 // 2.3 Headings
