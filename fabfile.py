@@ -435,6 +435,22 @@ def test(
 
 
 @task(help=HELP)
+def requirements(context):
+    """
+    Run piptools pip-compile to update requirements.
+    """
+    pip_compile = "pip-compile --annotate --quiet"
+
+    command = (
+        f"{pip_compile} requirements/base.in "
+        f"&& {pip_compile} requirements/local.in "
+        f"&& {pip_compile} requirements/production.in"
+    )
+    command = f"run --rm django bash -c '{command}'"
+    run_command(context, get_local_user(), False, None, None, command)
+
+
+@task(help=HELP)
 def compose(
     context, command, user=get_local_user(), remote=False, instance=None, stack=None
 ):
