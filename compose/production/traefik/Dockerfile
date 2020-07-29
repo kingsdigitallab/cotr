@@ -1,4 +1,4 @@
-FROM traefik:latest
+FROM traefik:2.0
 
 RUN mkdir -p /etc/traefik/acme
 RUN touch /etc/traefik/acme/acme.json
