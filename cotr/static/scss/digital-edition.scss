@@ -653,6 +653,8 @@ $highlighted-background-color: #ee0;
     border-bottom: 1px solid scale-color($primary-color, $lightness: 70%);
     margin-left: 2.5rem;
     margin-bottom: 1rem;
+    min-height: 100px;
+    position: relative;
 
     .label {
       margin-left: -2.5rem;
