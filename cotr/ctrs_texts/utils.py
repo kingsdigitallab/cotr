@@ -117,21 +117,30 @@ def get_sentence_from_text(encoded_text, sentence_number):
     ret = ''
 
     # ac-139 we remove all auxiliary sentences first
-    content = re.sub('<p[^>]+data-dpt-type="auxiliary".*?</p>',
-                     '', encoded_text.content)
+    content = re.sub(
+        '<p[^>]+data-dpt-type="auxiliary".*?</p>',
+        '',
+        encoded_text.content
+    )
 
     pattern = ''.join([
         r'(?usi)(<p>\s*<span[^>]+data-rid="s-',
         re.escape(str(sentence_number)),
-        r'".*?</p>)\s*(<p>\s*<span data-dpt="sn"|$)'
+        r'".*?</p>)\s*(<p>\s*<span data-dpt="[cs]n"|$)'
     ])
 
     match = re.search(pattern, content)
 
     if match:
-        ret = match.group(1)
+        ret = remove_separator_paragraphs(match.group(1))
 
     return ret
+
+
+def remove_separator_paragraphs(text_string):
+    '''Return the text_string without
+    separating pragraph such as <p>___</p>'''
+    return re.sub(r'(?i)<p>[^a-z<]*</p>', '', text_string)
 
 
 def get_regions_with_unique_variants(text_ids):
@@ -274,7 +283,9 @@ def get_text_chunk(encoded_text, view, region_type):
     if view in ['histogram']:
         ret = get_text_viz_data(encoded_text, region_type)
     else:
-        ret = encoded_text.get_content_with_readings()
+        ret = remove_separator_paragraphs(
+            encoded_text.get_content_with_readings()
+        )
 
     return ret
 
