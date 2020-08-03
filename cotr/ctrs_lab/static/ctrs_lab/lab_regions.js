@@ -87,7 +87,7 @@ $(() => {
         }
       }, [...]]
       */
-      is_reading_distant: 1,
+      is_reading_distant: 0,
 
       texts: [],
       regions: [
