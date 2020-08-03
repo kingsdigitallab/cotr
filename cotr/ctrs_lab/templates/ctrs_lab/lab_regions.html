@@ -22,12 +22,16 @@
         {{ text.attributes.siglum }}
       </option>
     </select>
+    <label>
+      <input type="checkbox" v-model="is_reading_distant">
+      Distant reading
+    </label>
   </p>
 
-  <table>
+  <table :class="{'distant-reading': is_reading_distant}">
     <thead>
       <tr>
-        <th>Region #</th>
+        <th class="heading-rid">Region #</th>
         <th v-for="source in regions_meta.sources">{{ source.siglum }}</th>
       </tr>
     </thead>
