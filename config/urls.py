@@ -2,7 +2,6 @@ from django.conf import settings
 from django.urls import include, path
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.views.generic import TemplateView
 from django.views import defaults as default_views
 
 from wagtail.admin import urls as wagtailadmin_urls
@@ -15,6 +14,7 @@ urlpatterns = [
 
     path('wagtail/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
+    path('lab/', include('ctrs_lab.urls')),
     path('', include('ctrs_texts.urls')),
     path('', include(wagtail_urls)),
     # Your stuff: custom urls includes go here

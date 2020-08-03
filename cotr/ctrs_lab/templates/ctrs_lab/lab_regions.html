@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load staticfiles compress %}
+
+{% block meta_title %}Regions Viewer{% endblock %}
+
+{% block custom_css %}
+  <link rel="stylesheet" type="text/x-scss"
+        href="{% static 'ctrs_lab/lab_regions.scss' %}">
+{% endblock %}
+
+{% block title %}
+  <h2>Regions Viewer (prototype)</h2>
+{% endblock %}
+
+{% block main %}
+{% verbatim %}
+<div id="lab-regions" class="">
+  <p>
+    Parent:
+    <select v-model="parent" >
+      <option v-for="text in texts" :value="text.attributes.siglum|lowercase" v-if="text.type != 'manuscript'">
+        {{ text.attributes.siglum }}
+      </option>
+    </select>
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Region #</th>
+        <th v-for="source in regions_meta.sources">{{ source.siglum }}</th>
+      </tr>
+    </thead>
+    <tr v-for="region in regions">
+      <td>{{ region.region }}</td>
+      <td v-for="reading in region.readings" :style="get_reading_style(reading, region)">{{ reading.t }}</td>
+    </tr>
+  </table>
+</div>
+{% endverbatim %}
+{% endblock %}
+
+{% block footer_scripts %}
+  <script src="{% static 'vue/dist/vue.js' %}"></script>
+  <script src="{% static 'ctrs_lab/lab_regions.js' %}"></script>
+{% endblock %}

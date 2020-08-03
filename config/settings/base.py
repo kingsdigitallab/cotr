@@ -93,6 +93,7 @@ LOCAL_APPS = [
     # Your stuff: custom apps go here
     'cms',
     'ctrs_texts',
+    'ctrs_lab',
     'twitterhut',
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
