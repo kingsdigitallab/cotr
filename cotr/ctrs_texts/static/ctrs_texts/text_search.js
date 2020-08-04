@@ -8,7 +8,7 @@ const VUE_QS_MAPPING = [
   ['group', 'group', '', 'declaration'],
   ['page', 'page', 'int', 1],
   ['result_type', 'rt', '', 'sentences'],
-  ['sentence_number', 'sn', 'int', 1],
+  ['sentence_number', 'sn', '', '1'],
   ['encoding_type', 'et', '', 'transcription'],
   ['q', 'q', '', ''],
 ]
@@ -98,8 +98,6 @@ $(() => {
 
       this._set_vue_from_query_string()
 
-      // self.group = this._get_group_from_query_string();
-
       $.getJSON('/api/texts/?group='+self.facets.group).done((res) => {
         Vue.set(self.facets, 'texts', res.data)
         // clog(res);
@@ -128,7 +126,9 @@ $(() => {
         }
 
         Vue.set(self.facets, 'sentence_numbers', res.meta.sentence_numbers)
-        self.facets.sentence_number = res.meta.sentence_numbers[0]
+        if (res.meta.sentence_numbers.indexOf(''+self.facets.sentence_number) == -1) {
+            self.facets.sentence_number = res.meta.sentence_numbers[0]
+        }
 
         // change from fetching to initial so we can actually fetch
         self.status = STATUS_INITIAL
@@ -275,7 +275,7 @@ $(() => {
 
       _set_vue_from_query_string: function() {
         // initialise facet selection from the query string
-        // Except the texts (see mounted)
+        // Except the texts (see mounted())
         const params = new URLSearchParams(window.location.search);
         for (const m of VUE_QS_MAPPING) {
           let val = params.get(m[1])

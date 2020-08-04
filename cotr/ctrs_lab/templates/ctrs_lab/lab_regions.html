@@ -24,7 +24,7 @@
     </select>
     <label>
       <input type="checkbox" v-model="is_reading_distant">
-      Distant reading
+      Bird's eye view
     </label>
   </p>
 
@@ -32,12 +32,16 @@
     <thead>
       <tr>
         <th class="heading-rid">Region #</th>
-        <th v-for="source in regions_meta.sources">{{ source.siglum }}</th>
+        <th v-for="source in regions_meta.sources">
+          {{ source.siglum }}
+        </th>
       </tr>
     </thead>
     <tr v-for="region in regions">
-      <td>{{ region.region }}</td>
-      <td v-for="reading in region.readings" :style="get_reading_style(reading, region)">{{ reading.t }}</td>
+      <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">{{ region.region }}</a></td>
+      <td v-for="reading in region.readings" :style="get_reading_style(reading, region)">
+        {{ reading.t }}
+      </td>
     </tr>
   </table>
 </div>
