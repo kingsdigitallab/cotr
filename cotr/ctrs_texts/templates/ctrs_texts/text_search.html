@@ -15,7 +15,6 @@
 
 {% block main %}
 {% verbatim %}
-
 <div id="text-search" class="grid-x grid-margin-x">
   <div class="cell small-12 medium-9">
     <h1 class="no-container">
@@ -26,12 +25,12 @@
   <div class="cell small-12 medium-3">
     <p class="text-right">
       <a :href="facets.group == 'declaration' ? '/search/?group=regiam' : '/search/?group=declaration'" class="button secondary">
-        {{ facets.group == 'declaration' ? 'Switch to Regiam Maiestatem' : 'Switch to The Declaration of Arbroath' }}
+        Switch to {{ facets.group == 'declaration' ? 'Regiam Maiestatem' : 'The Declaration of Arbroath' }}
       </a>
     </p>
   </div>
   <div class="cell medium-3 controls">
-    <h2>Type</h2>
+    <h2>Result type</h2>
 
     <div class="grid-x grid-margin-x">
       <div class="cell small-4" v-if="is_heatmap_visible">

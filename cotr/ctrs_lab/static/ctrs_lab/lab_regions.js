@@ -9,6 +9,8 @@ const VUE_QS_MAPPING = [
   ['parent', 'parent', 'lowercase', 'v1'],
 ]
 
+const PRESELECTED_TEXT_SIGLA = ['V1']
+
 const API_PATH_TEXTS_LIST = '/api/texts/?'
 const GROUP_DEFAULT = 'declaration';
 
@@ -72,7 +74,14 @@ $(() => {
     data: {
       status: STATUS_FETCHED,
       group: 'declaration',
-      parent: 'v1',
+      parent: 'custom',
+
+      panels: {
+        'table': 'Table',
+        'settings': 'Settings',
+        'help': 'Help',
+      },
+      panel: 'settings',
       /*
       List of all available texts. Exactly as returned by /api/texts/.
 
@@ -107,9 +116,25 @@ $(() => {
         for (let text of this.texts) {
           text.parent = this.get_text_from_id_or_siglum(text.attributes.group)
         }
-      })
 
-      this.fetch_regions()
+        // select the texts from the query string
+        const params = new URLSearchParams(window.location.search);
+        let qs_text_ids = params.get('texts')
+        if (qs_text_ids) {
+            qs_text_ids = qs_text_ids.split(',')
+        } else {
+            qs_text_ids = PRESELECTED_TEXT_SIGLA
+        }
+
+        for (let siglum of qs_text_ids) {
+          let text = self.get_text_from_id_or_siglum(siglum)
+          if (text) {
+              text.selected = true
+          }
+        }
+
+        this.fetch_regions()
+      })
 
     },
     computed: {
@@ -127,7 +152,7 @@ $(() => {
     watch: {
       parent: function() {
         this.fetch_regions()
-      }
+      },
     },
     filters: {
       lowercase: function(value) {
@@ -138,6 +163,27 @@ $(() => {
       }
     },
     methods: {
+      on_tick_text: function (text, silent) {
+        // TODO: deduplicate from text_search.js
+        let selected = text.selected
+
+        if (text.type == 'version') {
+          // select all members accordingly
+          for (let member of this.texts) {
+            if (member.parent === text) {
+              member.selected = selected
+            }
+          }
+        }
+        if (text.type == 'manuscript') {
+          // deselect parent of member if unselected
+          if (!selected) {
+            text.parent.selected = selected
+          }
+        }
+
+        if (!silent) this.fetch_regions()
+      },
       get_reading_style: function(reading, region) {
         if (region.groups == 1) return ''
 
@@ -158,24 +204,36 @@ $(() => {
 
         let self = this
 
-          $.getJSON(
+        // array of of selected text ids
+        let text_ids = this.texts.map(function(t) {
+          if (t.selected) return t.id
+        }).filter(aid => aid)
+
+        $.getJSON(
             '/lab/api/regions/compare/',
             {
-              group: self.group,
-              parent: self.parent,
+                group: self.group,
+                parent: self.parent,
+                texts: text_ids.join(','),
             }
-          ).done((res) => {
+        ).done((res) => {
             Vue.set(self, 'regions', res.data)
             Vue.set(self, 'regions_meta', res.meta)
             self.update_query_string()
             self.status = STATUS_FETCHED
-          })
+        })
       },
       update_query_string: function () {
         // update query string with current state of viewer
         // e.g. ?blocks=506:transcription,transcription;495:transcription
         var self = this
         let qs = 'group=' + self.group + '&parent=' + self.parent
+
+        let text_ids = this.texts.map(function(t) {
+          if (t.selected) return t.id
+        }).filter(aid => aid).join(',')
+        qs += '&texts='+text_ids
+
         qs = window.location.href.replace(
           /^([^?]+)([^#]+)(.*)$/,
           '$1?' + qs + '$3'

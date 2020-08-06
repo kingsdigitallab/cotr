@@ -6,6 +6,8 @@
 {% block custom_css %}
   <link rel="stylesheet" type="text/x-scss"
         href="{% static 'ctrs_lab/lab_regions.scss' %}">
+  <link rel="stylesheet" type="text/x-scss"
+        href="{% static 'scss/digital-edition.scss' %}">
 {% endblock %}
 
 {% block title %}
@@ -16,34 +18,116 @@
 {% verbatim %}
 <div id="lab-regions" class="">
   <p>
-    Parent:
-    <select v-model="parent" >
+    Group:
+    <select v-model="parent">
       <option v-for="text in texts" :value="text.attributes.siglum|lowercase" v-if="text.type != 'manuscript'">
         {{ text.attributes.siglum }}
       </option>
+      <option value="custom">
+        Custom selection
+      </option>
     </select>
+  </p>
+  <p>
     <label>
       <input type="checkbox" v-model="is_reading_distant">
       Bird's eye view
     </label>
   </p>
 
-  <table :class="{'distant-reading': is_reading_distant}">
-    <thead>
-      <tr>
-        <th class="heading-rid">Region #</th>
-        <th v-for="source in regions_meta.sources">
-          {{ source.siglum }}
-        </th>
-      </tr>
-    </thead>
-    <tr v-for="region in regions">
-      <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">{{ region.region }}</a></td>
-      <td v-for="reading in region.readings" :style="get_reading_style(reading, region)">
-        {{ reading.t }}
-      </td>
-    </tr>
-  </table>
+  <ul class="tabs" data-tabs>
+    <li v-for="(panel_label, panel_slug) in panels" :class="{'tabs-title': 1, 'is-active': panel==panel_slug}">
+      <a @click.prevent="panel = panel_slug" href="#">{{panel_label}}</a>
+    </li>
+  </ul>
+
+  <div class="tabs-content">
+    <div v-show="panel == 'settings'" class="tabs-panel is-active">
+
+      <template v-for="text in texts" v-if="parent=='custom'">
+        <template v-if="text.type == 'version'">
+          <ul class="menu vertical">
+            <li :class="">
+              <label>
+                <input type="checkbox" v-model="text.selected"
+                  @change="on_tick_text(text)">
+                <span
+                  :class="'label secondary version ' + text.attributes.siglum.toLowerCase() + '-text-id'">{{ text.attributes.siglum }}</span>
+                {{ text.attributes.name }}
+              </label>
+              <ul class="menu vertical">
+                <template v-for="member in texts">
+                  <li :class="" v-if="member.attributes.group == text.id">
+                    <label>
+                      <input type="checkbox" v-model="member.selected"
+                        @change="on_tick_text(member)">
+                      <span
+                        class="label secondary manuscript">{{ member.attributes.siglum }}</span>
+                      {{ member.attributes.name }}
+                    </label>
+                  </li>
+                </template>
+              </ul>
+            </li>
+          </ul>
+        </template>
+      </template>
+
+    </div>
+
+    <div v-show="panel == 'table'" class="tabs-panel is-active">
+      <table :class="{'distant-reading': is_reading_distant}">
+        <thead>
+          <tr>
+            <th class="heading-rid">Region #</th>
+            <th v-for="source in regions_meta.sources">
+              {{ source.siglum }} ({{ source.siglum_parent }})
+            </th>
+          </tr>
+        </thead>
+        <tr v-for="region in regions">
+          <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">{{ region.region }}</a></td>
+          <td v-for="reading in region.readings" :style="get_reading_style(reading, region)">
+            {{ reading.t }}
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div v-show="panel == 'help'" class="tabs-panel is-active">
+      <h2>Introduction</h2>
+      <p>This is an experimental prototype visualisation of the unsettled regions.</p>
+      <p>It tries to help answer the following questions in a visual and intuitive way:</p>
+      <ol>
+        <li><strong>Outlier detection</strong>: which text disrupts the version or the work the most in a given area? I.e. who's the 'troublemaker'?</li>
+        <li><strong>Heterogeneity</strong>: how much do the texts disagree with each other in a given area?</li>
+        <li><strong>Clustering</strong>: which group of texts tend to agree with each other in a given area?</li>
+      </ol>
+      <p>The heatmap visualisation is similar in the sense that it shows the spatial distribution of heterogeneity (question 2).
+      However since this visualisation shows the selected texts in parallel, it enables comparative analysis.</p>
+      <p>This tabular representation is quite common to represent collations. Each column is a text and each row represent an unsettled region.
+        The regions appear in the sequential order of the text.
+      Each cell is the reading for a particular text in a given region</p>
+      <h2>What do the colors mean?</h2>
+      <p>In a row, the cells with identical readings will have identical colors.
+        The most represented readings will be green and the less represented will be blue, with shades within that spectrum for intermediate groups.
+        Also, the more a reading differ from the other in the region the more red it looks.</p>
+      <p>Unlike other established conventions with tabular visualisations of collations, green and red don't translate into 'correct reading' and a mistake.
+      In line with the principles of a dynamic edition the colors are not influenced by a specific text, they encourage you to explore all alternatives impartially.</p>
+      <h2>Limitations & caveats</h2>
+      <p>The coloring and underlying measures of similarity are full of caveats as there are imperfect and arbitrary.
+      The visualisation is a tool to intuitively explore the dynamic of the edition through the distributions of differences
+        but no conclusion should be drawn from it without careful textual analysis. It's aim is to draw attentions to variations and patterns
+        that might be easily missed when looking at a couple of manuscript folios side by side.</p>
+      <p>The difference is measured using difflib in Python: it looks at the number of characters in common between two readings.
+        It is purely syntactic, with no concept of semantic.
+        So <i>magnificus</i> and <i>malificus</i> would be considered almost identical but <i>uel</i> and <i>aut</i> very different.
+      </p>
+      <p>Geoffroy Noel</p>
+    </div>
+
+    </div>
+  </div>
 </div>
 {% endverbatim %}
 {% endblock %}

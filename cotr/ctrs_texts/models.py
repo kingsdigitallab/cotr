@@ -43,7 +43,7 @@ class EncodedText(index.Indexed, TimestampedModel, ImportedModel):
         related_name='encoded_texts',
         on_delete=models.SET_NULL
     )
-    # The XML content
+    # The XML content (as a string)
     content = models.TextField(blank=True, null=True)
 
     plain = models.TextField(blank=True, null=True,
@@ -54,6 +54,13 @@ class EncodedText(index.Indexed, TimestampedModel, ImportedModel):
         related_name='encoded_texts',
         on_delete=models.CASCADE
     )
+
+    @property
+    def content_xml(self):
+        '''returns the content as an ElementTree Node'''
+        return utils.get_xml_from_unicode(
+            self.content, ishtml=True, add_root=True
+        )
 
     @classmethod
     def update_or_create(

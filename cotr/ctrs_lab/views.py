@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import time
 from difflib import SequenceMatcher
 
 from django.http import JsonResponse, HttpResponse
@@ -10,10 +11,16 @@ from ctrs_texts.utils import get_xml_from_unicode, get_unicode_from_xml
 
 
 def view_api_regions_compare(request):
+    t0 = time.time()
     parent_siglum = request.GET.get('parent', 'v1').lower()
     work_slug = request.GET.get('group', 'declaration').lower()
+    text_ids = request.GET.get('texts', '').strip()
+    if text_ids:
+        text_ids = text_ids.split(',')
+    else:
+        text_ids = []
 
-    ret = api_regions(parent_siglum, work_slug)
+    ret = api_regions(work_slug, parent_siglum, text_ids)
 
     use_global_distance = True
 
@@ -26,9 +33,7 @@ def view_api_regions_compare(request):
         groups = Counter([r['t'] for r in readings])
         top_reading = groups.most_common(1)[0][0]
         groups = dict([[g[0], [i, g[1]]] for i, g in enumerate(groups.most_common())])
-
-        min_dist = 1000
-        max_dist = 0
+        present_count = max(sum([1 for r in readings if r['t']]), 2)
 
         for i in range(len(readings)):
             dist = 0
@@ -42,19 +47,28 @@ def view_api_regions_compare(request):
                 # but it is arbitrary when second grp has same freq
                 dist = get_reading_distance(readings[i]['t'], top_reading)
             if use_global_distance:
-                readings[i]['dist'] = dist / (len(readings) - 1)
+                readings[i]['dist'] = dist / (present_count - 1)
             else:
                 readings[i]['dist'] = dist
-            min_dist = min(readings[i]['dist'], min_dist)
-            max_dist = max(readings[i]['dist'], max_dist)
+
             readings[i]['grp'] = groups[readings[i]['t']][0]
+
+        dists = [r['dist'] for r in readings if r['dist']] or [0]
+        min_dist = min(dists)
+        max_dist = max(dists)
 
         if max_dist != min_dist:
             for r in readings:
-                # rescale between 0 and max
+                # rescale between 0 and max (to get more contrast)
                 r['dist'] = (r['dist'] - min_dist) * max_dist / (max_dist - min_dist)
 
         region['groups'] = len(groups)
+
+    t1 = time.time()
+
+    ret['meta']['stats'] = {
+        'duration': t1-t0
+    }
 
     return JsonResponse(ret)
 
@@ -64,6 +78,9 @@ def get_reading_distance(reading1, reading2):
 
 
 def get_reading_distance_levenstein(reading1, reading2):
+    if not(reading1 and reading2):
+        # special case for missing end of V6
+        return 0
     return 1 - SequenceMatcher(None, reading1, reading2).quick_ratio()
 
 
@@ -78,15 +95,44 @@ def get_reading_distance_binary(reading1, reading2):
 
 def view_api_regions(request):
     # todo: error management
-    parent_siglum = request.GET.get('parent', 'v1').lower()
     work_slug = request.GET.get('group', 'declaration').lower()
+    parent_siglum = request.GET.get('parent', 'v1').lower()
+    text_ids = request.GET.get('texts', '').split(',')
 
-    ret = api_regions(parent_siglum, work_slug)
+    ret = api_regions(work_slug, parent_siglum, text_ids)
 
     return JsonResponse(ret)
 
 
-def api_regions(parent_siglum='v1', work_slug='declaration'):
+def api_regions(work_slug='declaration', parent_siglum='v1', text_ids=None):
+
+    if parent_siglum == 'custom':
+        regions, texts = api_regions_many_parents(text_ids)
+    else:
+        regions, texts = api_regions_one_parent(work_slug, parent_siglum)
+
+    # format is inspired by Guthenberg Model (see CollateX)
+    # However the table contains groups of tokens (rather than individual ones)
+    # and only the groups where at least one witness disagrees.
+    ret = [
+        ['meta', {
+            'sources': [
+                {
+                    'siglum_parent': abstracted_text.group.short_name,
+                    'siglum': abstracted_text.short_name,
+                    'title': str(abstracted_text),
+                    'id': abstracted_text.pk,
+                }
+                for abstracted_text in texts
+            ]}],
+        ['data', regions],
+    ]
+    ret = OrderedDict(ret)
+
+    return ret
+
+
+def api_regions_one_parent(work_slug='declaration', parent_siglum='v1'):
     region_type = 'version'
 
     from ctrs_texts.models import EncodedText
@@ -139,23 +185,43 @@ def api_regions(parent_siglum='v1', work_slug='declaration'):
 
         ti += 1
 
-    # format is inspired by Guthenberg Model (see CollateX)
-    # However the table contains groups of tokens (rather than individual ones)
-    # and only the groups where at least one witness disagrees.
-    ret = OrderedDict([
-        ['meta', {
-            'sources': [
-                {
-                    'siglum': t.abstracted_text.short_name,
-                    'title': str(t.abstracted_text),
-                    'id': t.abstracted_text.pk,
-                }
-                for t in texts
-            ]}],
-        ['data', regions],
-    ])
+    return regions, [t.abstracted_text for t in texts]
 
-    return ret
+
+def api_regions_many_parents(text_ids=None):
+
+    regions = []
+    abstracted_texts = []
+
+    # pre-allocate the reading (more efficient & avoids holes)
+    from ctrs_texts.models import AbstractedText
+    readings_per_region = AbstractedText.objects.filter(
+        type__slug='manuscript',
+        id__in=text_ids,
+    ).count()
+
+    # reading callback to populate regions
+    def ms_wreading_callback(
+        region_index, reading, version_siglum, ms_siglum,
+        ms_index, ms_abstracted
+    ):
+        if not(abstracted_texts) or ms_abstracted != abstracted_texts[-1]:
+            abstracted_texts.append(ms_abstracted)
+
+        if len(regions) <= region_index:
+            regions.append({
+                'readings': [{'t': ''} for i in range(readings_per_region)],
+                # TODO
+                'sentence': 1,
+                # TODO
+                'region': 'v1',
+            })
+        regions[region_index]['readings'][ms_index]['t'] = reading
+
+    from ctrs_texts import utils
+    utils.parse_mss_wregions(text_ids, ms_wreading_callback)
+
+    return regions, abstracted_texts
 
 
 def view_api_regions_all_plaintext(request):

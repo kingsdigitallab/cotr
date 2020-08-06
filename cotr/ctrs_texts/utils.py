@@ -159,9 +159,7 @@ def get_regions_with_unique_variants(text_ids):
         abstracted_text__short_name__in=['HM1'],
         type__slug='transcription'
     ):
-        content = get_xml_from_unicode(
-            encoded_text.content, ishtml=True, add_root=True
-        )
+        content = encoded_text.content_xml
         for wregion in content.findall(wpattern):
             key = slugify(get_unicode_from_xml(wregion, text_only=True))[:20]
             key = key or '∅'
@@ -174,36 +172,79 @@ def get_regions_with_unique_variants(text_ids):
                 'readings': OrderedDict()
             })
 
+    def ms_wreading_callback(
+        region_index, reading, version_siglum, ms_siglum,
+        ms_index, ms_abstracted
+    ):
+        if region_index < len(ret):
+            if reading not in ret[region_index]['readings']:
+                ret[region_index]['readings'][reading] = []
+            ret[region_index]['readings'][reading].append(
+                [version_siglum, ms_siglum]
+            )
+        else:
+            print('WARNING: w-region #{} of {} not found in {}'.format(
+                region_index, version_siglum, 'heatmap text (HM1)'
+            ))
+
+    parse_mss_wregions(text_ids, ms_wreading_callback)
+
+    return ret
+
+
+def parse_mss_wregions(text_ids, ms_wreading_callback):
+    '''
+    text_ids: a list of mss ids (AbstractedText)
+    wregions_callback: a callback with the signature:
+        (region_index, reading, version_siglum, ms_siglum, ms_index)
+
+    For each MS in text_ids, the callback is called on all the wregion
+    of its parent version.
+    The callback is receives info about a wregion
+    where the + sign (nested vregion) has been replaced
+    with the reading from the MS.
+
+    e.g.
+        wregion i in Version = [abc [+:vregion j] cde]
+        vregion j in MS k    = [xyz]
+        => reading           = [abc xyz cde]
+        region_index         = i
+        ms_index             = k
+    '''
+
     # for each selected manuscript, get its parent w-regions
     # where all v-regions have been substituted with the content from the MS
+
+    if not text_ids:
+        return
+
+    wpattern = './/span[@data-dpt-group="work"]'
     vpattern = './/span[@data-dpt-group="version"]'
 
+    ms_index = 0
+
+    from ctrs_texts.models import EncodedText
     for encoded_text in EncodedText.objects.filter(
         abstracted_text_id__in=text_ids,
         type__slug='transcription',
         abstracted_text__type__slug='manuscript',
-    ).order_by('abstracted_text__short_name'):
-        member_siglum = encoded_text.abstracted_text.short_name
+    ).order_by('abstracted_text__group__short_name', 'abstracted_text__short_name'):
+        ms_abstracted = encoded_text.abstracted_text
+        member_siglum = ms_abstracted.short_name
 
         # get vregions from member
         vregions = []
-        content = get_xml_from_unicode(
-            encoded_text.content, ishtml=True, add_root=True
-        )
+        content = encoded_text.content_xml
         for vregion in content.findall(vpattern):
             vregions.append(get_unicode_from_xml(vregion, text_only=True))
 
-        # print(vregions)
-
         # get parent
         parent = EncodedText.objects.filter(
-            abstracted_text=encoded_text.abstracted_text.group,
+            abstracted_text=ms_abstracted.group,
             type__slug='transcription',
         ).first()
 
-        content_parent = get_xml_from_unicode(
-            parent.content, ishtml=True, add_root=True
-        )
+        content_parent = parent.content_xml
         parent_siglum = parent.abstracted_text.short_name
 
         # replace vregion in parent with text from member
@@ -218,19 +259,13 @@ def get_regions_with_unique_variants(text_ids):
 
         # get the text of all the wregions from parent
         for i, wregion in enumerate(content_parent.findall(wpattern)):
-            if i < len(ret):
-                wreading = get_unicode_from_xml(wregion, text_only=True)
-                wreading = wreading.strip()
-                if wreading not in ret[i]['readings']:
-                    ret[i]['readings'][wreading] = []
-                ret[i]['readings'][wreading].append(
-                    [parent_siglum, member_siglum])
-            else:
-                print('WARNING: w-region #{} of {} not found in {}'.format(
-                    i, parent, 'heatmap text (HM1)')
-                )
+            wreading = get_unicode_from_xml(wregion, text_only=True).strip()
+            ms_wreading_callback(
+                i, wreading, parent_siglum, member_siglum, ms_index,
+                ms_abstracted
+            )
 
-    return ret
+        ms_index += 1
 
 
 def get_annotations_from_archetype():

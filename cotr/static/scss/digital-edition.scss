@@ -456,7 +456,7 @@ $highlighted-background-color: #ee0;
       // we highlight it in this block.
       // TODO: remove !important
       background-color: $highlighted-background-color;
-    }    
+    }
   }
 
   // span[data-dpt=sn],
@@ -663,7 +663,7 @@ $highlighted-background-color: #ee0;
   }
 }
 
-#text-search {
+#text-search, #lab-regions {
   .menu.vertical {
     li {
       margin-top: 4px;
