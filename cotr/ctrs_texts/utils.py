@@ -10,6 +10,39 @@ from django.utils.text import slugify
 from lxml import html
 
 
+def get_regions_from_content_xml(content_xml, region_type='version'):
+    '''content_xml a lxml etree node for the text
+    For each region of type region_type, yields
+    {
+        'xml': the xml element for that region,
+        'text': the plain text content of that region,
+        'sentence': the sentence number/code,
+        'region': the id of the region,
+        'index': index of the region,
+    }
+    '''
+    reg_pattern = './/span[@data-dpt-group="' + region_type + '"]'
+    ri = 0
+    for para in content_xml.findall('.//p'):
+        number = ''
+        sentence_element = para.find('.//span[@data-dpt="sn"]')
+        if sentence_element is not None:
+            number = re.sub(
+                r'^s-(\d+)$', r'\1',
+                sentence_element.attrib.get('data-rid', '')
+            )
+
+        for reg in para.iterfind(reg_pattern):
+            yield {
+                'xml': reg,
+                'text': get_unicode_from_xml(reg, text_only=True).strip(),
+                'sentence': number,
+                'region': reg.attrib.get('data-rid', ''),
+                'index': ri,
+            }
+            ri += 1
+
+
 def get_xml_from_unicode(document, ishtml=False, add_root=False):
     # document = a unicode object containing the document
     # ishtml = True will be more lenient about the XML format
@@ -173,9 +206,11 @@ def get_regions_with_unique_variants(text_ids):
             })
 
     def ms_wreading_callback(
-        region_index, reading, version_siglum, ms_siglum,
+        region_data, version_siglum, ms_siglum,
         ms_index, ms_abstracted
     ):
+        region_index = region_data['index']
+        reading = region_data['text']
         if region_index < len(ret):
             if reading not in ret[region_index]['readings']:
                 ret[region_index]['readings'][reading] = []
@@ -196,7 +231,9 @@ def parse_mss_wregions(text_ids, ms_wreading_callback):
     '''
     text_ids: a list of mss ids (AbstractedText)
     wregions_callback: a callback with the signature:
-        (region_index, reading, version_siglum, ms_siglum, ms_index)
+        (region_data, version_siglum, ms_siglum, ms_index)
+
+    region_data = see get_regions_from_content_xml()
 
     For each MS in text_ids, the callback is called on all the wregion
     of its parent version.
@@ -218,17 +255,45 @@ def parse_mss_wregions(text_ids, ms_wreading_callback):
     if not text_ids:
         return
 
-    wpattern = './/span[@data-dpt-group="work"]'
     vpattern = './/span[@data-dpt-group="version"]'
 
     ms_index = 0
 
+    # get all the requested texts (encoded)
     from ctrs_texts.models import EncodedText
-    for encoded_text in EncodedText.objects.filter(
+    encoded_texts = EncodedText.objects.filter(
         abstracted_text_id__in=text_ids,
         type__slug='transcription',
         abstracted_text__type__slug='manuscript',
-    ).order_by('abstracted_text__group__short_name', 'abstracted_text__short_name'):
+    ).order_by(
+       'abstracted_text__group__short_name',
+       'abstracted_text__short_name'
+    ).select_related('abstracted_text__group')
+
+    # get all their parents (encoded version)
+    encoded_parents = {
+        ep.abstracted_text_id: {
+            'encoded_text': ep,
+            'content_xml': ep.content_xml,
+        }
+        for ep in
+        EncodedText.objects.filter(
+            type__slug='transcription',
+            abstracted_text_id__in=[
+                et.abstracted_text.group_id for et in encoded_texts
+            ],
+        ).select_related('abstracted_text')
+    }
+    for ep in encoded_parents.values():
+        ep['vregions'] = [
+            vregion if vregion.clear(keep_tail=True) else vregion
+            for vregion in
+            ep['content_xml'].findall(vpattern)
+        ]
+
+        ep['wregions'] = list(get_regions_from_content_xml(ep['content_xml'], 'work'))
+
+    for encoded_text in encoded_texts:
         ms_abstracted = encoded_text.abstracted_text
         member_siglum = ms_abstracted.short_name
 
@@ -239,30 +304,27 @@ def parse_mss_wregions(text_ids, ms_wreading_callback):
             vregions.append(get_unicode_from_xml(vregion, text_only=True))
 
         # get parent
-        parent = EncodedText.objects.filter(
-            abstracted_text=ms_abstracted.group,
-            type__slug='transcription',
-        ).first()
+        parent = encoded_parents[ms_abstracted.group_id]
 
-        content_parent = parent.content_xml
-        parent_siglum = parent.abstracted_text.short_name
+        parent_siglum = parent['encoded_text'].abstracted_text.short_name
 
         # replace vregion in parent with text from member
-        for i, vregion in enumerate(content_parent.findall(vpattern)):
+        for i, vregion in enumerate(parent['vregions']):
             if i < len(vregions):
-                vregion.clear(keep_tail=True)
                 vregion.text = vregions[i]
             else:
                 print('WARNING: v-region #{} of {} not found in {}'.format(
-                    i, encoded_text, parent)
+                    i, encoded_text, parent['encoded_text'])
                 )
 
         # get the text of all the wregions from parent
-        for i, wregion in enumerate(content_parent.findall(wpattern)):
-            wreading = get_unicode_from_xml(wregion, text_only=True).strip()
+        for i, wregion in enumerate(parent['wregions']):
+            wregion['text'] = get_unicode_from_xml(
+                wregion['xml'], text_only=True
+            ).strip()
             ms_wreading_callback(
-                i, wreading, parent_siglum, member_siglum, ms_index,
-                ms_abstracted
+                wregion, parent_siglum, member_siglum,
+                ms_index, ms_abstracted
             )
 
         ms_index += 1

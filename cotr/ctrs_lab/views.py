@@ -1,13 +1,9 @@
 from collections import OrderedDict
 import time
 from difflib import SequenceMatcher
-
 from django.http import JsonResponse, HttpResponse
-import re
 from collections import Counter
-
-
-from ctrs_texts.utils import get_xml_from_unicode, get_unicode_from_xml
+from ctrs_texts.utils import get_regions_from_content_xml
 
 
 def view_api_regions_compare(request):
@@ -60,7 +56,10 @@ def view_api_regions_compare(request):
         if max_dist != min_dist:
             for r in readings:
                 # rescale between 0 and max (to get more contrast)
-                r['dist'] = (r['dist'] - min_dist) * max_dist / (max_dist - min_dist)
+                r['dist'] = round(
+                    (r['dist'] - min_dist) * max_dist / (max_dist - min_dist),
+                    3
+                )
 
         region['groups'] = len(groups)
 
@@ -147,41 +146,24 @@ def api_regions_one_parent(work_slug='declaration', parent_siglum='v1'):
         texts = texts.filter(abstracted_text__group__group__slug__iexact=work_slug)
         texts = texts.filter(abstracted_text__group__short_name__iexact=parent_siglum)
 
+    texts.select_related('abstracted_text__group')
     texts = texts.order_by('abstracted_text__short_name')
+    texts = list(texts)
 
     regions = []
-
-    texts_count = texts.count()
 
     ti = 0
     for text in texts:
         ri = 0
-        xml = get_xml_from_unicode(text.content, add_root=True, ishtml=True)
-        for para in xml.findall('.//p'):
-            number = ''
-            for sentence_element in para.findall('.//span[@data-dpt="sn"]'):
-                number = re.sub(r'^s-(\d+)$', r'\1',
-                                sentence_element.attrib.get('data-rid', ''))
-
-            regs = para.findall(
-                './/span[@data-dpt-group="' + region_type + '"]')
-
-            for reg in regs:
-                if len(regions) <= ri:
-                    regions.append({
-                        'readings': [{'t': ''} for i in range(texts_count)],
-                        'sentence': number,
-                        'region': reg.attrib.get('data-rid', ''),
-                    })
-                regions[ri]['readings'][ti] = {
-                    't': get_unicode_from_xml(
-                        reg,
-                        encoding='utf-8',
-                        text_only=True,
-                        remove_root=False
-                    ).strip(),
-                }
-                ri += 1
+        for reg in get_regions_from_content_xml(text.content_xml, region_type):
+            if len(regions) <= ri:
+                regions.append({
+                    'readings': [{'t': ''} for i in range(len(texts))],
+                    'sentence': reg['sentence'],
+                    'region': reg['region'],
+                })
+            regions[ri]['readings'][ti] = {'t': reg['text']}
+            ri += 1
 
         ti += 1
 
@@ -202,21 +184,20 @@ def api_regions_many_parents(text_ids=None):
 
     # reading callback to populate regions
     def ms_wreading_callback(
-        region_index, reading, version_siglum, ms_siglum,
+        region_data, version_siglum, ms_siglum,
         ms_index, ms_abstracted
     ):
         if not(abstracted_texts) or ms_abstracted != abstracted_texts[-1]:
             abstracted_texts.append(ms_abstracted)
 
-        if len(regions) <= region_index:
+        if len(regions) <= region_data['index']:
             regions.append({
                 'readings': [{'t': ''} for i in range(readings_per_region)],
-                # TODO
-                'sentence': 1,
-                # TODO
-                'region': 'v1',
+                'sentence': region_data['sentence'],
+                'region': region_data['region'],
             })
-        regions[region_index]['readings'][ms_index]['t'] = reading
+        regions[region_data['index']]['readings'][ms_index]['t'] = \
+            region_data['text']
 
     from ctrs_texts import utils
     utils.parse_mss_wregions(text_ids, ms_wreading_callback)
@@ -225,9 +206,15 @@ def api_regions_many_parents(text_ids=None):
 
 
 def view_api_regions_all_plaintext(request):
+    '''returns all the tokens in all teh regions.
+    This is used to extract embeddings from word2vec models.
+    TODO: export also the w-regions from the versions.
+    '''
     work_slug = request.GET.get('group', 'declaration').lower()
 
     region_type = 'version'
+
+    ret = ''
 
     from ctrs_texts.models import EncodedText
     texts = EncodedText.objects.filter(
@@ -238,18 +225,12 @@ def view_api_regions_all_plaintext(request):
 
     texts = texts.order_by('abstracted_text__short_name')
 
-    ret = ''
-
     for text in texts:
-        xml = get_xml_from_unicode(text.content, add_root=True, ishtml=True)
-        for reg in xml.findall(
-                    './/span[@data-dpt-group="' + region_type + '"]'):
-
-            ret += get_unicode_from_xml(
-                    reg,
-                    encoding='utf-8',
-                    text_only=True,
-                    remove_root=False
-                ).strip()+' .\n'
+        ret += ' .\n'.join([
+            reg['text']
+            for reg
+            in get_regions_from_content_xml(text.content_xml, region_type)
+        ])
+        ret += ' .\n'
 
     return HttpResponse(ret)
