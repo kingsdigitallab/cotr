@@ -78,10 +78,11 @@ $(() => {
 
       panels: {
         'table': 'Table',
+        'matrix': 'Matrix',
         'settings': 'Settings',
         'help': 'Help',
       },
-      panel: 'settings',
+      panel: 'matrix',
       /*
       List of all available texts. Exactly as returned by /api/texts/.
 
@@ -183,6 +184,18 @@ $(() => {
         }
 
         if (!silent) this.fetch_regions()
+      },
+      get_diff_cell_style: function(i, j) {
+        let color = blend_colors(
+          COLOR_GROUP_FIRST,
+          COLOR_MOST_DISTANT,
+          this.regions_meta.diff_matrix[i][j] / this.regions_meta.diff_matrix_max
+        )
+
+        return 'background-color: rgb(' + color.join(',') + ')'
+      },
+      get_diff_cell_value: function(i, j) {
+        return (this.regions_meta.diff_matrix[i][j] / this.regions_meta.diff_matrix_max).toFixed(2)
       },
       get_reading_style: function(reading, region) {
         if (region.groups == 1) return ''

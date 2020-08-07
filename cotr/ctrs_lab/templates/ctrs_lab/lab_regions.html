@@ -80,13 +80,19 @@
         <thead>
           <tr>
             <th class="heading-rid">Region #</th>
+            <th class="heading-rid">Sent.</th>
             <th v-for="source in regions_meta.sources">
               {{ source.siglum }} ({{ source.siglum_parent }})
             </th>
           </tr>
         </thead>
-        <tr v-for="region in regions">
-          <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">{{ region.region }}</a></td>
+        <tr v-for="region in regions" v-if="region.groups > 1">
+          <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">
+            {{ region.region }}
+          </a></td>
+          <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">
+            {{ region.sentence }}
+          </a></td>
           <td v-for="reading in region.readings" :style="get_reading_style(reading, region)">
             {{ reading.t }}
           </td>
@@ -94,38 +100,60 @@
       </table>
     </div>
 
+    <div v-show="panel == 'matrix'" class="tabs-panel is-active">
+      <table :class="">
+        <thead>
+          <tr>
+            <th>
+              /
+            </th>
+            <th v-for="source in regions_meta.sources">
+              {{ source.siglum }} ({{ source.siglum_parent }})
+            </th>
+          </tr>
+        </thead>
+        <tr v-for="(source, i) in regions_meta.sources">
+          <td>{{ source.siglum }} ({{ source.siglum_parent }})</td>
+          <td v-for="(source, j) in regions_meta.sources" :style="get_diff_cell_style(i, j)">{{ get_diff_cell_value(i, j) }}</td>
+        </td>
+      </table>
+    </div>
+
     <div v-show="panel == 'help'" class="tabs-panel is-active">
       <h2>Introduction</h2>
-      <p>This is an experimental prototype visualisation of the unsettled regions.</p>
-      <p>It is an attempt to intuitively approach the following questions:</p>
+      <p>This is an experimental tool to make more visible variational patterns among the texts of the Dynamic Edition.</p>
+      <p>In particular it is designed to intuitively approach the following questions:</p>
       <ol>
         <li><strong>Outlier detection</strong>: which text disrupts the version or the work the most in a given area? I.e. who's the 'troublemaker'?</li>
         <li><strong>Heterogeneity</strong>: how much do the texts disagree with each other in a given area?</li>
         <li><strong>Clustering</strong>: which group of texts tend to agree with each other in a given area?</li>
       </ol>
-      <p>The heatmap visualisation is similar in the sense that it shows the spatial distribution of heterogeneity (question 2).
-      However since this visualisation shows the selected texts in parallel, it enables comparative analysis.</p>
       <p>This type of visualisation is very similar to established tabular representations of collation results [1].
-        Each column is a text and each row represent an unsettled region.
+        To each column corresponds a text and each row represents an unsettled region.
         The regions appear in the sequential order of the text.
-      Each cell contains the reading for a particular text in a given region</p>
+        Each cell contains the reading for a particular text in a given region</p>
       <h2>What do the colors mean?</h2>
       <p>In a row, the cells with identical readings have identical colors.
         The most consensual readings are green and the most unique ones are blue. Any intermediate frequencies fall within that green-blue spectrum.
-        Also, the more a reading differs from the others in the region the more red it looks.</p>
-      <p>Unlike some other tabular visualisations of collations, green and red here don't mean 'correct reading' and mistake respectively.
-      In line with the principles of a Dynamic Edition the colors encourage you to explore all alternatives impartially without the influence of a specific text.</p>
+        Also the more a reading differs from the others in the region the more red it looks.</p>
+      <p>Unlike some other tabular visualisations of collations, green and red here don't mean 'correct reading' and 'rejected reading' respectively.
+      Instead, in line with the principles of a Dynamic Edition, the colors encourage you to explore all alternatives impartially without the influence of a specific text.</p>
+      <h2>Difference with the Heatmap</h2>
+      <p>The <a href="/search/regions/">Heatmap visualisation</a> is similar
+        in the sense that it shows the physical distribution (i.e. spatial projection on a facsimile of the manuscript)
+        of textual heterogeneity (question 2).
+      This visualisation however enables comparative analysis by showing all the selected texts in parallel.
+      Another key difference is that the similarity measure on the heatmap is fully binary.</p>
       <h2>Limitations</h2>
-      <p>The coloring, underlying measures of similarity and many other choices made here are full of caveats;
-        they are imperfect, incomplete, simplified and arbitrary instruments of comparison.
-      This visualisation is a tool to intuitively explore the dynamic of the edition through the distributions of mutual and non-binary differences
-        but no conclusion should be drawn from it without careful textual analysis. It's aim is to draw attentions to variations and patterns
-        that might be easily missed when looking at a couple of manuscript folios side by side.</p>
+      <p>In general, there are many ways to compare the variations among texts and each one can yield different results.
+        The coloring, underlying measures of similarity and many other implementation choices made here are full of caveats.
+      </p>
       <p>We have used a non-binary similarity metric
         (based on <a href="https://docs.python.org/3/library/difflib.html#difflib.SequenceMatcher.quick_ratio">Python's quick_ratio</a> method).
-        It calculate the proportion of character sequences in common between two readings.
+        It calculates the proportion of character sequences in common between two readings.
         It is purely syntactic, with no concept of semantic.
-        So <i>magnificus</i> and <i>malificus</i> are considered 84% similar whereas <i>uel</i> and <i>aut</i> very different (only 33% similarity).
+        So <i>magnificus</i> and <i>malificus</i> are considered 84% similar
+        whereas <i>uel</i> and <i>aut</i> very different (only 33% similarity).
       </p>
       <p>Geoffroy Noël</p>
 

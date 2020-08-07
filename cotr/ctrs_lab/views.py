@@ -20,6 +20,11 @@ def view_api_regions_compare(request):
 
     use_global_distance = True
 
+    # the diff matrix
+    texts_count = len(ret['meta']['sources'])
+    diff_matrix = [[0 for t in range(texts_count)] for t in range(texts_count)]
+    diff_matrix_max = 0
+
     for region in ret['data']:
         readings = region['readings']
 
@@ -36,7 +41,10 @@ def view_api_regions_compare(request):
             if use_global_distance:
                 # distance with all the rest
                 for j in range(len(readings)):
-                    dist += get_reading_distance(readings[i]['t'], readings[j]['t'])
+                    adist = get_reading_distance(readings[i]['t'], readings[j]['t'])
+                    dist += adist
+                    diff_matrix[i][j] += adist
+                    diff_matrix_max = max(diff_matrix[i][j], diff_matrix_max)
             else:
                 # distance with the most frequent group
                 # this brings more contrasts in the colors
@@ -68,6 +76,9 @@ def view_api_regions_compare(request):
     ret['meta']['stats'] = {
         'duration': t1-t0
     }
+
+    ret['meta']['diff_matrix'] = diff_matrix
+    ret['meta']['diff_matrix_max'] = diff_matrix_max
 
     return JsonResponse(ret)
 

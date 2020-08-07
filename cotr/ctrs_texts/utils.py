@@ -252,6 +252,8 @@ def parse_mss_wregions(text_ids, ms_wreading_callback):
     # for each selected manuscript, get its parent w-regions
     # where all v-regions have been substituted with the content from the MS
 
+    # TODO: simplify the code
+
     if not text_ids:
         return
 
