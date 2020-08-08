@@ -12,13 +12,17 @@ from lxml import html
 
 
 class StringDiff:
+    """
+    Helper class to compare two strings efficiently
+    """
 
     def __init__(self, method='difflib_quick_ratio'):
         self.method = method
         self.difflib_matcher = SequenceMatcher(None, '', '', False)
-        self._last_s2 = ''
+        self._diff_cache = {}
 
     def get_distance(self, s1, s2):
+        """Returns 0.0 if s1 == s2; 1.0 if totally different"""
         if not(s1 and s2):
             return 0
         if 1:
@@ -27,16 +31,25 @@ class StringDiff:
             s2 = s2.lower()
         if s1 == s2:
             return 0
-        if self.method == 'difflib_quick_ratio':
-            self.difflib_matcher.set_seqs(s1, s2)
-            return 1 - self.difflib_matcher.quick_ratio()
-            # return 1 - SequenceMatcher(None, s1, s2, False).quick_ratio()
-        if self.method == 'difflib_ratio':
-            self.difflib_matcher.set_seqs(s1, s2)
-            return 1 - self.difflib_matcher.ratio()
 
-        # e.g. binary
-        return 1
+        ret = 1
+
+        if self.method != 'binary':
+            cache_key = s1 + '|' + s2
+            ret = self._diff_cache.get(cache_key, None)
+            if ret is None:
+                self.difflib_matcher.set_seqs(s1, s2)
+
+                if self.method == 'difflib_quick_ratio':
+                    ret = self.difflib_matcher.quick_ratio()
+                elif self.method == 'difflib_ratio':
+                    ret = self.difflib_matcher.ratio()
+
+                ret = 1 - ret
+                self._diff_cache[cache_key] = ret
+                self._diff_cache[s2+'|'+s1] = ret
+
+        return ret
 
 
 def get_regions_from_content_xml(content_xml, region_type='version'):

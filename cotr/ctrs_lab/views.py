@@ -20,7 +20,7 @@ def view_api_regions_compare(request):
 
     use_global_distance = True
 
-    # the diff matrix
+    # initialise the diff matrix
     texts_count = len(ret['meta']['sources'])
     diff_matrix = [[0 for t in range(texts_count)] for t in range(texts_count)]
     diff_matrix_max = 0
@@ -41,7 +41,6 @@ def view_api_regions_compare(request):
             in enumerate(groups.most_common())
         ])
         present_count = max(sum([1 for r in readings if r['t']]), 2)
-        diff_cache = {}
 
         for i in range(len(readings)):
             dist = 0
@@ -49,11 +48,7 @@ def view_api_regions_compare(request):
                 # distance with all the rest
                 for j in range(len(readings)):
                     rs = [readings[j]['t'], readings[i]['t']]
-                    adist = diff_cache.get(rs[0]+rs[1], None)
-                    if adist is None:
-                        adist = differ.get_distance(*rs)
-                        # diff_cache[rs[0] + rs[1]] = adist
-                        # diff_cache[rs[1] + rs[0]] = adist
+                    adist = differ.get_distance(*rs)
                     dist += adist
                     diff_matrix[i][j] += adist
                     diff_matrix_max = max(diff_matrix[i][j], diff_matrix_max)
