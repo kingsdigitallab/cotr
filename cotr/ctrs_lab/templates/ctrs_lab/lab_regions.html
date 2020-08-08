@@ -38,6 +38,22 @@
 
   <div class="tabs-content">
     <div v-show="panel == 'settings'" class="tabs-panel is-active">
+      <p>
+        <label>
+          Similarity metric:
+          <select v-model="diff_method">
+            <option v-for="method in diff_methods" :value="method[0]">{{ method[1] }}</option>
+          </select>
+        </label>
+        <label>
+          Unit of comparison:
+          <select v-model="diff_unit">
+            <option v-for="unit in diff_units" :value="unit[0]">{{ unit[1] }}</option>
+          </select>
+        </label>
+      </p>
+
+      <hr>
 
       <p v-show="parent!='custom'">
         <em><a @click="parent = 'custom'">Select 'Custom'</a>
@@ -75,15 +91,6 @@
           </template>
         </template>
       </div>
-
-      <p>
-        <label>
-          Similarity metric:
-          <select v-model="diff_method">
-            <option v-for="method in get_diff_methods()" :value="method[0]">{{ method[1] }}</option>
-          </select>
-        </label>
-      </p>
 
     </div>
 

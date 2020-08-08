@@ -15,19 +15,34 @@ def view_api_regions_compare(request):
     else:
         text_ids = []
     diff_method = request.GET.get('diff', 'difflib_quick_ratio').strip()
+    diff_unit = request.GET.get('unit', 'region').strip()
 
+    # call the region api
     ret = api_regions(work_slug, parent_siglum, text_ids)
+
+    texts_count = len(ret['meta']['sources'])
+
+    regions = ret['data']
+    if diff_unit == 'sentence':
+        # merge regions by sentence
+        for i in range(len(regions)-2, -1, -1):
+            if regions[i + 1]['sentence'] == regions[i]['sentence']:
+                for j in range(0, texts_count):
+                    reading = regions[i+1]['readings'][j]['t'].strip()
+                    if reading:
+                        reading = '… ' + reading
+                    regions[i]['readings'][j]['t'] += reading
+                del regions[i+1]
 
     use_global_distance = True
 
     # initialise the diff matrix
-    texts_count = len(ret['meta']['sources'])
     diff_matrix = [[0 for t in range(texts_count)] for t in range(texts_count)]
     diff_matrix_max = 0
 
     differ = StringDiff(diff_method)
 
-    for region in ret['data']:
+    for region in regions:
         readings = region['readings']
 
         # group readings

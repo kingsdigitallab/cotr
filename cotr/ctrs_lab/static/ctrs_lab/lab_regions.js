@@ -11,12 +11,7 @@ const VUE_QS_MAPPING = [
   ['is_birds_eye_view_enabled', 'bev', 'int', 0],
   ['is_omission_highlighted', 'oh', 'int', 0],
   ['diff_method', 'diff', 'lowercase', 'difflib_quick_ratio'],
-]
-
-const DIFF_METHODS = [
-    ['difflib_quick_ratio', 'quick_ratio (Difflib)'],
-    ['difflib_ratio', 'ratio (Difflib)'],
-    ['binary', 'Binary'],
+  ['diff_unit', 'unit', 'lowercase', 'region'],
 ]
 
 const PRESELECTED_TEXT_SIGLA = ['V1']
@@ -83,9 +78,21 @@ $(() => {
     el: '#lab-regions',
     data: {
       status: STATUS_INITIAL,
-      group: 'declaration',
-      parent: 'custom',
+      group: '',
+      parent: '',
+
+      diff_methods: [
+        ['difflib_quick_ratio', 'quick_ratio (Difflib)'],
+        ['difflib_ratio', 'ratio (Difflib)'],
+        ['binary', 'Binary'],
+      ],
       diff_method: '',
+
+      diff_units: [
+        ['region', 'Unsettled region'],
+        ['sentence', 'sentence'],
+      ],
+      diff_unit: '',
 
       panels: {
         'table': 'Table',
@@ -93,7 +100,13 @@ $(() => {
         'settings': 'Settings',
         'help': 'Help',
       },
-      panel: 'matrix',
+      panels: {
+        'table': 'Table',
+        'matrix': 'Matrix',
+        'settings': 'Settings',
+        'help': 'Help',
+      },
+      panel: '',
       /*
       List of all available texts. Exactly as returned by /api/texts/.
 
@@ -178,6 +191,9 @@ $(() => {
         this.update_query_string()
       },
       diff_method: function() {
+        this.fetch_regions()
+      },
+      diff_unit: function() {
         this.fetch_regions()
       },
     },
@@ -286,6 +302,7 @@ $(() => {
                 parent: self.parent,
                 texts: text_ids.join(','),
                 diff: self.diff_method,
+                unit: self.diff_unit,
             }
         ).done((res) => {
             Vue.set(self, 'regions', res.data)
@@ -356,10 +373,6 @@ $(() => {
           }
         }
         return null
-      },
-
-      get_diff_methods: function() {
-        return DIFF_METHODS;
       },
 
     }

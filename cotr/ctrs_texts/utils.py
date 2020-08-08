@@ -18,7 +18,7 @@ class StringDiff:
 
     def __init__(self, method='difflib_quick_ratio'):
         self.method = method
-        self.difflib_matcher = SequenceMatcher(None, '', '', False)
+        self.difflib_matcher = SequenceMatcher(lambda x: x in '…', '', '', False)
         self._diff_cache = {}
 
     def get_distance(self, s1, s2):
