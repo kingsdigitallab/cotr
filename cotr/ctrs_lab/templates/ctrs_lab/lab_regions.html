@@ -18,7 +18,8 @@
 {% verbatim %}
 <div id="lab-regions" class="">
   <p>
-    Group:
+    <span class="message-loading label warning" v-show="status !== 3">Loading results...</span>
+    Parent:
     <select v-model="parent">
       <option v-for="text in texts" :value="text.attributes.siglum|lowercase" v-if="text.type != 'manuscript'">
         {{ text.attributes.siglum }}
@@ -27,12 +28,6 @@
         Custom selection
       </option>
     </select>
-  </p>
-  <p>
-    <label>
-      <input type="checkbox" v-model="is_reading_distant">
-      Bird's eye view
-    </label>
   </p>
 
   <ul class="tabs" data-tabs>
@@ -44,39 +39,66 @@
   <div class="tabs-content">
     <div v-show="panel == 'settings'" class="tabs-panel is-active">
 
-      <template v-for="text in texts" v-if="parent=='custom'">
-        <template v-if="text.type == 'version'">
-          <ul class="menu vertical">
-            <li :class="">
-              <label>
-                <input type="checkbox" v-model="text.selected"
-                  @change="on_tick_text(text)">
-                <span
-                  :class="'label secondary version ' + text.attributes.siglum.toLowerCase() + '-text-id'">{{ text.attributes.siglum }}</span>
-                {{ text.attributes.name }}
-              </label>
-              <ul class="menu vertical">
-                <template v-for="member in texts">
-                  <li :class="" v-if="member.attributes.group == text.id">
-                    <label>
-                      <input type="checkbox" v-model="member.selected"
-                        @change="on_tick_text(member)">
-                      <span
-                        class="label secondary manuscript">{{ member.attributes.siglum }}</span>
-                      {{ member.attributes.name }}
-                    </label>
-                  </li>
-                </template>
-              </ul>
-            </li>
-          </ul>
+      <p v-show="parent!='custom'">
+        <em><a @click="parent = 'custom'">Select 'Custom'</a>
+          in the Parent dropdown above to enable selection of individual texts.</em>
+      </p>
+
+      <div class="text-list">
+        <p>Texts: (select: <a @click="on_select_all_texts(0)">all</a> | <a @click="on_select_all_texts(1)">none</a>)</p>
+        <template v-for="text in texts">
+          <template v-if="text.type == 'version'">
+            <ul class="menu vertical">
+              <li :class="">
+                <label>
+                  <input type="checkbox" v-model="text.selected"
+                    @change="on_tick_text(text)" :disabled="parent !== 'custom'">
+                  <span
+                    :class="'label secondary version ' + text.attributes.siglum.toLowerCase() + '-text-id'">{{ text.attributes.siglum }}</span>
+                  {{ text.attributes.name }}
+                </label>
+                <ul class="menu vertical">
+                  <template v-for="member in texts">
+                    <li :class="" v-if="member.attributes.group == text.id">
+                      <label>
+                        <input type="checkbox" v-model="member.selected"
+                          @change="on_tick_text(member)" :disabled="parent !== 'custom'">
+                        <span
+                          class="label secondary manuscript">{{ member.attributes.siglum }}</span>
+                        {{ member.attributes.name }}
+                      </label>
+                    </li>
+                  </template>
+                </ul>
+              </li>
+            </ul>
+          </template>
         </template>
-      </template>
+      </div>
+
+      <p>
+        <label>
+          Similarity metric:
+          <select v-model="diff_method">
+            <option v-for="method in get_diff_methods()" :value="method[0]">{{ method[1] }}</option>
+          </select>
+        </label>
+      </p>
 
     </div>
 
     <div v-show="panel == 'table'" class="tabs-panel is-active">
-      <table :class="{'distant-reading': is_reading_distant}">
+      <p>
+        <label>
+          <input type="checkbox" v-model="is_birds_eye_view_enabled">
+          Bird's eye view
+        </label>
+        <label>
+          <input type="checkbox" v-model="is_omission_highlighted">
+          Highlight omissions
+        </label>
+      </p>
+      <table :class="{'birds-eye-view': is_birds_eye_view_enabled}">
         <thead>
           <tr>
             <th class="heading-rid">Region #</th>
@@ -114,8 +136,12 @@
         </thead>
         <tr v-for="(source, i) in regions_meta.sources">
           <td>{{ source.siglum }} ({{ source.siglum_parent }})</td>
-          <td v-for="(source, j) in regions_meta.sources" :style="get_diff_cell_style(i, j)">{{ get_diff_cell_value(i, j) }}</td>
-        </td>
+          <td v-for="(source, j) in regions_meta.sources"
+              :style="get_diff_cell_style(i, j)"
+              :class="get_diff_cell_boundary_classes(i, j)">
+            {{ get_diff_cell_value(i, j) }}
+          </td>
+        </tr>
       </table>
     </div>
 
@@ -139,11 +165,12 @@
       <p>Unlike some other tabular visualisations of collations, green and red here don't mean 'correct reading' and 'rejected reading' respectively.
       Instead, in line with the principles of a Dynamic Edition, the colors encourage you to explore all alternatives impartially without the influence of a specific text.</p>
       <h2>Difference with the Heatmap</h2>
-      <p>The <a href="/search/regions/">Heatmap visualisation</a> is similar
+      <p>The <a href="/search/?rt=regions">Heatmap visualisation</a> is similar
         in the sense that it shows the physical distribution (i.e. spatial projection on a facsimile of the manuscript)
         of textual heterogeneity (question 2).
-      This visualisation however enables comparative analysis by showing all the selected texts in parallel.
-      Another key difference is that the similarity measure on the heatmap is fully binary.</p>
+        Both of them allow you to break free from the confines of a stemmatic branch by comparing texts across different versions.
+      This tabular visualisation however better facilitates comparative analysis by showing all the selected texts in parallel.
+      Another key difference is that the similarity measures on the heatmap are exclusively binary.</p>
       <h2>Limitations</h2>
       <p>In general, there are many ways to compare the variations among texts and each one can yield different results.
         The coloring, underlying measures of similarity and many other implementation choices made here are full of caveats.
@@ -155,9 +182,19 @@
         So <i>magnificus</i> and <i>malificus</i> are considered 84% similar
         whereas <i>uel</i> and <i>aut</i> very different (only 33% similarity).
       </p>
+      <h2>How to read the Difference Matrix?</h2>
+      <p>The difference matrix shows how different each text is every other text.
+      The number varies between 0 (identical) and 1 (most different among the selected group of texts).
+      The color varies from green (closer to 0) to red (closer to 1).
+      It's important to note that the meaning of 1 (and red) is different from what's used on the tabular visualisation.
+      1 or red is used for the most distant pair of texts, all the numbers between 0 and 1 are relative to that.
+      </p>
       <p>Geoffroy Noël</p>
 
-      <p>[1] Elisa Nury, "Visualizing Collation Results", Variants [Online], 14 | 2019, accessed 06 August 2020. (https://doi.org/10.4000/variants.950)</p>
+      <hr>
+
+      <p>[1] Elisa Nury, "Visualizing Collation Results", Variants [Online], 14 | 2019, accessed 06 August 2020.
+        (<a href="https://doi.org/10.4000/variants.950">https://doi.org/10.4000/variants.950</a>)</p>
     </div>
 
     </div>

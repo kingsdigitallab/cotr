@@ -7,6 +7,16 @@
 const VUE_QS_MAPPING = [
   ['group', 'group', 'lowercase', 'declaration'],
   ['parent', 'parent', 'lowercase', 'v1'],
+  ['panel', 'panel', 'lowercase', 'table'],
+  ['is_birds_eye_view_enabled', 'bev', 'int', 0],
+  ['is_omission_highlighted', 'oh', 'int', 0],
+  ['diff_method', 'diff', 'lowercase', 'difflib_quick_ratio'],
+]
+
+const DIFF_METHODS = [
+    ['difflib_quick_ratio', 'quick_ratio (Difflib)'],
+    ['difflib_ratio', 'ratio (Difflib)'],
+    ['binary', 'Binary'],
 ]
 
 const PRESELECTED_TEXT_SIGLA = ['V1']
@@ -72,9 +82,10 @@ $(() => {
   let app = new Vue({
     el: '#lab-regions',
     data: {
-      status: STATUS_FETCHED,
+      status: STATUS_INITIAL,
       group: 'declaration',
       parent: 'custom',
+      diff_method: '',
 
       panels: {
         'table': 'Table',
@@ -97,7 +108,8 @@ $(() => {
         }
       }, [...]]
       */
-      is_reading_distant: 0,
+      is_birds_eye_view_enabled: 0,
+      is_omission_highlighted: 0,
 
       texts: [],
       regions: [
@@ -131,9 +143,11 @@ $(() => {
           let text = self.get_text_from_id_or_siglum(siglum)
           if (text) {
               text.selected = true
+              this.on_tick_text(text, true)
           }
         }
 
+        this.status = STATUS_TO_FETCH
         this.fetch_regions()
       })
 
@@ -152,6 +166,18 @@ $(() => {
     },
     watch: {
       parent: function() {
+        this.fetch_regions()
+      },
+      panel: function() {
+        this.update_query_string()
+      },
+      is_birds_eye_view_enabled: function() {
+        this.update_query_string()
+      },
+      is_omission_highlighted: function() {
+        this.update_query_string()
+      },
+      diff_method: function() {
         this.fetch_regions()
       },
     },
@@ -185,6 +211,10 @@ $(() => {
 
         if (!silent) this.fetch_regions()
       },
+      on_select_all_texts: function(unselect=false) {
+        for (text of this.texts) text.selected = !unselect
+        this.fetch_regions()
+      },
       get_diff_cell_style: function(i, j) {
         let color = blend_colors(
           COLOR_GROUP_FIRST,
@@ -197,6 +227,29 @@ $(() => {
       get_diff_cell_value: function(i, j) {
         return (this.regions_meta.diff_matrix[i][j] / this.regions_meta.diff_matrix_max).toFixed(2)
       },
+      get_diff_cell_boundary_classes: function(i, j) {
+        // this is used to create borders around a group cells of the same
+        // parent (version)
+        let ret = []
+        let sources = this.regions_meta.sources
+        if (j > 0
+        && sources[j].siglum_parent != sources[j-1].siglum_parent
+        && (
+            sources[i].siglum_parent == sources[j-1].siglum_parent
+            || sources[i].siglum_parent == sources[j].siglum_parent
+        )) {
+            ret.push('different-version-from-left')
+        }
+        if (i > 0
+            && sources[i].siglum_parent != sources[i-1].siglum_parent
+            && (
+                sources[j].siglum_parent == sources[i-1].siglum_parent
+                || sources[i].siglum_parent == sources[j].siglum_parent
+           )) {
+            ret.push('different-version-from-top')
+        }
+        return ret.join(' ')
+      },
       get_reading_style: function(reading, region) {
         if (region.groups == 1) return ''
 
@@ -206,10 +259,16 @@ $(() => {
           reading.grp / (region.groups - 1)
         )
         color = blend_colors(color, COLOR_MOST_DISTANT, reading.dist * 0.8)
+
+        if (this.is_omission_highlighted && reading.t == '∅') {
+            color = [255, 255, 255]
+        }
+
         return 'background-color: rgb(' + color.join(',') + ')'
       },
       fetch_regions: function() {
-        if (this.status != STATUS_FETCHED) {
+        if (this.status != STATUS_FETCHED
+            && this.status != STATUS_TO_FETCH) {
             return
         }
 
@@ -218,9 +277,7 @@ $(() => {
         let self = this
 
         // array of of selected text ids
-        let text_ids = this.texts.map(function(t) {
-          if (t.selected) return t.id
-        }).filter(aid => aid)
+        let text_ids = this.texts.filter(t => t.selected).map(t => t.id)
 
         $.getJSON(
             '/lab/api/regions/compare/',
@@ -228,19 +285,26 @@ $(() => {
                 group: self.group,
                 parent: self.parent,
                 texts: text_ids.join(','),
+                diff: self.diff_method,
             }
         ).done((res) => {
             Vue.set(self, 'regions', res.data)
             Vue.set(self, 'regions_meta', res.meta)
-            self.update_query_string()
             self.status = STATUS_FETCHED
+            self.update_query_string()
         })
       },
       update_query_string: function () {
+        if (this.status != STATUS_FETCHED) return
+
         // update query string with current state of viewer
         // e.g. ?blocks=506:transcription,transcription;495:transcription
-        var self = this
-        let qs = 'group=' + self.group + '&parent=' + self.parent
+        let qs = []
+        for (const m of VUE_QS_MAPPING) {
+          let val = this._convert_value(this[m[0]], m[2], this[m[0]])
+          if (val != m[3]) qs.push(m[1] + '=' + val)
+        }
+        qs = qs.join('&')
 
         let text_ids = this.texts.map(function(t) {
           if (t.selected) return t.id
@@ -262,17 +326,21 @@ $(() => {
         // Except the texts (see mounted)
         const params = new URLSearchParams(window.location.search);
         for (const m of VUE_QS_MAPPING) {
-          let val = params.get(m[1])
-          val = (val === undefined || val === null) ? m[3] : val;
-          if (m[2] === 'int') {
-            val = parseInt(val)
-            if (isNaN(val)) val = m[3]
-          }
-          if (m[2] === 'lowercase') {
-            val = val.toLowerCase()
-          }
-          this[m[0]] = val
+          this[m[0]] = this._convert_value(params.get(m[1]), m[2], m[3])
         }
+      },
+
+      _convert_value: function(val, conversion, default_val) {
+          if (val === undefined || val === null) return default_val
+
+          if (conversion === 'int') {
+            // better than parseInt (true -> 1)
+            val = val | default_val
+          }
+          if (conversion === 'lowercase') {
+            val = ('' + val).toLowerCase()
+          }
+          return val
       },
 
       get_text_from_id_or_siglum: function (id_or_siglum) {
@@ -288,6 +356,10 @@ $(() => {
           }
         }
         return null
+      },
+
+      get_diff_methods: function() {
+        return DIFF_METHODS;
       },
 
     }

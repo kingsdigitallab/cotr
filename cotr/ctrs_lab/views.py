@@ -1,9 +1,8 @@
 from collections import OrderedDict
 import time
-from difflib import SequenceMatcher
 from django.http import JsonResponse, HttpResponse
 from collections import Counter
-from ctrs_texts.utils import get_regions_from_content_xml
+from ctrs_texts.utils import get_regions_from_content_xml, StringDiff
 
 
 def view_api_regions_compare(request):
@@ -15,6 +14,7 @@ def view_api_regions_compare(request):
         text_ids = text_ids.split(',')
     else:
         text_ids = []
+    diff_method = request.GET.get('diff', 'difflib_quick_ratio').strip()
 
     ret = api_regions(work_slug, parent_siglum, text_ids)
 
@@ -25,6 +25,8 @@ def view_api_regions_compare(request):
     diff_matrix = [[0 for t in range(texts_count)] for t in range(texts_count)]
     diff_matrix_max = 0
 
+    differ = StringDiff(diff_method)
+
     for region in ret['data']:
         readings = region['readings']
 
@@ -33,15 +35,25 @@ def view_api_regions_compare(request):
         # TODO: any faster/better way of achieving this?
         groups = Counter([r['t'] for r in readings])
         top_reading = groups.most_common(1)[0][0]
-        groups = dict([[g[0], [i, g[1]]] for i, g in enumerate(groups.most_common())])
+        groups = dict([
+            [g[0], [i, g[1]]]
+            for i, g
+            in enumerate(groups.most_common())
+        ])
         present_count = max(sum([1 for r in readings if r['t']]), 2)
+        diff_cache = {}
 
         for i in range(len(readings)):
             dist = 0
             if use_global_distance:
                 # distance with all the rest
                 for j in range(len(readings)):
-                    adist = get_reading_distance(readings[i]['t'], readings[j]['t'])
+                    rs = [readings[j]['t'], readings[i]['t']]
+                    adist = diff_cache.get(rs[0]+rs[1], None)
+                    if adist is None:
+                        adist = differ.get_distance(*rs)
+                        # diff_cache[rs[0] + rs[1]] = adist
+                        # diff_cache[rs[1] + rs[0]] = adist
                     dist += adist
                     diff_matrix[i][j] += adist
                     diff_matrix_max = max(diff_matrix[i][j], diff_matrix_max)
@@ -49,7 +61,7 @@ def view_api_regions_compare(request):
                 # distance with the most frequent group
                 # this brings more contrasts in the colors
                 # but it is arbitrary when second grp has same freq
-                dist = get_reading_distance(readings[i]['t'], top_reading)
+                dist = differ.get_distance(readings[i]['t'], top_reading)
             if use_global_distance:
                 readings[i]['dist'] = dist / (present_count - 1)
             else:
@@ -81,26 +93,6 @@ def view_api_regions_compare(request):
     ret['meta']['diff_matrix_max'] = diff_matrix_max
 
     return JsonResponse(ret)
-
-
-def get_reading_distance(reading1, reading2):
-    return get_reading_distance_levenstein(reading1, reading2)
-
-
-def get_reading_distance_levenstein(reading1, reading2):
-    if not(reading1 and reading2):
-        # special case for missing end of V6
-        return 0
-    return 1 - SequenceMatcher(None, reading1, reading2).quick_ratio()
-
-
-def get_reading_distance_binary(reading1, reading2):
-    ret = 1
-
-    if reading1.lower() == reading2.lower():
-        return 0
-
-    return ret
 
 
 def view_api_regions(request):

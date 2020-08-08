@@ -2,12 +2,41 @@ import json
 import os
 import re
 from collections import Counter
+from difflib import SequenceMatcher
 
 import lxml.etree as ET
 from _collections import OrderedDict
 from django.conf import settings
 from django.utils.text import slugify
 from lxml import html
+
+
+class StringDiff:
+
+    def __init__(self, method='difflib_quick_ratio'):
+        self.method = method
+        self.difflib_matcher = SequenceMatcher(None, '', '', False)
+        self._last_s2 = ''
+
+    def get_distance(self, s1, s2):
+        if not(s1 and s2):
+            return 0
+        if 1:
+            # TODO: optimise
+            s1 = s1.lower()
+            s2 = s2.lower()
+        if s1 == s2:
+            return 0
+        if self.method == 'difflib_quick_ratio':
+            self.difflib_matcher.set_seqs(s1, s2)
+            return 1 - self.difflib_matcher.quick_ratio()
+            # return 1 - SequenceMatcher(None, s1, s2, False).quick_ratio()
+        if self.method == 'difflib_ratio':
+            self.difflib_matcher.set_seqs(s1, s2)
+            return 1 - self.difflib_matcher.ratio()
+
+        # e.g. binary
+        return 1
 
 
 def get_regions_from_content_xml(content_xml, region_type='version'):

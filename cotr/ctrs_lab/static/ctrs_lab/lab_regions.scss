@@ -1,6 +1,6 @@
 /* LAB regions scss  */
 
-table.distant-reading {
+table.birds-eye-view {
   tbody td {
     padding: 0.3rem;
     font-size: 0.1em;
@@ -15,4 +15,20 @@ table.distant-reading {
     background-color: #385669;
     color: white;
   }
+}
+
+.message-loading {
+  float: right;
+}
+
+.different-version-from-left {
+  border-left: 4px solid grey
+}
+
+.different-version-from-top {
+  border-top: 4px solid grey
+}
+
+.text-list {
+  margin-bottom: 1rem;
 }
