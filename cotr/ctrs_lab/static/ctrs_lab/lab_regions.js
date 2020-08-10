@@ -6,7 +6,7 @@
 // [VUE_DATA_NAME, QUERY_STRING_NAME, TYPE, DEFAULT_VALUE]
 const VUE_QS_MAPPING = [
   ['group', 'group', 'lowercase', 'declaration'],
-  ['parent', 'parent', 'lowercase', 'v1'],
+  ['parent', 'parent', 'lowercase', 'v2'],
   ['panel', 'panel', 'lowercase', 'table'],
   ['is_birds_eye_view_enabled', 'bev', 'int', 0],
   ['is_omission_highlighted', 'oh', 'int', 0],
@@ -14,7 +14,7 @@ const VUE_QS_MAPPING = [
   ['diff_unit', 'unit', 'lowercase', 'region'],
 ]
 
-const PRESELECTED_TEXT_SIGLA = ['V1']
+const PRESELECTED_TEXT_SIGLA = ['V2']
 
 const API_PATH_TEXTS_LIST = '/api/texts/?'
 const GROUP_DEFAULT = 'declaration';
@@ -85,6 +85,7 @@ $(() => {
         ['difflib_quick_ratio', 'quick_ratio (Difflib)'],
         ['difflib_ratio', 'ratio (Difflib)'],
         ['binary', 'Binary'],
+        ['region-vecs-ft-30.json', 'embeddings (fastText, 30)'],
       ],
       diff_method: '',
 

@@ -1,5 +1,7 @@
 from collections import OrderedDict
 import time
+
+from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from collections import Counter
 from ctrs_texts.utils import get_regions_from_content_xml, StringDiff
@@ -57,6 +59,8 @@ def view_api_regions_compare(request):
         ])
         present_count = max(sum([1 for r in readings if r['t']]), 2)
 
+        # assign distance to each reading
+        # TODO: we should do that at the group level, not for each reading
         for i in range(len(readings)):
             dist = 0
             if use_global_distance:
@@ -225,24 +229,31 @@ def view_api_regions_all_plaintext(request):
     '''
     work_slug = request.GET.get('group', 'declaration').lower()
 
-    region_type = 'version'
-
     ret = ''
 
     from ctrs_texts.models import EncodedText
     texts = EncodedText.objects.filter(
-        type__slug='transcription',
-        abstracted_text__type__slug='manuscript',
-        abstracted_text__group__group__slug__iexact=work_slug
-    ).exclude(abstracted_text__short_name__startswith='HM')
+        Q(type__slug='transcription') &
+        Q(abstracted_text__group__slug__iexact=work_slug) |
+        Q(abstracted_text__group__group__slug__iexact=work_slug)
+    ).exclude(
+        abstracted_text__short_name__startswith='HM',
+        abstracted_text__type__slug='work',
+    ).select_related('abstracted_text__type')
 
     texts = texts.order_by('abstracted_text__short_name')
 
     for text in texts:
+        # ret += str(text)
         ret += ' .\n'.join([
             reg['text']
             for reg
-            in get_regions_from_content_xml(text.content_xml, region_type)
+            in get_regions_from_content_xml(
+                text.content_xml,
+                'version'
+                if text.abstracted_text.type.slug == 'manuscript'
+                else 'work'
+            )
         ])
         ret += ' .\n'
 

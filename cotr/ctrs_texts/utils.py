@@ -20,6 +20,10 @@ class StringDiff:
         self.method = method
         self.difflib_matcher = SequenceMatcher(lambda x: x in '…', '', '', False)
         self._diff_cache = {}
+        self.embeddings = None
+        self.embeddings_dim = 0
+        self.read_embeddings()
+        print(self.method)
 
     def get_distance(self, s1, s2):
         """Returns 0.0 if s1 == s2; 1.0 if totally different"""
@@ -37,19 +41,76 @@ class StringDiff:
         if self.method != 'binary':
             cache_key = s1 + '|' + s2
             ret = self._diff_cache.get(cache_key, None)
+
             if ret is None:
-                self.difflib_matcher.set_seqs(s1, s2)
+                if self.embeddings is not None:
+                    ret = 1 - self.compare_with_embeddings(s1, s2)
+                else:
+                    self.difflib_matcher.set_seqs(s1, s2)
 
-                if self.method == 'difflib_quick_ratio':
-                    ret = self.difflib_matcher.quick_ratio()
-                elif self.method == 'difflib_ratio':
-                    ret = self.difflib_matcher.ratio()
+                    if self.method == 'difflib_quick_ratio':
+                        ret = self.difflib_matcher.quick_ratio()
+                    elif self.method == 'difflib_ratio':
+                        ret = self.difflib_matcher.ratio()
 
-                ret = 1 - ret
-                self._diff_cache[cache_key] = ret
-                self._diff_cache[s2+'|'+s1] = ret
+                    ret = 1 - ret
+
+                # add to cache
+                if ret is not None:
+                    self._diff_cache[cache_key] = ret
+                    self._diff_cache[s2+'|'+s1] = ret
+                    # print('{:0.2f} {} | {}'.format(ret, s1, s2))
 
         return ret
+
+    def compare_with_embeddings(self, s1, s2):
+        import math
+
+        def norm(v):
+            return math.sqrt(sum([c * c for c in v]))
+
+        def cosim(v1, v2):
+            return (
+                sum([v1[i] * v2[i] for i in range(len(v1))])
+                / norm(v1) / norm(v2)
+            )
+
+        # split each string into tokens
+        vs = []
+        for s in [s1, s2]:
+            token_count = 0
+            tokens = re.findall(r'\w+', s)
+            v = [0] * self.embeddings_dim
+            for t in tokens:
+                embedding = self.embeddings.get(t, None)
+                if embedding:
+                    token_count += 1
+                    for i in range(self.embeddings_dim):
+                        v[i] += embedding[i]
+
+            if token_count:
+                v = [c/token_count for c in v]
+            else:
+                return 0
+
+            vs.append(v)
+
+        ret = cosim(vs[0], vs[1])
+
+        return ret
+
+    def read_embeddings(self):
+        if self.method.endswith('.json'):
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '..', 'ctrs_lab', 'embeddings', self.method
+            )
+            import json
+            with open(path, 'rt') as fh:
+                self.embeddings = json.loads(fh.read())
+
+            for embedding in self.embeddings.values():
+                self.embeddings_dim = len(embedding)
 
 
 def get_regions_from_content_xml(content_xml, region_type='version'):

@@ -185,9 +185,34 @@
       <p>We have used a non-binary similarity metric
         (based on <a href="https://docs.python.org/3/library/difflib.html#difflib.SequenceMatcher.quick_ratio">Python's quick_ratio</a> method).
         It calculates the proportion of character sequences in common between two readings.
+        That works generally well when comparing two words. But it is less reliable when readings include more words.
         It is purely syntactic, with no concept of semantic.
         So <i>magnificus</i> and <i>malificus</i> are considered 84% similar
         whereas <i>uel</i> and <i>aut</i> very different (only 33% similarity).
+      </p>
+      <h3>Word embeddings</h3>
+      <p>
+        In an attempt to address this limitation, the prototype also offer a distance
+        based on word embeddings which is is supposed to capture some of the meaning of the words.
+        The results are not very convincing and sometimes counter-intuitive, probably because:
+        <ul>
+        <li>those embeddings are derived from Latin Wikipedia articles (i.e. mordern/standardised Latin with a lot of garbage data);</li>
+          <li>embeddings capture aboutness rather than similarity (so opposite words can be very 'close');</li>
+          <li>our embedding manipulations are very simple, more complex machine learning methods could better address this problem</li>
+        </ul>
+        According to our tests the comparison between the same pair of words can vary considerably depending
+        on the embedding models (trained on different corpora). Good quality medieval Latin embedding models are difficult to produce.
+        It is possible that our quick prototyping approach doesn't make justice to the word embedding approach
+        but we leave it here just as an illustration, accepting the possibility that the limitations might also
+        be due to us not giving it a fair chance.
+      (We've used the pre-trained <a href="https://fasttext.cc/docs/en/crawl-vectors.html">fastText model for Latin</a> and reduced its dimension from 100 to 30).
+      </p>
+      <h3>Unit of comparison</h3>
+      <p>
+        Another important limitation is the effect of word movement on the comparisons. If the same word is in different positions
+        in two different texts, our encoding model will produce two separate (and disconnected) unsettled regions.
+        Each one will have a high distance measure.
+        To mitigate that effect the prototype allows you to compare unsettled text by sentence rather than by region.
       </p>
       <h2>How to read the Difference Matrix?</h2>
       <p>The difference matrix shows how different each text is every other text.
