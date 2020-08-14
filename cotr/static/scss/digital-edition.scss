@@ -398,7 +398,6 @@ $highlighted-background-color: #ee0;
   }
 
   [data-dpt-type=editorial] {
-    // background: linear-gradient($light-gray, white);
     border-left: 1px solid $medium-gray;
     border-right: 1px solid $medium-gray;
     border-top: 1px solid $medium-gray;
@@ -413,10 +412,9 @@ $highlighted-background-color: #ee0;
 
   span[data-dpt=head],
   span[data-dpt-type=subheading] {
-    &:before {
+    &::before {
       background: $light-gray;
       border-left: 10px solid $medium-gray;
-      // font-family: "Open Sans Condensed", sans-serif;
       font-size: 14px;
       font-weight: 700;
       padding: 4px 8px 4px 4px;
@@ -431,8 +429,9 @@ $highlighted-background-color: #ee0;
   span[data-dpt-type=subheading] {
     font-variant: small-caps;
     text-transform: lowercase;
-    &:before {
+    &::before {
       content: 'Subheading';
+      margin-right: 4px;
     }
   }
 
@@ -463,11 +462,11 @@ $highlighted-background-color: #ee0;
   span[data-dpt=cn][data-dpt-type=editorial] {
     // font-weight: 700;
 
-    // &:before {
+    // &::before {
     //   content: '(';
     // }
 
-    // &:after {
+    // &::after {
     //   content: ') ';
     // }
 
@@ -482,15 +481,31 @@ $highlighted-background-color: #ee0;
     cursor: pointer;
   }
 
+  span[data-dpt=head] span[data-dpt=cn] {
+    background: $light-gray;
+    display: inline-block;
+    line-height: 2;
+    margin-left: 8px;
+    padding: 0 8px 0 4px;
+  }
+
   span[data-dpt=cn]:not([data-dpt-type=editorial]) {
-    &:before {
-      content: '(Chap.) '
+    &::before {
+      background: url("/static/images/icons/fontawesome-pro/svgs/solid/bookmark.svg") no-repeat;
+      background-size: 10px;
+      background-position: 5px;
+      content: 'Chap. ';
+      padding-left: 20px;
     }
   }
 
   span[data-dpt-type=auxiliary] {
-    &:before {
-      content: '(Auxiliary) '
+    &::before {
+      background: $light-gray;
+      content: '(Auxiliary)';
+      margin-right: 4px;
+      padding-left: 4px;
+      padding-right: 4px;
     }
   }
 
@@ -500,7 +515,7 @@ $highlighted-background-color: #ee0;
       padding-top: 1rem;
       border-top: 1px dashed grey;
     }
-    &:before {
+    &::before {
       content: '§ Block ';
     }
   }
