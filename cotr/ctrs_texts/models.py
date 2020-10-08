@@ -99,6 +99,9 @@ class EncodedText(index.Indexed, TimestampedModel, ImportedModel):
         True iff there is an EncodedText with type 'non-standardised'
             AND we are in debug mode or the copy status is 'live'
         '''
+        if settings.ALL_NON_STANDARDISED_TEXTS_ARE_PUBLIC:
+            return True
+
         filters = {}
         from django.db.models.functions import Length
         if not settings.DEBUG:

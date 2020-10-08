@@ -297,6 +297,11 @@ WAGTAILSEARCH_BACKENDS = {
 # any encodedtext.content smaller than that will be ignored
 COTR_MIN_CONTENT_LEN = 10
 
+# See models can_show_non_standardised().
+# If True all the non-standardised texts are public.
+# Otherwise it depends on their publication status.
+ALL_NON_STANDARDISED_TEXTS_ARE_PUBLIC = True
+
 # CMS
 # ------------------------------------------------------------------------------
 ITEMS_PER_PAGE = 10
