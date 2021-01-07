@@ -64,7 +64,7 @@ jedi==0.16.0              # via ipython
 jinja2==2.11.1            # via coreschema, sphinx
 lazy-object-proxy==1.4.3  # via astroid
 libsass==0.19.4           # via django-libsass
-lxml==4.5.0               # via -r requirements/./base.in
+lxml==4.6.2               # via -r requirements/./base.in
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8, pylint
 more-itertools==8.2.0     # via pytest
@@ -121,16 +121,16 @@ termcolor==1.1.0          # via pytest-sugar
 text-unidecode==1.3       # via faker, python-slugify
 toml==0.10.0              # via black, pre-commit
 traitlets==4.3.3          # via ipython
-twython==3.8.2            # via -r /requirements/./base.in
-typed-ast==1.4.1          # via astroid, black, mypy
+twython==3.8.2            # via -r requirements/./base.in
+typed-ast==1.4.1          # via black, mypy
 typing-extensions==3.7.4.1  # via django-stubs, mypy
 unidecode==1.1.1          # via wagtail
 uritemplate==3.0.1        # via coreapi
 urllib3==1.25.8           # via elasticsearch, requests
 virtualenv==20.0.10       # via pre-commit
-wagtail==2.7.2            # via -r /requirements/./base.in
-wagtailmenus==3.0.1       # via -r /requirements/./base.in
-watchdog==0.10.2          # via -r /requirements/local.in
+wagtail==2.7.2            # via -r requirements/./base.in
+wagtailmenus==3.0.1       # via -r requirements/./base.in
+watchdog==0.10.2          # via -r requirements/local.in
 wcwidth==0.1.8            # via prompt-toolkit, pytest
 webencodings==0.5.1       # via html5lib
 werkzeug==1.0.0           # via -r requirements/local.in
