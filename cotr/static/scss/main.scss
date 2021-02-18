@@ -307,8 +307,9 @@ a {
 
   &:active,
   &:focus {
-    background: lighten($primary-color, 40%);
-    color: $primary-color !important;
+    // background: lighten($primary-color, 40%);
+    // color: $primary-color !important;
+    border: 3px solid $yellow;
   }
 
   &.decorate {
@@ -469,6 +470,13 @@ header {
 
     a {
       padding: .75rem .625rem;
+    }
+
+    .active {
+      a {
+        color: darken($primary-color, 13%);
+        font-weight: 700;
+      }
     }
   }
 
