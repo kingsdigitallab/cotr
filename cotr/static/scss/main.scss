@@ -345,8 +345,19 @@ header {
   color: white;
 
   a {
+
+    &:focus,
     &:hover {
       color: lighten($secondary-color, 15%);
+    }
+  }
+}
+
+footer {
+  a {
+    &:hover {
+      background: transparent;
+      border-bottom: 1px solid lighten($secondary-color, 15%);
     }
   }
 }
