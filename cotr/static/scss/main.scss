@@ -187,11 +187,19 @@ button,
 
   &.secondary {
     background: lighten($secondary-color, 15%);
-    color: $primary-color
+    color: $primary-color;
+
+    &:hover {
+      background: lighten($secondary-color, 30%);
+    }
   }
 
   &.success {
-    background: $success-color;
+    background: lighten($success-color, 10%);
+
+    &:hover {
+      background: lighten($success-color, 20%);
+    }
   }
 }
 
@@ -338,7 +346,7 @@ header {
 
   a {
     &:hover {
-      color: $secondary-color;
+      color: lighten($secondary-color, 15%);
     }
   }
 }
@@ -486,12 +494,6 @@ header {
     color: white;
     padding: .75rem .25rem;
   }
-
-  // .second-line {
-  //   li {
-  //     background: darken($primary-color, 3%);
-  //   }
-  // }
 }
 
 .top-nav {
@@ -509,7 +511,8 @@ main {
   }
 
   small {
-    color: scale-color($rich-black, $lightness: 20%);
+    color: lighten($rich-black, 20%);
+    // color: scale-color($rich-black, $lightness: 20%);
   }
 }
 
@@ -684,6 +687,12 @@ footer {
   text-align: center;
   width: 100%;
   z-index: 1001;
+
+  a {
+    &:hover {
+      border-bottom: 0;
+    }
+  }
 }
 
 
