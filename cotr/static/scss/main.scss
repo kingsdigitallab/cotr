@@ -187,11 +187,19 @@ button,
 
   &.secondary {
     background: lighten($secondary-color, 15%);
-    color: $primary-color
+    color: $primary-color;
+
+    &:hover {
+      background: lighten($secondary-color, 30%);
+    }
   }
 
   &.success {
-    background: $success-color;
+    background: lighten($success-color, 10%);
+
+    &:hover {
+      background: lighten($success-color, 20%);
+    }
   }
 }
 
@@ -297,9 +305,18 @@ a {
     border-bottom: 1px solid $secondary-color;
   }
 
+  &:active,
+  &:focus {
+    // background: lighten($primary-color, 40%);
+    // color: $primary-color !important;
+    border: 3px solid $yellow;
+  }
+
   &.decorate {
     border-bottom: 1px dotted $secondary-color;
   }
+
+
 }
 
 // 2.5 Tables
@@ -337,16 +354,29 @@ header {
   color: white;
 
   a {
+    &:active,
+    &:focus,
     &:hover {
-      color: $secondary-color;
+      color: lighten($secondary-color, 15%);
     }
   }
 }
 
 footer {
+  a {
+    &:hover {
+      background: transparent;
+      border-bottom: 1px solid lighten($secondary-color, 15%);
+    }
+  }
+
+  h3 {
+    font-size: rem-calc(25);
+  }
+
   svg {
     fill: $light-gray;
-    max-width: 24px;
+    width: 24px;
   }
 }
 
@@ -441,6 +471,13 @@ header {
     a {
       padding: .75rem .625rem;
     }
+
+    .active {
+      a {
+        color: darken($primary-color, 13%);
+        font-weight: 700;
+      }
+    }
   }
 
   &:first-child {
@@ -486,12 +523,6 @@ header {
     color: white;
     padding: .75rem .25rem;
   }
-
-  // .second-line {
-  //   li {
-  //     background: darken($primary-color, 3%);
-  //   }
-  // }
 }
 
 .top-nav {
@@ -509,7 +540,8 @@ main {
   }
 
   small {
-    color: scale-color($rich-black, $lightness: 20%);
+    color: lighten($rich-black, 20%);
+    // color: scale-color($rich-black, $lightness: 20%);
   }
 }
 
@@ -684,6 +716,12 @@ footer {
   text-align: center;
   width: 100%;
   z-index: 1001;
+
+  a {
+    &:hover {
+      border-bottom: 0;
+    }
+  }
 }
 
 
@@ -738,6 +776,7 @@ main {
     overflow-wrap: break-word;
   }
 
+  h3,
   h4,
   h5 {
     padding: 0;
@@ -749,10 +788,10 @@ main {
   }
 
   .media-object {
-    h4 {
+    h3, h4 {
       font-size: 1.25rem;
       line-height: 1.25;
-      patting-top: .25rem;
+      padding-top: 0;
 
       small {
         font-size: 1rem;
@@ -909,10 +948,10 @@ main {
 
   .social {
     .media-object {
-      h4 {
+      h3, h4 {
         font-size: 1.25rem;
         line-height: 1.25;
-        patting-top: .25rem;
+        padding-top: 0;
 
         small {
           font-size: 1rem;
