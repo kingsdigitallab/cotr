@@ -8,10 +8,10 @@
 <div class="top-bar" id="main-menu">
   <div class="top-bar-left">
     <ul class="dropdown menu" data-dropdown-menu>
-      <li><a href="/">Home</a></li>
+      <li><a href="/" tabindex="-1">Home</a></li>
       {% for page in menu_pages %}
       <li{% if page.active %} class="active"{% endif %}>
-        <a href="{% pageurl page %}">
+        <a href="{% pageurl page %}" tabindex="-1">
           {% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}
         </a>
       </li>
@@ -26,9 +26,9 @@
     <ul class="menu">
       {% if request.user.is_authenticated %}
       {% if request.user.is_staff %}
-      <li class="right"><a href="/wagtail/"><i class="icon icon-wagtail"></i></a></li>
+      <li class="right"><a href="/wagtail/" tabindex="-1"><i class="icon icon-wagtail"></i></a></li>
       {% endif %}
-      <li class="right"><a href="/admin/logout/">Logout <strong>{{ request.user.first_name }}</strong> <i class="fas fa-user"></i></a></li>
+      <li class="right"><a href="/admin/logout/" tabindex="-1">Logout <strong>{{ request.user.first_name }}</strong> <i class="fas fa-user"></i></a></li>
       {% endif %}
     </ul>
   </div>

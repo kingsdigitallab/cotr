@@ -305,9 +305,17 @@ a {
     border-bottom: 1px solid $secondary-color;
   }
 
+  &:active,
+  &:focus {
+    background: lighten($primary-color, 40%);
+    color: $primary-color !important;
+  }
+
   &.decorate {
     border-bottom: 1px dotted $secondary-color;
   }
+
+
 }
 
 // 2.5 Tables
@@ -345,7 +353,7 @@ header {
   color: white;
 
   a {
-
+    &:active,
     &:focus,
     &:hover {
       color: lighten($secondary-color, 15%);
