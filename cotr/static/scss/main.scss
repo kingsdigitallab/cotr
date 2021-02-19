@@ -21,9 +21,6 @@
  *  7.  Print
  *  8.  Digital edition global
  *
- *  TODO - Add:
- *      code (pre & code)
- *      blockquote
  */
 
 /* 1. Imports / Settings / Variables */
@@ -49,8 +46,6 @@ body {
   font-weight: 400;
   margin: 0;
 }
-
-blockquote {}
 
 .capitalize {
   text-transform: capitalize;
