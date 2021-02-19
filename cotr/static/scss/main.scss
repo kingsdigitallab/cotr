@@ -175,6 +175,11 @@ button,
   line-height: 1.75em;
   padding: 5px 10px;
 
+  &:active,
+  &:focus {
+    border: 1px solid $yellow;
+  }
+
   &.fullscreen {
     &:hover {
       background: lighten($primary-color, 50%);
@@ -189,6 +194,7 @@ button,
     background: lighten($secondary-color, 15%);
     color: $primary-color;
 
+    &:focus,
     &:hover {
       background: lighten($secondary-color, 30%);
     }
@@ -309,7 +315,7 @@ a {
   &:focus {
     // background: lighten($primary-color, 40%);
     // color: $primary-color !important;
-    border: 3px solid $yellow;
+    border: 1px solid $yellow;
   }
 
   &.decorate {

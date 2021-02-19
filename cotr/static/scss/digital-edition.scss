@@ -401,7 +401,7 @@ $highlighted-background-color: #ee0;
     border-left: 1px solid $medium-gray;
     border-right: 1px solid $medium-gray;
     border-top: 1px solid $medium-gray;
-    color: $dark-gray;
+    color: $darker-gray;
     font-family: "Open Sans Condensed", sans-serif;
     font-size: 24px;
     margin-left: -1rem;
@@ -460,16 +460,6 @@ $highlighted-background-color: #ee0;
 
   // span[data-dpt=sn],
   span[data-dpt=cn][data-dpt-type=editorial] {
-    // font-weight: 700;
-
-    // &::before {
-    //   content: '(';
-    // }
-
-    // &::after {
-    //   content: ') ';
-    // }
-
     &.highlighted {
       // GN: ac-142: user has clicked on region/reading in other block
       // we highlight it in this block.
@@ -511,10 +501,12 @@ $highlighted-background-color: #ee0;
 
   span[data-dpt=cn][data-dpt-type=editorial] {
     display: block;
+    
     &:not(:first-child) {
       padding-top: 1rem;
       border-top: 1px dashed grey;
     }
+
     &::before {
       content: '§ Block ';
     }
