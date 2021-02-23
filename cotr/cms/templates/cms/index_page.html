@@ -14,8 +14,8 @@
 {% block main %}
 <div class="grid-x grid-margin-x data-equalizer" data-equalize-on="medium" id="sidebar">
     <div class="cell medium-3 sidebar" data-equalizer-watch="sidebar">
+        {% include "cms/includes/index_tree.html" with menu_parent=self|get_section %}
         <ul class="vertical menu accordion-menu" data-accordion-menu data-submenu-toggle="true">
-            {% include "cms/includes/index_tree.html" with menu_parent=self|get_section %}
             {% if self.title == "Guidelines" %}
             {% flat_menu "guidelines_menu" %}
             {% endif %}
