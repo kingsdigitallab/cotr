@@ -628,6 +628,24 @@ main {
   background: scale-color($primary-color, $lightness: 85%);
   border-left: 1px solid scale-color($primary-color, $lightness: 55%);
 
+  .is-parent-page {
+    color: $rich-black;
+    display: block;
+    font-family: $header-font-family;
+    font-size: 1.25rem;
+    height: 42px;
+    padding: .375rem 1rem .5rem;
+
+    &:hover {
+      background: scale-color($primary-color, $lightness: 70%);
+      text-decoration: none;
+    }
+
+    &.active {
+      background: scale-color($secondary-color, $lightness: 40%);
+    }
+  }
+
   .menu {
     .active {
       background: scale-color($secondary-color, $lightness: 40%);

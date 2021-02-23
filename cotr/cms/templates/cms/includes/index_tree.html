@@ -1,6 +1,6 @@
 {% load cms_tags wagtailcore_tags %}
 
-<a href="{{ menu_parent.url }}"{% if menu_parent.id == self.id %} class="active"{% endif %}>
+<a class="{% if not is_child_menu %}is-parent-page{% else %}is-child-page{% endif %}{% if menu_parent.id == self.id %} active{% endif %}" href="{{ menu_parent.url }}">
     {% if menu_parent.seo_title %}
     {{ menu_parent.seo_title }}
     {% else %}
@@ -13,7 +13,7 @@
   class="vertical menu nested{% if menu_parent.id == self.id or menu_parent in self.get_ancestors %} is-active{% endif %}">
   {% for menu_child in menu_children %}
   <li>
-    {% include "cms/includes/index_tree.html" with menu_parent=menu_child %}
+    {% include "cms/includes/index_tree.html" with menu_parent=menu_child is_child_menu=True%}
   </li>
   {% endfor %}
 </ul>
