@@ -254,16 +254,23 @@ button,
       width: 12px;
     }
   }
+}
 
-  // &.button {
-  //   &:hover {
-  //     color: white;
+// Skip to main content
 
-  //     svg {
-  //       fill: white;
-  //     }
-  //   }
-  // }
+.skip-link {
+  background: $primary-color;
+  color: #fff;
+  font-weight: 700;
+  left: 50%;
+  padding: 4px;
+  position: absolute;
+  transform: translateY(-100%);
+  transition: transform 0.3s;
+}
+
+.skip-link:focus {
+  transform: translateY(0%);
 }
 
 // 2.2 Forms
