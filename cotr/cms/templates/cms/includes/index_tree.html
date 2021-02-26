@@ -1,6 +1,7 @@
 {% load cms_tags wagtailcore_tags %}
-
-<a class="{% if not is_child_menu %}is-parent-page{% else %}is-child-page{% endif %}{% if menu_parent.id == self.id %} active{% endif %}" href="{{ menu_parent.url }}">
+<a class="{% if not is_child_menu %}is-parent-page{% else %}is-child-page{% endif %}
+  {% if menu_parent.id == self.id %} active{% endif %}" 
+  href="{{ menu_parent.url }}">
     {% if menu_parent.seo_title %}
     {{ menu_parent.seo_title }}
     {% else %}
@@ -9,10 +10,14 @@
 </a>
 {% with menu_parent.get_children.live.public as menu_children %}
 {% if menu_children.count %}
-<ul
-  class="vertical menu nested{% if menu_parent.id == self.id or menu_parent in self.get_ancestors %} is-active{% endif %}">
+<ul class="vertical menu {% if not is_child_menu %}accordion-menu
+    {% else %}nested{% endif %}
+    {% if menu_parent.id == self.id or menu_parent in self.get_ancestors %} is-active{% endif %}"
+    {% if not is_child_menu %} data-accordion-menu data-submenu-toggle="true"{% endif %}>
   {% for menu_child in menu_children %}
-  <li>
+  <li 
+    {% if menu_child.id == self.id %}
+    aria-selected="true"{% else %} aria-selected="false"{% endif %}>
     {% include "cms/includes/index_tree.html" with menu_parent=menu_child is_child_menu=True%}
   </li>
   {% endfor %}
