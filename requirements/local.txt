@@ -61,7 +61,7 @@ ipython==7.13.0           # via ipdb
 isort==4.3.21             # via pylint
 itypes==1.1.0             # via coreapi
 jedi==0.16.0              # via ipython
-jinja2==2.11.1            # via coreschema, sphinx
+jinja2==2.11.3            # via coreschema, sphinx
 lazy-object-proxy==1.4.3  # via astroid
 libsass==0.19.4           # via django-libsass
 lxml==4.5.0               # via -r requirements/./base.in
