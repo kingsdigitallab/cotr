@@ -35,6 +35,7 @@
   <body{% block body-class %}{% endblock%}>
     <header class="top-header">
       <div class="grid-container">
+        <a class="skip-link" href='#main'>Skip to content</a>
         {% include 'includes/header.html' %}
       </div>
     </header>
@@ -45,7 +46,7 @@
       </div>
     </nav>
 
-    <main>
+    <main id="main">
       <div class="grid-container">
         {% block title %}{% endblock %}
         {% block main %}{% endblock %}

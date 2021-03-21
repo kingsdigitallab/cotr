@@ -254,28 +254,31 @@ button,
       width: 12px;
     }
   }
+}
 
-  // &.button {
-  //   &:hover {
-  //     color: white;
+// Skip to main content
 
-  //     svg {
-  //       fill: white;
-  //     }
-  //   }
-  // }
+.skip-link {
+  background: $primary-color;
+  color: #fff;
+  font-weight: 700;
+  left: 50%;
+  padding: 4px;
+  position: absolute;
+  transform: translateY(-100%);
+  transition: transform 0.3s;
+}
+
+.skip-link:focus {
+  transform: translateY(0%);
 }
 
 // 2.2 Forms
 
 // 2.3 Headings
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3,
+h4, h5, h6 {
   padding: .5em 0 .25em;
 }
 
@@ -627,6 +630,24 @@ main {
 .sidebar {
   background: scale-color($primary-color, $lightness: 85%);
   border-left: 1px solid scale-color($primary-color, $lightness: 55%);
+
+  .is-parent-page {
+    color: $rich-black;
+    display: block;
+    font-family: $header-font-family;
+    font-size: 1.25rem;
+    height: 42px;
+    padding: .375rem 1rem .5rem;
+
+    &:hover {
+      background: scale-color($primary-color, $lightness: 70%);
+      text-decoration: none;
+    }
+
+    &.active {
+      background: scale-color($secondary-color, $lightness: 40%);
+    }
+  }
 
   .menu {
     .active {
