@@ -7,6 +7,7 @@ from difflib import SequenceMatcher
 import lxml.etree as ET
 from _collections import OrderedDict
 from django.conf import settings
+from django.template.loader import get_template
 from django.utils.text import slugify
 from lxml import html
 
@@ -23,7 +24,6 @@ class StringDiff:
         self.embeddings = None
         self.embeddings_dim = 0
         self.read_embeddings()
-        print(self.method)
 
     def get_distance(self, s1, s2):
         """Returns 0.0 if s1 == s2; 1.0 if totally different"""
@@ -585,9 +585,11 @@ def get_plain_text(encoded_text):
 def get_sentence_numbers(work=None):
     '''return all sentence numbers for the given work
     work is a an AbstractedText'''
-    ret = [str(n) for n in range(1, 28)]
+    # ret = [str(n) for n in range(1, 28)]
+    # if work and work.slug == 'regiam':
+    ret = []
 
-    if work.slug == 'regiam':
+    if work:
         encoded = work.encoded_texts.filter(type__slug='transcription').first()
         if encoded:
             ret = re.findall(
@@ -631,3 +633,16 @@ def get_int(string, default=0):
         return int(string)
     except ValueError:
         return default
+
+
+def transform_xml(xml_str, xslt_template_path):
+    import lxml.etree as ET
+
+    dom = ET.XML(xml_str)
+    xslt_template = get_template(xslt_template_path)
+    xslt_str = xslt_template.render({})
+    xslt = ET.XML(xslt_str)
+    transform = ET.XSLT(xslt)
+    newdom = transform(dom)
+    ret = ET.tostring(newdom, pretty_print=True)
+    return ret

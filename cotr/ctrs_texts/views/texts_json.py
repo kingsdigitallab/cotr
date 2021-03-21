@@ -1,6 +1,9 @@
 import re
 
 from _collections import OrderedDict
+
+from django.shortcuts import render
+
 from ctrs_texts.models import AbstractedText, EncodedText
 from django.db.models import Q
 from django.http import JsonResponse
@@ -59,7 +62,8 @@ def view_api_texts(request):
                 'name': text.name,
                 'group': text.group_id,
                 'siglum': text.short_name,
-            }]
+            }],
+            ['links', {'self': text.get_api_url(request)}]
         ]
         text_data = OrderedDict(text_data)
         if text.manuscript:
@@ -97,17 +101,20 @@ def view_api_text_chunk(
     if view in ['histogram']:
         encoded_type = 'transcription'
 
-    try:
-        filters = {'abstracted_text__id__in': [int(s) for s in slugs]}
-    except ValueError:
-        filters = {'abstracted_text__slug__in': slugs}
+    if slugs and len(slugs) == 1 and slugs[0].lower() == 'all':
+        filters = {}
+    else:
+        try:
+            filters = {'abstracted_text__id__in': [int(s) for s in slugs]}
+        except ValueError:
+            filters = {'abstracted_text__slug__in': slugs}
 
     encoded_texts = EncodedText.objects.filter(
         **filters
     ).filter(type__slug=encoded_type)
 
     data = {}
-    if encoded_texts.count() == 1:
+    if encoded_texts.count() > 0:
         # individual chunk
         encoded_text = encoded_texts[0]
 
@@ -118,6 +125,7 @@ def view_api_text_chunk(
         data = OrderedDict([
             ['id', encoded_text.id],
             ['type', 'text_chunk'],
+            ['links', {'self': encoded_text.get_api_url(request)}],
             ['attributes', OrderedDict([
                 ['view', view],
                 ['unit', unit],
@@ -131,10 +139,6 @@ def view_api_text_chunk(
             ])],
         ])
 
-    if encoded_texts.count() > 1:
-        # TODO: comparative chunk
-        pass
-
     ret = OrderedDict([
         ['jsonapi', '1.0'],
         ['meta', {
@@ -145,7 +149,58 @@ def view_api_text_chunk(
         ['data', data],
     ])
 
-    return JsonResponse(ret)
+    format = request.GET.get('format', 'json')
+    if format == 'json':
+        ret = JsonResponse(ret)
+    elif format in ['tei', 'html']:
+        content_type = 'text/html'
+        if format == 'tei':
+            content_type = 'application/tei'
+
+        content_type += '; charset=utf-8'
+
+        chunk = '\n\n'.join([
+            f'\n\n<!-- {et.abstracted_text.id}' +
+            f'{et.abstracted_text.type} ########## -->\n' +
+            utils.get_text_chunk(
+                et, view, region_type
+            )
+            for et in encoded_texts
+        ])
+
+        text_type_name = 'translated'
+
+        # get parents = version, work
+        parents = []
+        p = encoded_text.abstracted_text
+        while p:
+            parents.append(p)
+            p = p.group
+
+        ret = render(
+            request,
+            'ctrs_texts/tei.xml',
+            {
+                'text': encoded_text,
+                'text_type_name': text_type_name,
+                'api_url': encoded_text.get_api_url(request)+'?format=tei',
+                'work': parents[-1],
+                'body': get_tei_from_chunk(chunk),
+            },
+            content_type=content_type
+        )
+    else:
+        raise Exception(
+            'Invalid value for format parameter, use json, tei or html.'
+        )
+
+    return ret
+
+
+def get_tei_from_chunk(html):
+    html = f'<div class="chunk">{html}</div>'
+    return utils.transform_xml(html, 'ctrs_texts/tei.xslt').decode('utf-8')
+
 
 # -------------------------------------------------------------------
 

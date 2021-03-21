@@ -116,7 +116,7 @@
 
     <template v-if="facets.result_type == 'text'">
       <h3>Query</h3>
-      <form v-on:submit.prevent="fetch_results">
+      <form v-on:submit.prevent="fetch_results(0)">
         <div class="button-group with-input">
           <input v-model="facets.q" type="string" value="" id="query_string">
           <label for="query_string">

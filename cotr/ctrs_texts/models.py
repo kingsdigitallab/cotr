@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django.urls import reverse
 from django.utils.text import slugify
 from wagtail.search import index
 from wagtail.snippets.models import register_snippet
@@ -255,6 +256,9 @@ class EncodedText(index.Indexed, TimestampedModel, ImportedModel):
 
         return ret
 
+    def get_api_url(self, request, view='transcription'):
+        return self.abstracted_text.get_api_url(request, self.type.slug)
+
     search_fields = [
         index.RelatedFields('abstracted_text', [
             index.SearchField('slug', partial_match=True),
@@ -395,3 +399,13 @@ class AbstractedText(NamedModel, ImportedModel):
         if self.short_name:
             ret = self.short_name + ': ' + ret
         return ret
+
+    def get_api_url(self, request, view='transcription'):
+        return request.build_absolute_uri(reverse(
+            'view_api_text_chunk', kwargs={
+                'text_slug': self.slug,
+                'view': view,
+                'unit': 'whole',
+                'location': 'whole',
+            }
+        ))

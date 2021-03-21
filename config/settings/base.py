@@ -302,6 +302,24 @@ COTR_MIN_CONTENT_LEN = 10
 # Otherwise it depends on their publication status.
 ALL_NON_STANDARDISED_TEXTS_ARE_PUBLIC = True
 
+# Labels for the text types on the front-end (viewer & /lab/regions)
+# Key matches EncodedTextType.slug
+TEXT_TYPES_LABEL = {
+    'transcription': 'Latin',
+    'translation': 'English translation',
+    'histogram': 'Bar chart'
+}
+
+# list of settings variables to send in the template context {{ ds.XXX }}
+# and to javascript CDS.XXX
+# see context_processor.py
+FRONT_END_SETTINGS = [
+    'TEXT_TYPES_LABEL',
+    'GA_ID',
+    'WAGTAIL_SITE_NAME',
+    'TWITTER_SCREEN_NAME',
+]
+
 # CMS
 # ------------------------------------------------------------------------------
 ITEMS_PER_PAGE = 10

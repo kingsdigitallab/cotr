@@ -1,14 +1,13 @@
-{% load staticfiles compress %}
+{% load staticfiles compress cms_tags %}
 <!DOCTYPE html>
 <html lang="en-GB" class="no-js">
 
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{% block meta_title %}{% endblock %} |
-      {{ ds.WAGTAIL_SITE_NAME }}</title>
+    <title>{% block meta_title %}{% endblock %} {{ ds.WAGTAIL_SITE_NAME }}</title>
     <meta name="author" content="King's Digital Lab">
-    <meta name="description" content="">
+    <meta name="description" content="The community of the realm in Scotland, 1249-1424. History, law and charters in a recreated kingdom.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     {% compress css %}
@@ -89,6 +88,10 @@
       $(document).foundation();
     </script>
     {% endcompress %}
+
+    <script>
+      window.CDS = {{ ds|json }};
+    </script>
 
     {% block footer_scripts %}{% endblock %}
 

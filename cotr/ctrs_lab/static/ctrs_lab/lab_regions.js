@@ -42,13 +42,6 @@ const Vue = window.Vue
 
 const HIGHLIGHT_CLASS = 'highlighted'
 
-// types of views
-const TYPES_LABEL = {
-  transcription: 'Latin',
-  translation: 'English translation',
-  histogram: 'Bar chart'
-}
-
 const HISTOGRAM_VIEW = 'histogram'
 const WINDOW_INNER_WIDTH = window.innerWidth
 
@@ -167,9 +160,6 @@ $(() => {
 
     },
     computed: {
-      view_types: function () {
-        return TYPES_LABEL
-      },
       text_types: function () {
         return [
           { label: 'Work', type: 'work' },
@@ -202,9 +192,6 @@ $(() => {
       lowercase: function(value) {
         return value.toLowerCase()
       },
-      view_type_label: function (value) {
-        return TYPES_LABEL[value]
-      }
     },
     methods: {
       on_tick_text: function (text, silent) {
