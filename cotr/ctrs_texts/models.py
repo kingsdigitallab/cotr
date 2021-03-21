@@ -129,6 +129,8 @@ class EncodedText(index.Indexed, TimestampedModel, ImportedModel):
 
         regions, members = self.get_readings_from_members()
 
+        parent_short_name = self.abstracted_text.short_name
+
         #  Get the content of the parent (i.e. self)
         xml = utils.get_xml_from_unicode(
             self.content, ishtml=True, add_root=True)
@@ -159,22 +161,28 @@ class EncodedText(index.Indexed, TimestampedModel, ImportedModel):
                     data_tid=str(members[mi].id),
                 )
 
+                # small label for the type of the parent (e.g. V1, or W)
                 utils.append_xml_element(
                     variant,
                     'span',
-                    r['parent'],
-                    class_='label version {}-text-id'.format(
-                        r['parent'].lower())
+                    parent_short_name,
+                    class_='label {} {}-text-id'.format(
+                        abstracted_type.slug,
+                        parent_short_name.lower()
+                    )
                 )
 
-                clazz = 'version' if r['parent'] == 'W' else 'manuscript'
+                # small label for the type of the reading (e.g. JH, or V1)
+                # clazz = 'version' if r['parent'] == 'W' else 'manuscript'
 
                 utils.append_xml_element(
                     variant,
                     'span',
                     members[mi].short_name,
                     class_='label {} {}-text-id'.format(
-                        clazz, members[mi].short_name.lower())
+                        members[mi].type.slug,
+                        members[mi].short_name.lower()
+                    )
                 )
 
                 utils.append_xml_element(
@@ -204,6 +212,7 @@ class EncodedText(index.Indexed, TimestampedModel, ImportedModel):
             return regions, members
 
         ab_text = self.abstracted_text
+        parent_short_name = ab_text.short_name
         members = list(ab_text.members.all().exclude(
             short_name__in=['HM1', 'HM2']
         ))
@@ -218,12 +227,14 @@ class EncodedText(index.Indexed, TimestampedModel, ImportedModel):
             for ri, region in enumerate(other_content.get_regions(
                 abstracted_type.slug)
             ):
+                # TODO: 'parent' key is probably ot needed at all.
+                # was used in get_content_with_readings() for labels.
                 if len(regions) <= ri:
                     # watch out: the SAME dictionary instance is shared by all
                     # entries by default. You modify one => all are modified!
                     regions.append([
                         {
-                            'parent': 'ms',
+                            'parent': parent_short_name,
                             'reading': '[absent]',
                             'id': '',
                             'copies': '0',
@@ -231,7 +242,7 @@ class EncodedText(index.Indexed, TimestampedModel, ImportedModel):
                     ] * len(members))
 
                 regions[ri][mi] = region
-                region['parent'] = ab_text.short_name
+                region['parent'] = parent_short_name
 
         return regions, members
 

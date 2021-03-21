@@ -275,7 +275,7 @@ def get_sentence_from_text(encoded_text, sentence_number):
 
 def remove_separator_paragraphs(text_string):
     '''Return the text_string without
-    separating pragraph such as <p>___</p>'''
+    separating paragraphs such as <p>___</p>'''
     return re.sub(r'(?i)<p>[^a-z<]*</p>', '', text_string)
 
 
