@@ -7,6 +7,7 @@ from difflib import SequenceMatcher
 import lxml.etree as ET
 from _collections import OrderedDict
 from django.conf import settings
+from django.http import JsonResponse
 from django.template.loader import get_template
 from django.utils.text import slugify
 from lxml import html
@@ -645,4 +646,38 @@ def transform_xml(xml_str, xslt_template_path):
     transform = ET.XSLT(xslt)
     newdom = transform(dom)
     ret = ET.tostring(newdom, pretty_print=True)
+    return ret
+
+
+def get_jsonapi_response(doc):
+    '''
+    Returns doc as a JsonResponse.
+    doc is a python dict that complies with jsonapi.org 1.0 format.
+    The jsonapi version is automatically added to the response.
+    Raises an exception if doc is not valid jsonapi format.
+    '''
+
+    # complete the doc
+    doc['jsonapi'] = {'version': '1.0'}
+    doc.move_to_end('jsonapi', last=False)
+
+    # validate
+    import jsonschema
+    from jsonschema import validate
+    with open('jsonapi-schema.json', 'r') as fh:
+        schema = json.load(fh)
+    try:
+        validate(instance=doc, schema=schema)
+    except jsonschema.exceptions.ValidationError as err:
+        doc_js = json.dumps(doc, indent=2)
+        message = f'Invalid jsonapi: {err}\n\n{doc_js}'
+        raise Exception(message)
+
+    # response
+    ret = JsonResponse(
+        doc,
+        json_dumps_params=dict(indent=2),
+        content_type='application/vnd.api+json'
+    )
+
     return ret

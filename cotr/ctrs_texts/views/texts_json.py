@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string, get_template
 
 from .. import utils
+from ..utils import get_jsonapi_response
 
 
 def view_api_texts(request):
@@ -55,7 +56,7 @@ def view_api_texts(request):
         if text.slug == group_slug:
             work = text
         text_data = [
-            ['id', text.id],
+            ['id', f'{text.id}'],
             ['type', text.type.slug],
             ['attributes', {
                 'slug': text.slug,
@@ -77,14 +78,13 @@ def view_api_texts(request):
         texts.append(text_data)
 
     ret = OrderedDict([
-        ['jsonapi', '1.0'],
         ['data', texts],
         ['meta', {
             'sentence_numbers': utils.get_sentence_numbers(work)
         }]
     ])
 
-    return JsonResponse(ret)
+    return get_jsonapi_response(ret)
 
 
 def view_api_text_chunk(
@@ -123,7 +123,7 @@ def view_api_text_chunk(
             region_type = 'version'
 
         data = OrderedDict([
-            ['id', encoded_text.id],
+            ['id', f'{encoded_text.id}'],
             ['type', 'text_chunk'],
             ['links', {'self': encoded_text.get_api_url(request)}],
             ['attributes', OrderedDict([
@@ -143,7 +143,6 @@ def view_api_text_chunk(
         ])
 
     ret = OrderedDict([
-        ['jsonapi', '1.0'],
         ['meta', {
             'page': 1,
             'page_count': 1,
@@ -154,7 +153,8 @@ def view_api_text_chunk(
 
     format = request.GET.get('format', 'json')
     if format == 'json':
-        ret = JsonResponse(ret)
+        ret = get_jsonapi_response(ret)
+
     elif format in ['tei', 'html']:
         content_type = 'text/html'
         if format == 'tei':
