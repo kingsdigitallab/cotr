@@ -89,7 +89,7 @@ py==1.8.1                 # via pytest
 pycodestyle==2.5.0        # via flake8
 pycparser==2.20           # via cffi
 pyflakes==2.1.1           # via flake8
-pygments==2.6.1           # via ipython, sphinx
+pygments==2.7.4           # via ipython, sphinx
 pylint-django==2.0.13     # via -r requirements/local.in
 pylint-plugin-utils==0.6  # via pylint-django
 pylint==2.4.4             # via pylint-django, pylint-plugin-utils
