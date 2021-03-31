@@ -354,7 +354,7 @@ $(() => {
           this.annotation_loaded = true
         })
       } else {
-        for (let rect of window.annotations) {
+        for (let rect of window.rects) {
           // TODO: update color instead of removing and adding everything again
           window.map.removeLayer(rect)
         }
@@ -366,44 +366,39 @@ $(() => {
   function load_annotations(image_layer, response) {
     // iiif-image metadata is loaded, now we draw all the annotations
     // TODO: avoid using _ property
-    let ret = response.data[0].annotations
+    let regions = response.data
 
     let map = image_layer._map
 
     // make the regions accessible by their keys.
     // TODO: check that this code works on mobile/older browsers.
     // regions becomes an array with keys... convenient but unorthodox.
-    let regions = response.data[0].regions
-    window.regions = regions
-    for (let i = regions.length - 1; i > -1; i--) {
-      regions[regions[i].key] = regions[i]
-    }
+    window.rects = []
+    for (let region of regions) {
+      // regions[region.id] = region
 
-    // we draw all the rectangles.
-    // replace each pair of coordinates in an.rects
-    // with a reference to the new rectangle.
-    window.annotations = []
-
-    for (let [key, an] of Object.entries(ret)) {
-      an.key = key
-      for (let i = 0; i < an.rects.length; i++) {
-        let style = _get_annotation_style(an)
-        if (style) {
-          let rect = L.rectangle(ps2cs(image_layer, an.rects[i]), style).addTo(
-            map
-          )
-          rect.annotation = an
-          rect.on('mousedown', _on_rect_mousedown)
-          rect.on('mouseover', _on_rect_mouseover)
-          rect.on('mouseout', _on_rect_mouseleave)
-          rect.on('popupclose', _on_rect_popupclose)
-          an.rects[i] = rect
-          window.annotations.push(rect)
+      // we draw all the rectangles.
+      // replace each pair of coordinates in an.rects
+      // with a reference to the new rectangle.
+      if (region.attributes.rects) {
+        let style = _get_annotation_style(region)
+        for (let rect of region.attributes.rects) {
+          if (style) {
+            rect = L.rectangle(ps2cs(image_layer, rect), style).addTo(
+              map
+            )
+            rect.region = region
+            rect.on('mousedown', _on_rect_mousedown)
+            rect.on('mouseover', _on_rect_mouseover)
+            rect.on('mouseout', _on_rect_mouseleave)
+            rect.on('popupclose', _on_rect_popupclose)
+            window.rects.push(rect)
+          }
         }
       }
     }
 
-    return ret
+    return regions
   }
 
   function _on_rect_mousedown(e) {
@@ -425,8 +420,8 @@ $(() => {
   }
 
   function _on_rect_mouseover(e) {
-    let region_key = e.target.annotation.key
-    app.selected_region = window.regions[region_key]
+    // let region_key = e.target.annotation.key
+    app.selected_region = e.target.region
   }
 
   function _on_rect_mouseleave(e) {
@@ -440,14 +435,13 @@ $(() => {
     app.selected_region = null
   }
 
-  function _get_annotation_style(annotation) {
+  function _get_annotation_style(region) {
     let ret = {
       color: '#ff0000',
       weight: 1,
       fillOpacity: 0.3
     }
 
-    let region = window.regions[annotation.key]
     if (!region) {
       clog(
         'WARNING: annotation key ' + annotation.key + ' not found in regions'
@@ -459,7 +453,7 @@ $(() => {
         ret.weight = 0
       }
     } else {
-      let freq = Object.keys(region.readings).length
+      let freq = Object.keys(region.attributes.readings).length
       freq = Math.min(freq, DISTINCT_READINGS_MAX)
 
       if (freq < 2) {
