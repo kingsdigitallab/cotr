@@ -64,7 +64,7 @@ jedi==0.16.0              # via ipython
 jinja2==2.11.1            # via coreschema, sphinx
 lazy-object-proxy==1.4.3  # via astroid
 libsass==0.19.4           # via django-libsass
-lxml==4.5.0               # via -r requirements/./base.in
+lxml==4.6.3               # via -r requirements/./base.in
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8, pylint
 more-itertools==8.2.0     # via pytest
