@@ -176,7 +176,7 @@
       <li class="arrow {% if facets.page > 1 %}unavailable{% endif %}">
         <a href="#results" @click="on_click_previous_page">&laquo;</a>
       </li>
-      <li>Page <strong>{{ facets.page }}</strong> of {{ response.meta.page_count }}</li>
+      <li class="page-number">Page <strong>{{ facets.page }}</strong> of {{ response.meta.page_count }}</li>
       <li class="arrow {% if facets.page < response.meta.page_count %}unavailable{% endif %}">
         <a href="#results" @click="on_click_next_page">&raquo;</a>
       </li>
@@ -209,7 +209,7 @@
       <li class="arrow {% if facets.page > 1 %}unavailable{% endif %}">
         <a href="#results" @click="on_click_previous_page">&laquo;</a>
       </li>
-      <li>Page <strong>{{ facets.page }}</strong> of {{ response.meta.page_count }}</li>
+      <li class="page-number">Page <strong>{{ facets.page }}</strong> of {{ response.meta.page_count }}</li>
       <li class="arrow {% if facets.page < response.meta.page_count %}unavailable{% endif %}">
         <a href="#results" @click="on_click_next_page">&raquo;</a>
       </li>
