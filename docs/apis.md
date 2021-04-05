@@ -16,6 +16,8 @@ group is a code of the work, 'declaration' or 'regiam'.
 
 `/api/texts/?&group=declaration`
 
+The type of a text is either: manuscript, version or work.
+
 ## Text content
 
 The following request returns the content of a given text.
