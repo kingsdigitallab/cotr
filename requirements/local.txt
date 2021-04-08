@@ -40,7 +40,7 @@ django-redis==4.11.0      # via -r requirements/./base.in
 django-stubs==1.4.0       # via -r requirements/local.in
 django-taggit==1.2.0      # via wagtail
 django-treebeard==4.3.1   # via wagtail
-django==2.2.13            # via -r requirements/./base.in, django-appconf, django-debug-toolbar, django-model-utils, django-redis, django-stubs, django-taggit, django-treebeard, djangorestframework, wagtail
+django==2.2.20            # via -r requirements/./base.in, django-appconf, django-debug-toolbar, django-model-utils, django-redis, django-stubs, django-taggit, django-treebeard, djangorestframework, wagtail
 djangorestframework==3.11.0  # via -r requirements/./base.in, wagtail
 docutils==0.16            # via sphinx
 draftjs-exporter==2.1.7   # via wagtail
