@@ -12,7 +12,7 @@ Currently: [https://cotr.ac.uk](https://cotr.ac.uk)
 
 The following request returns a list of all the texts for a given work.
 
-group is a code of the work, 'declaration' or 'regiam'.
+*group* is a code for the work, 'declaration' or 'regiam'.
 
 `/api/texts/?&group=declaration`
 
