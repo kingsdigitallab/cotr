@@ -10,6 +10,6 @@ Please refer to [the Guideline section on the COTR website](https://cotr.ac.uk/g
 
 ## Web APIs
 
-Documentation of the public (Web APIs to search and browse the editions)[apis.md]. 
+Documentation of the public [Web APIs to search and browse the editions](apis.md). 
 
 
