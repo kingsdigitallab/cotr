@@ -6,10 +6,31 @@ research project.
 
 [AHRC Overview of COTR](https://gtr.ukri.org/projects?ref=AH%2FP013759%2F1)
 
-Please refer to [the Guideline section on the COTR website](https://cotr.ac.uk/guidelines/) for the historical and research perspective on the project.
+Please refer to [the Guideline section on the COTR website](https://cotr.ac.uk/guidelines/) 
+for the historical and research perspective on the project and ways to cite our work.
+
+KDL team: Paul Caton, Ginestra Ferraro, Geoffroy Noël, Miguel Vieira, Brian Maher.
+
+## System Architecture
+
+The web application was developed using two python 3 web frameworks:
+* [Django](https://www.djangoproject.com/)
+* [Wagtail Content Management System](https://wagtail.io/)
+
+We have used the [Django Cookie Cutter](https://github.com/cookiecutter/cookiecutter) 
+stack, which is [docker](https://www.docker.com/)-based and comes with postgresql for the relational database, 
+nginx as a web server for the media assets, gunicorn to run the Python application and Traefik as a reverse proxy.
+
+The source code of the [Django project](https://github.com/kingsdigitallab/cotr/tree/master/cotr) 
+itself is open source and included in [this COTR repository](https://github.com/kingsdigitallab/cotr).
+
+The [search page](https://cotr.ac.uk/search/) and the [text viewer](https://cotr.ac.uk/viewer?group=declaration&blocks=23:transcription;) 
+on the public website are part of the [ctrs_text Django app](https://github.com/kingsdigitallab/cotr/tree/master/cotr/ctrs_texts).
+
+## Data Models
+
+Documentation of the logical data model of the ctrs_text application. 
 
 ## Web APIs
 
 Documentation of the public [Web APIs to search and browse the editions](apis.md). 
-
-
