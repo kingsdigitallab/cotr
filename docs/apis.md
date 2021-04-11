@@ -3,10 +3,10 @@
 The search page and the text viewer on the website 
 are built on top of web APIs which are
 publicly accessible. The APIs responses follow the 
-[json:api](https://jsonapi.org/) specification.
+[json:api](https://jsonapi.org/) 1.0 specification.
 
-The addresses below should be prefixed with the domain the live COTR website.
-Currently: [https://cotr.ac.uk](https://cotr.ac.uk)
+The addresses below are prefixed with the domain the live COTR website:
+[https://cotr.ac.uk](https://cotr.ac.uk)
 
 ## List of texts
 
