@@ -8,6 +8,10 @@ publicly accessible. The APIs responses follow the
 The addresses below are prefixed with the domain the live COTR website:
 [https://cotr.ac.uk](https://cotr.ac.uk)
 
+The APIs are implemented in the ctrs_text app of the Django project in this repository: 
+
+https://github.com/kingsdigitallab/cotr/blob/master/cotr/ctrs_texts/views/texts_json.py
+
 ## List of texts
 
 The following request returns a list of all the texts for a given work.
