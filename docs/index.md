@@ -65,14 +65,14 @@ and the `AbstractedTextType` class which represents the level in the grouping hi
 Only an `AbstractedText` of type "manuscript" can be linked to a `Manuscript` instance and has a "locus".
 Versions and Work obviously cannot be located into a single physical document.
 There are actually two dimensions of abstractions: 
-* the interpretive extraction of the handwritten content from the manuscript (which abstracts other aspects of the Manuscripts, e.g. codicology)
-* the grouping that implies an ideal text from a multiplicity of members (which abstracts singular readings - encoded with a special symbol ⊕)
+* the interpretive extraction of the handwritten content from the manuscript (which abstracts [other aspects of the Manuscripts](https://epierazzo.blogspot.com/2013/), e.g. codicology)
+* the grouping that implies an ideal text from a multiplicity of members (which abstracts singular readings - [encoded with a special symbol ⊕](https://cotr.ac.uk/guidelines/dynamic-text/version-v-text/))
 
 Since each AbstractedText is edited in Latin and in English by the researchers, 
 we have also generalised that aspect into the `EncodedText` class. 
 The class represents a single edition of an `AbstractedText` 
 and its attribute `Content` holds the text marked-up as XML.
-`EncodedTextType` specifies the type of edition: "trancription" or "translation".
+`EncodedTextType` specifies the type of edition: "transcription" or "translation".
 `EncodedTextStatus` represents the editorial status of the EncodedText: "draft", "public". 
 Only editions marked as "public" are visible on the public website.
 
