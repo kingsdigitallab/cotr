@@ -1,6 +1,7 @@
 # Research Software documentation of COTR
 
-This page contains a high-level documentation of the research software analysed, designed and developed by [King's Digital Lab (KDL)](https://kdl.kcl.ac.uk) 
+This page contains a high-level documentation of the research software analysed, 
+designed and developed by [King's Digital Lab (KDL)](https://kdl.kcl.ac.uk) 
 for the [The Community of the Realm in Scotland, 1249-1424: history, law and charters in a recreated kingdom (COTR)](https://cotr.ac.uk/) 
 research project, [funded by the AHRC](https://gtr.ukri.org/projects?ref=AH%2FP013759%2F1).
 
@@ -42,16 +43,47 @@ Each node (grey box) in the above diagram is a separate Docker container.
 See the [docker-compose file](https://github.com/kingsdigitallab/cotr/blob/master/kdl_liv.yml) 
 for the specification details. 
 
-## Data Models
+## Data Model
 
 The [conceptual data model](https://cotr.ac.uk/guidelines/dynamic-edition-key-concepts/) was created by Paul Caton in collaboration with the research team.
 
 This was later adapted into a logical model by Geoffroy Noel 
-to facilitate its implementation in [Django ORM](https://github.com/kingsdigitallab/cotr/blob/master/cotr/ctrs_texts/models.py) 
+to facilitate [our implementation]((https://github.com/kingsdigitallab/cotr/blob/master/cotr/ctrs_texts/models.py)) 
+in [Django ORM](https://docs.djangoproject.com/en/3.1/topics/db/models/) 
 and the derived database schema. 
 
 UML Class diagram:
 ![UML Class Diagram](./uml/diagrams/ctrs-class-diagram.png)
+
+The main difference with the conceptual model is the generalisation of the concept of group.
+In COTR a version represents of group of texts abstracted from a manuscripts.
+Here we consider a work as group of versions. We thus have a hierarchy of groups:
+manuscripts into version, versions into work. 
+This is modeled by the recursive association (`grouped into`) from AbstractedText to itself 
+and the `AbstractedTextType` class which represents the level in the grouping hierarchy: 
+"manuscript", "version" or "work".
+Only an `AbstractedText` of type "manuscript" can be linked to a `Manuscript` instance and has a "locus".
+Versions and Work obviously cannot be located into a single physical document.
+There are actually two dimensions of abstractions: 
+* the interpretive extraction of the handwritten content from the manuscript (which abstracts other aspects of the Manuscripts, e.g. codicology)
+* the grouping that implies an ideal text from a multiplicity of members (which abstracts singular readings - encoded with a special symbol ⊕)
+
+Since each AbstractedText is edited in Latin and in English by the researchers, 
+we have also generalised that aspect into the `EncodedText` class. 
+The class represents a single edition of an `AbstractedText` 
+and its attribute `Content` holds the text marked-up as XML.
+`EncodedTextType` specifies the type of edition: "trancription" or "translation".
+`EncodedTextStatus` represents the editorial status of the EncodedText: "draft", "public". 
+Only editions marked as "public" are visible on the public website.
+
+The XML markup is an adaptation of TEI into XHTML. It can therefore be directly displayed
+and edited in the web-based Text Editor of Archetype and rendered directly on the live 
+website with CSS styling. However although the mark-up is valid HTML, it is designed
+to map unambiguously to TEI. It is possible to export any text into TEI by applying
+an XSLT transform. The XHTML content is saved in the relational database for 
+long term storage and live searches. This approach has been used in many projects
+based on the Archetype framework; it is web-friendly and integrates very well with the
+rest of the rich editorial environment.
 
 ## Data and editorial Workflow
 
@@ -73,7 +105,8 @@ came quite late as we needed some draft manuscript and version XMLs to help us
 analyse those specific requirements and design an encoding schema that works well across both system
 and isn't too complicated for the editors.
 
-The manuscripts metadata were imported into Archetype by a python script from an Excel spreadsheet provided by the research team.
+The manuscripts metadata were imported into Archetype by a python script 
+from an Excel spreadsheet provided by the research team.
 Further cataloguing was done using the existing backend environment within Archetype.
 
 The conversion of the content from Archetype to the Public system is automated thanks
@@ -85,7 +118,7 @@ of the regions across the various texts. Three of the research partners were alr
 familiar with the framework through their participation in the 
 [Models of Authority](http://www.modelsofauthority.ac.uk/) project (developed by DDH).
 
-However given that Archetype is a legacy application built on an obsolete software stack
+However, given that Archetype is a legacy application built on an obsolete software stack
 this customised instance cannot be maintained much longer beyond the end of this project.
 It will be taken down, packaged up as a docker instance for archival on github. 
 At which point the editions on the live website are considered final.
