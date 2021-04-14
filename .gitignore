@@ -290,3 +290,8 @@ arc-content.json
 
 # dev venv
 /venv
+
+# openapi
+.openapi-generator
+.openapi-generator-ignore
+

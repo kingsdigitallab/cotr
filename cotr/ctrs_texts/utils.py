@@ -703,4 +703,6 @@ def get_jsonapi_response(doc, request=None):
         content_type='application/vnd.api+json'
     )
 
+    ret['Access-Control-Allow-Origin'] = '*'
+
     return ret

@@ -80,30 +80,47 @@ and the `AbstractedTextType` class which represents the level in the grouping hi
 "manuscript", "version" or "work".
 Only an `AbstractedText` of type "manuscript" can be linked to a `Manuscript` instance and has a "locus".
 Versions and Work obviously cannot be located into a single physical document.
+
 There are actually two dimensions of abstractions: 
-* the interpretive extraction of the handwritten content from the manuscript (which abstracts [other aspects of the Manuscripts](https://epierazzo.blogspot.com/2013/), e.g. codicology)
+* the interpretive extraction of the handwritten content from the manuscript (which abstracts [other aspects of the Manuscripts](https://epierazzo.blogspot.com/2013/) (e.g. codicology) as well as the exact form of the written text (e.g. abbreviations, spelling))
 * the grouping that implies an ideal text from a multiplicity of members (which abstracts singular readings - [encoded with a special symbol ⊕](https://cotr.ac.uk/guidelines/dynamic-text/version-v-text/))
 
 Since each AbstractedText is edited in Latin and in English by the researchers, 
 we have also generalised that aspect into the `EncodedText` class. 
 The class represents a single edition of an `AbstractedText` 
-and its attribute `Content` holds the text marked-up as XML.
+and its attribute `Content` holds the text marked-up as XML ([see Encoding section below](#encoding-of-the-texts)).
 `EncodedTextType` specifies the type of edition: "transcription" or "translation".
 `EncodedTextStatus` represents the editorial status of the EncodedText: "draft", "public". 
 Only editions marked as "public" are visible on the public website.
 
-The XML markup is an adaptation of TEI into XHTML. It can therefore be directly displayed
-and edited in the web-based Text Editor of Archetype and rendered directly on the live 
-website with CSS styling. However although the mark-up is valid HTML, it is designed
-to map unambiguously to TEI. It is possible to export any text into TEI by applying
-an XSLT transform. The XHTML content is saved in the relational database for 
-long term storage and live searches. This approach has been used in many projects
-based on the Archetype framework; it is web-friendly and integrates very well with the
-rest of the rich editorial environment.
+### Technical note
+
+`NamedModel` is special class, each class connected to it inherits from its attributes:
+* `Name`: a fully descriptive label that can be display on screen
+* `Short Name`: a shorthand (e.g. a siglum, or an abbreviated form)
+* `Slug`: [an memorable identifier](https://developer.mozilla.org/en-US/docs/Glossary/Slug)
+
+For instance an AbstractedText could have the following attributes:
+* Name: Edinburgh, NLS, MS Adv. 35.1.7, pp.345–346
+* Short Name: CA   (its siglum)
+* Slug: edinburgh-nls-ms-adv-3517-pp345346
+* Locus: pp.345–346
 
 ## Web APIs
 
 [See separate documentation of the public Web APIs to search and browse the editions](apis.md). 
+
+## Encoding of the texts
+
+The XML encoding of the texts is an adaptation of [TEI](https://tei-c.org/) semantic into XHTML format. 
+It can therefore be directly displayed
+and edited in the web-based Text Editor of Archetype and rendered directly on the live 
+website with CSS styling. However although the mark-up is valid HTML, it is designed
+to map unambiguously to TEI. It is possible to export any text into TEI by applying
+an XSLT transform. The XHTML content is saved in the relational database for 
+long term storage alongside a plain text derivative for indexing and live searches. 
+This approach has been used in many projects based on the Archetype framework; it is web-friendly and integrates very well with the
+rest of the rich editorial environment.
 
 ## System Architecture
 
