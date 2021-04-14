@@ -5,6 +5,12 @@ are built on top of web APIs which are
 publicly accessible. The APIs responses follow the 
 [json:api](https://jsonapi.org/) 1.0 specification.
 
+The Text Viewing part of the API is defined as an [OpenAPI 3 specification](./apis/ctrs-openapi.yaml)
+and is [documented separately](./apis/docs/index.html).
+They were generated from the json response respectively with
+[Swagger Generator](https://roger13.github.io/SwagDefGen/)
+PyCharm OpenAPI plugin (html2 documentation).
+
 The addresses below are prefixed with the domain the live COTR website:
 [https://cotr.ac.uk](https://cotr.ac.uk)
 
