@@ -95,8 +95,8 @@ Only editions marked as "public" are visible on the public website.
 
 ### Technical note
 
-`NamedModel` is special class, each class connected to it inherits from its attributes:
-* `Name`: a fully descriptive label that can be display on screen
+`NamedModel` is a special class, each class connected to it inherits from its attributes:
+* `Name`: a fully descriptive label that can be displayed on screen
 * `Short Name`: a shorthand (e.g. a siglum, or an abbreviated form)
 * `Slug`: [an memorable identifier](https://developer.mozilla.org/en-US/docs/Glossary/Slug)
 

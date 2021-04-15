@@ -14,9 +14,8 @@ PyCharm OpenAPI plugin (html2 documentation).
 The addresses below are prefixed with the domain the live COTR website:
 [https://cotr.ac.uk](https://cotr.ac.uk)
 
-The APIs are implemented in the ctrs_text app of the Django project in this repository: 
-
-https://github.com/kingsdigitallab/cotr/blob/master/cotr/ctrs_texts/views/texts_json.py
+The API endpoints are implemented in the [ctrs_texts app](https://github.com/kingsdigitallab/cotr/blob/master/cotr/ctrs_texts/views/texts_json.py) 
+of the Django project in this repository.
 
 ## List of texts
 
