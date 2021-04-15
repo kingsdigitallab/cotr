@@ -318,6 +318,7 @@ FRONT_END_SETTINGS = [
     'GA_ID',
     'WAGTAIL_SITE_NAME',
     'TWITTER_SCREEN_NAME',
+    'DEBUG',
 ]
 
 # CMS
