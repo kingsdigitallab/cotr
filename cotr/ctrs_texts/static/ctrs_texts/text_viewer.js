@@ -21,11 +21,7 @@ const Vue = window.Vue
 const HIGHLIGHT_CLASS = 'highlighted'
 
 // types of views
-const TYPES_LABEL = {
-  transcription: 'Latin',
-  translation: 'English translation',
-  histogram: 'Histogram'
-}
+const TEXT_TYPES_LABEL = window.CDS.TEXT_TYPES_LABEL;
 
 const HISTOGRAM_VIEW = 'histogram'
 const WINDOW_INNER_WIDTH = window.innerWidth
@@ -95,7 +91,7 @@ $(() => {
     },
     computed: {
       view_types: function () {
-        return TYPES_LABEL
+        return TEXT_TYPES_LABEL
       },
       text_types: function () {
         return [
@@ -125,7 +121,7 @@ $(() => {
     },
     filters: {
       view_type_label: function (value) {
-        return TYPES_LABEL[value]
+        return TEXT_TYPES_LABEL[value]
       }
     },
     methods: {

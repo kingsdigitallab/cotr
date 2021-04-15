@@ -1,0 +1,34 @@
+/* LAB regions scss  */
+
+table.birds-eye-view {
+  tbody td {
+    padding: 0.3rem;
+    font-size: 0.1em;
+  }
+  .heading-rid {
+    font-size: 0.1em;
+  }
+}
+
+.tabs-title.is-active {
+  a, a:focus {
+    background-color: #385669;
+    color: white;
+  }
+}
+
+.message-loading {
+  float: right;
+}
+
+.different-version-from-left {
+  border-left: 4px solid grey
+}
+
+.different-version-from-top {
+  border-top: 4px solid grey
+}
+
+.text-list {
+  margin-bottom: 1rem;
+}

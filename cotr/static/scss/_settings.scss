@@ -72,7 +72,8 @@
 $global-font-size: 100%;
 $global-width: rem-calc(1920);
 $global-lineheight: 1.5;
-$foundation-palette: (primary: #2f4858,
+$foundation-palette: (
+  primary: #2f4858,
   secondary: #cab7a2,
   success: #54af68,
   warning: #f6ae2d,
@@ -81,14 +82,14 @@ $foundation-palette: (primary: #2f4858,
 $light-gray: #e6e6e6;
 $medium-gray: #cacaca;
 $dark-gray: #8a8a8a;
+$darker-gray: #4a4a4a;
 $tertiary-color: #7c3b1e;
 $rich-black: #06070e;
 $black: #0a0a0a;
 $white: #fefefe;
 $body-background: $white;
 $body-font-color: $black;
-$body-font-family: 'Martel',
-serif;
+$body-font-family: 'Martel', serif;
 $body-antialiased: true;
 $global-margin: 1rem;
 $global-padding: 1rem;
@@ -120,7 +121,8 @@ $reddish-purple: rgba(204, 121, 167, 1);
 // 2. Breakpoints
 // --------------
 
-$breakpoints: (small: 0,
+$breakpoints: (
+  small: 0,
   medium: 640px,
   large: 1024px,
   xlarge: 1200px,
@@ -134,7 +136,8 @@ $breakpoint-classes: (small medium large);
 
 $grid-row-width: $global-width;
 $grid-column-count: 12;
-$grid-column-gutter: (small: 20px,
+$grid-column-gutter: (
+  small: 20px,
   medium: 30px,
 );
 $grid-column-align-edge: true;
@@ -144,18 +147,15 @@ $block-grid-max: 8;
 // 4. Base Typography
 // ------------------
 
-$header-font-family: 'Open Sans Condensed',
-sans-serif;
+$header-font-family: 'Open Sans Condensed', sans-serif;
 $header-font-weight: $global-weight-normal;
 $header-font-style: normal;
-$font-family-monospace: Consolas,
-'Liberation Mono',
-Courier,
-monospace;
+$font-family-monospace: Consolas, 'Liberation Mono', Courier, monospace;
 $header-color: inherit;
 $header-lineheight: 1;
 $header-margin-bottom: 0.5rem;
-$header-styles: (small: ('h1': ('font-size': 24),
+$header-styles: (
+  small: ('h1': ('font-size': 24),
     'h2': ('font-size': 20),
     'h3': ('font-size': 19),
     'h4': ('font-size': 18),
@@ -198,11 +198,11 @@ $list-nested-side-margin: 1.25rem;
 $defnlist-margin-bottom: 1rem;
 $defnlist-term-weight: $global-weight-bold;
 $defnlist-term-margin-bottom: 0.3rem;
-$blockquote-color: $dark-gray;
+$blockquote-color: $darker-gray;
 $blockquote-padding: rem-calc(9 20 0 19);
-$blockquote-border: 1px solid $medium-gray;
+$blockquote-border: 1px solid $dark-gray;
 $cite-font-size: rem-calc(13);
-$cite-color: $dark-gray;
+$cite-color: $darker-gray;
 $cite-pseudo-content: '\2014 \0020';
 $keystroke-font: $font-family-monospace;
 $keystroke-color: $black;
@@ -303,7 +303,8 @@ $button-color: $white;
 $button-color-alt: $black;
 $button-radius: $global-radius;
 $button-hollow-border-width: 1px;
-$button-sizes: (tiny: 0.6rem,
+$button-sizes: (
+  tiny: 0.6rem,
   small: 0.75rem,
   default: 0.9rem,
   large: 1.25rem,
@@ -312,8 +313,7 @@ $button-palette: $foundation-palette;
 $button-opacity-disabled: 0.25;
 $button-background-hover-lightness: -20%;
 $button-hollow-hover-lightness: -50%;
-$button-transition: background-color 0.25s ease-out,
-color 0.25s ease-out;
+$button-transition: background-color 0.25s ease-out, color 0.25s ease-out;
 
 // 12. Button Group
 // ----------------
@@ -355,13 +355,16 @@ $card-margin-bottom: $global-margin;
 // ----------------
 
 $closebutton-position: right top;
-$closebutton-offset-horizontal: (small: 0.66rem,
+$closebutton-offset-horizontal: (
+  small: 0.66rem,
   medium: 1rem,
 );
-$closebutton-offset-vertical: (small: 0.33em,
+$closebutton-offset-vertical: (
+  small: 0.33em,
   medium: 0.5rem,
 );
-$closebutton-size: (small: 1.5em,
+$closebutton-size: (
+  small: 1.5em,
   medium: 2em,
 );
 $closebutton-lineheight: 1;
@@ -390,7 +393,8 @@ $dropdown-border: 1px solid $medium-gray;
 $dropdown-font-size: 1rem;
 $dropdown-width: 300px;
 $dropdown-radius: $global-radius;
-$dropdown-sizes: (tiny: 100px,
+$dropdown-sizes: (
+  tiny: 100px,
   small: 200px,
   large: 400px,
 );
@@ -488,7 +492,6 @@ $menu-items-padding: $global-menu-padding;
 $menu-simple-margin: 1rem;
 $menu-item-color-active: $white;
 $menu-item-background-active: lighten($primary-color, 30%);
-;
 $menu-icon-spacing: 0.25rem;
 $menu-item-background-hover: $light-gray;
 $menu-state-back-compat: true;
@@ -508,11 +511,12 @@ $meter-fill-bad: $alert-color;
 // 25. Off-canvas
 // --------------
 
-$offcanvas-sizes: (small: 250px,
+$offcanvas-sizes: (
+  small: 250px,
 );
-$offcanvas-vertical-sizes: (small: 250px,
+$offcanvas-vertical-sizes: (
+  small: 250px,
 );
-// $offcanvas-background: $light-gray;
 $offcanvas-background: scale-color($secondary-color, $lightness: 70%);
 $offcanvas-shadow: 0 0 10px rgba($black, 0.7);
 $offcanvas-inner-shadow-size: 10px;
@@ -572,10 +576,12 @@ $progress-radius: $global-radius;
 // 29. Prototype Arrow
 // -------------------
 
-$prototype-arrow-directions: (down,
+$prototype-arrow-directions: (
+  down,
   up,
   right,
-  left);
+  left
+);
 $prototype-arrow-size: 0.4375rem;
 $prototype-arrow-color: $black;
 
@@ -619,33 +625,41 @@ $prototype-font-bold: $global-weight-bold;
 // -----------------------------
 
 $prototype-list-breakpoints: $global-prototype-breakpoints;
-$prototype-style-type-unordered: (disc,
+$prototype-style-type-unordered: (
+  disc,
   circle,
-  square);
-$prototype-style-type-ordered: (decimal,
+  square
+);
+$prototype-style-type-ordered: (
+  decimal,
   lower-alpha,
   lower-latin,
   lower-roman,
   upper-alpha,
   upper-latin,
-  upper-roman);
+  upper-roman
+);
 
 // 36. Prototype Overflow
 // ----------------------
 
 $prototype-overflow-breakpoints: $global-prototype-breakpoints;
-$prototype-overflow: (visible,
+$prototype-overflow: (
+  visible,
   hidden,
-  scroll);
+  scroll
+);
 
 // 37. Prototype Position
 // ----------------------
 
 $prototype-position-breakpoints: $global-prototype-breakpoints;
-$prototype-position: (static,
+$prototype-position: (
+  static,
   relative,
   absolute,
-  fixed);
+  fixed
+);
 $prototype-position-z-index: 975;
 
 // 38. Prototype Rounded
@@ -675,12 +689,16 @@ $prototype-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .16),
 // --------------------
 
 $prototype-sizing-breakpoints: $global-prototype-breakpoints;
-$prototype-sizing: (width,
-  height);
-$prototype-sizes: (25: 25%,
+$prototype-sizing: (
+  width,
+  height
+);
+$prototype-sizes: (
+  25: 25%,
   50: 50%,
   75: 75%,
-  100: 100%);
+  100: 100%
+);
 
 // 42. Prototype Spacing
 // ---------------------
@@ -692,7 +710,8 @@ $prototype-spacers-count: 3;
 // -----------------------------
 
 $prototype-decoration-breakpoints: $global-prototype-breakpoints;
-$prototype-text-decoration: (overline,
+$prototype-text-decoration: (
+  overline,
   underline,
   line-through,
 );
@@ -701,9 +720,11 @@ $prototype-text-decoration: (overline,
 // ---------------------------------
 
 $prototype-transformation-breakpoints: $global-prototype-breakpoints;
-$prototype-text-transformation: (lowercase,
+$prototype-text-transformation: (
+  lowercase,
   uppercase,
-  capitalize);
+  capitalize
+);
 
 // 45. Prototype Text-Utilities
 // ----------------------------
@@ -715,7 +736,8 @@ $prototype-text-overflow: ellipsis;
 // --------------------
 
 $responsive-embed-margin-bottom: rem-calc(16);
-$responsive-embed-ratios: (default: 4 by 3,
+$responsive-embed-ratios: (
+  default: 4 by 3,
   widescreen: 16 by 9,
 );
 
@@ -852,8 +874,10 @@ $topbar-unstack-breakpoint: medium;
 $xy-grid: true;
 $grid-container: $global-width;
 $grid-columns: 12;
-$grid-margin-gutters: (small: 20px,
-  medium: 30px);
+$grid-margin-gutters: (
+  small: 20px,
+  medium: 30px
+);
 $grid-padding-gutters: $grid-margin-gutters;
 $grid-container-padding: $grid-padding-gutters;
 $grid-container-max: $global-width;

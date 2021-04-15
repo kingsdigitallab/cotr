@@ -1,0 +1,9 @@
+User-agent: *
+
+Disallow: /search
+Disallow: /viewer
+Disallow: /lab
+Disallow: /api
+Disallow: /texts/search
+
+

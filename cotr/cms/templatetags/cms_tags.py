@@ -2,6 +2,8 @@ from cms.models.pages import HomePage
 from django import template
 from django.conf import settings
 from wagtail.core.models import Page
+from django.utils.safestring import mark_safe
+import json as jsn
 
 register = template.Library()
 
@@ -42,6 +44,14 @@ def previous(some_list, current_index):
         return some_list[int(current_index) - 1]  # access the previous element
     except Exception:
         return ''  # return empty string in case of exception
+
+
+@register.filter
+def json(python_var):
+    """
+    returns the json version of the python_var
+    """
+    return mark_safe(jsn.dumps(python_var))
 
 
 @register.simple_tag

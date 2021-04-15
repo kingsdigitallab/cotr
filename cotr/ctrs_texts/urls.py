@@ -24,8 +24,7 @@ urlpatterns = [
     # path('texts/', view_texts, name="texts"),
 
     # New Text Viewer (multi-texts and multi-views)
-    path('viewer/',
-         view_text_viewer, name='text_viewer'),
+    path('viewer/', view_text_viewer, name='text_viewer'),
 
     # New Text Viewer (multi-texts and multi-views)
     # e.g. /test/viewer?blocks=506:translation;

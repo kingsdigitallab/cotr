@@ -238,7 +238,17 @@
     }
   }
 }
+.legend-text-viewer {
+  .text-view > .text-display {
+    padding: 0;
+  }
 
+  [data-dpt-group="work"] {
+    background: scale-color($secondary-color, $lightness: 80%);
+  }
+}
+
+.legend-text-viewer,
 #text-viewer {
   .menu {
     a {
@@ -383,37 +393,73 @@ $highlighted-background-color: #ee0;
 
   p {
     line-height: 2.25;
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+  [data-dpt-type=editorial] {
+    border-left: 1px solid $medium-gray;
+    border-right: 1px solid $medium-gray;
+    border-top: 1px solid $medium-gray;
+    color: $darker-gray;
+    font-family: "Open Sans Condensed", sans-serif;
+    font-size: 24px;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  span[data-dpt=head],
+  span[data-dpt-type=subheading] {
+    &::before {
+      background: $light-gray;
+      border-left: 10px solid $medium-gray;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 4px 8px 4px 4px;
+      text-transform: none;
+    }
   }
 
   span[data-dpt=head]:before {
-    text-transform: none;
-    font-variant: none;
-    font-weight: 700;
-    content: '(Heading) ';
+    content: 'Heading';
   }
 
   span[data-dpt-type=subheading] {
-    text-transform: lowercase;
     font-variant: small-caps;
-    &:before {
-      text-transform: none;
-      font-variant: none;
-      font-weight: 700;
-      content: '(Subheading) ';
+    text-transform: lowercase;
+    &::before {
+      content: 'Subheading';
+      margin-right: 4px;
     }
   }
 
-  span[data-dpt=sn], span[data-dpt=cn][data-dpt-type=editorial] {
-    font-weight: 700;
+  span[data-dpt=sn] {
+    border: 1px solid $medium-gray;
+    font-family: "Open Sans Condensed", sans-serif;
+    padding: 0 8px;
 
-    &:before {
-      content: '(';
+    &::before {
+      // fa fa-paragraph
+      content: url("/static/images/icons/fontawesome-pro/svgs/solid/paragraph.svg");
+      display: inline-block;
+      height: 14px;
+      width: 14px;
+      opacity: 0.4;
+      padding-right: 4px;
     }
 
-    &:after {
-      content: ') ';
+    &.highlighted {
+      // GN: ac-142: user has clicked on region/reading in other block
+      // we highlight it in this block.
+      // TODO: remove !important
+      background-color: $highlighted-background-color;
     }
+  }
 
+  // span[data-dpt=sn],
+  span[data-dpt=cn][data-dpt-type=editorial] {
     &.highlighted {
       // GN: ac-142: user has clicked on region/reading in other block
       // we highlight it in this block.
@@ -425,26 +471,44 @@ $highlighted-background-color: #ee0;
     cursor: pointer;
   }
 
+  span[data-dpt=head] span[data-dpt=cn] {
+    background: $light-gray;
+    display: inline-block;
+    line-height: 2;
+    margin-left: 8px;
+    padding: 0 8px 0 4px;
+  }
+
   span[data-dpt=cn]:not([data-dpt-type=editorial]) {
-    &:before {
-      content: '(Chap.) '
+    &::before {
+      background: url("/static/images/icons/fontawesome-pro/svgs/solid/bookmark.svg") no-repeat;
+      background-size: 10px;
+      background-position: 5px;
+      content: 'Ch. ';
+      padding-left: 20px;
     }
   }
 
   span[data-dpt-type=auxiliary] {
-    &:before {
-      content: '(Auxiliary) '
+    &::before {
+      background: $light-gray;
+      content: '(Auxiliary)';
+      margin-right: 4px;
+      padding-left: 4px;
+      padding-right: 4px;
     }
   }
 
   span[data-dpt=cn][data-dpt-type=editorial] {
     display: block;
+    
     &:not(:first-child) {
       padding-top: 1rem;
       border-top: 1px dashed grey;
     }
-    &:before {
-      content: '(Block ';
+
+    &::before {
+      content: '§ Block ';
     }
   }
 
@@ -596,6 +660,8 @@ $highlighted-background-color: #ee0;
     border-bottom: 1px solid scale-color($primary-color, $lightness: 70%);
     margin-left: 2.5rem;
     margin-bottom: 1rem;
+    min-height: 100px;
+    position: relative;
 
     .label {
       margin-left: -2.5rem;
@@ -604,7 +670,7 @@ $highlighted-background-color: #ee0;
   }
 }
 
-#text-search {
+#text-search, #lab-regions {
   .menu.vertical {
     li {
       margin-top: 4px;

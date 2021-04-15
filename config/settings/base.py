@@ -93,6 +93,7 @@ LOCAL_APPS = [
     # Your stuff: custom apps go here
     'cms',
     'ctrs_texts',
+    'ctrs_lab',
     'twitterhut',
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -295,6 +296,29 @@ WAGTAILSEARCH_BACKENDS = {
 # ------------------------------------------------------------------------------
 # any encodedtext.content smaller than that will be ignored
 COTR_MIN_CONTENT_LEN = 10
+
+# See models can_show_non_standardised().
+# If True all the non-standardised texts are public.
+# Otherwise it depends on their publication status.
+ALL_NON_STANDARDISED_TEXTS_ARE_PUBLIC = True
+
+# Labels for the text types on the front-end (viewer & /lab/regions)
+# Key matches EncodedTextType.slug
+TEXT_TYPES_LABEL = {
+    'transcription': 'Latin',
+    'translation': 'English translation',
+    'histogram': 'Bar chart'
+}
+
+# list of settings variables to send in the template context {{ ds.XXX }}
+# and to javascript CDS.XXX
+# see context_processor.py
+FRONT_END_SETTINGS = [
+    'TEXT_TYPES_LABEL',
+    'GA_ID',
+    'WAGTAIL_SITE_NAME',
+    'TWITTER_SCREEN_NAME',
+]
 
 # CMS
 # ------------------------------------------------------------------------------

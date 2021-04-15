@@ -1,12 +1,15 @@
 import re
 
 from _collections import OrderedDict
+
+from django.shortcuts import render
+from django.urls import reverse
+
 from ctrs_texts.models import AbstractedText, EncodedText
 from django.db.models import Q
-from django.http import JsonResponse
-from django.template.loader import render_to_string, get_template
 
 from .. import utils
+from ..utils import get_jsonapi_response
 
 
 def view_api_texts(request):
@@ -52,14 +55,15 @@ def view_api_texts(request):
         if text.slug == group_slug:
             work = text
         text_data = [
-            ['id', text.id],
+            ['id', f'{text.id}'],
             ['type', text.type.slug],
             ['attributes', {
                 'slug': text.slug,
                 'name': text.name,
                 'group': text.group_id,
                 'siglum': text.short_name,
-            }]
+            }],
+            ['links', {'self': text.get_api_url(request)}]
         ]
         text_data = OrderedDict(text_data)
         if text.manuscript:
@@ -73,14 +77,13 @@ def view_api_texts(request):
         texts.append(text_data)
 
     ret = OrderedDict([
-        ['jsonapi', '1.0'],
         ['data', texts],
         ['meta', {
             'sentence_numbers': utils.get_sentence_numbers(work)
         }]
     ])
 
-    return JsonResponse(ret)
+    return get_jsonapi_response(ret, request)
 
 
 def view_api_text_chunk(
@@ -97,17 +100,20 @@ def view_api_text_chunk(
     if view in ['histogram']:
         encoded_type = 'transcription'
 
-    try:
-        filters = {'abstracted_text__id__in': [int(s) for s in slugs]}
-    except ValueError:
-        filters = {'abstracted_text__slug__in': slugs}
+    if slugs and len(slugs) == 1 and slugs[0].lower() == 'all':
+        filters = {}
+    else:
+        try:
+            filters = {'abstracted_text__id__in': [int(s) for s in slugs]}
+        except ValueError:
+            filters = {'abstracted_text__slug__in': slugs}
 
     encoded_texts = EncodedText.objects.filter(
         **filters
     ).filter(type__slug=encoded_type)
 
     data = {}
-    if encoded_texts.count() == 1:
+    if encoded_texts.count() > 0:
         # individual chunk
         encoded_text = encoded_texts[0]
 
@@ -116,8 +122,9 @@ def view_api_text_chunk(
             region_type = 'version'
 
         data = OrderedDict([
-            ['id', encoded_text.id],
+            ['id', f'{encoded_text.id}'],
             ['type', 'text_chunk'],
+            ['links', {'self': encoded_text.get_api_url(request)}],
             ['attributes', OrderedDict([
                 ['view', view],
                 ['unit', unit],
@@ -125,18 +132,16 @@ def view_api_text_chunk(
                 ['value_max', 17],
                 ['region_type', region_type],
                 ['description', 'number of unsettled regions per sentence'],
-                ['can_show_non_standardised', encoded_text.can_show_non_standardised()],
+                [
+                    'can_show_non_standardised',
+                    encoded_text.can_show_non_standardised()
+                ],
                 ['chunk', utils.get_text_chunk(
                     encoded_text, view, region_type)],
             ])],
         ])
 
-    if encoded_texts.count() > 1:
-        # TODO: comparative chunk
-        pass
-
     ret = OrderedDict([
-        ['jsonapi', '1.0'],
         ['meta', {
             'page': 1,
             'page_count': 1,
@@ -145,7 +150,100 @@ def view_api_text_chunk(
         ['data', data],
     ])
 
-    return JsonResponse(ret)
+    format = request.GET.get('format', 'json')
+    if format == 'json':
+        ret = get_jsonapi_response(ret)
+
+    elif format in ['tei', 'html']:
+        content_type = 'text/html'
+        if format == 'tei':
+            content_type = 'application/tei'
+
+        content_type += '; charset=utf-8'
+
+        chunk = '\n\n'.join([
+            f'\n\n<!-- {et.abstracted_text.id}' +
+            f'{et.abstracted_text.type} ########## -->\n' +
+            utils.get_text_chunk(
+                et, view, region_type
+            )
+            for et in encoded_texts
+        ])
+
+        text_type_name = 'translated'
+
+        # get parents = version, work
+        parents = []
+        p = encoded_text.abstracted_text
+        while p:
+            parents.append(p)
+            p = p.group
+
+        ret = render(
+            request,
+            'ctrs_texts/tei.xml',
+            {
+                'text': encoded_text,
+                'text_type_name': text_type_name,
+                'api_url': encoded_text.get_api_url(request)+'?format=tei',
+                'work': parents[-1],
+                'body': get_tei_from_chunk(chunk),
+            },
+            content_type=content_type
+        )
+    else:
+        raise Exception(
+            'Invalid value for format parameter, use json, tei or html.'
+        )
+
+    return ret
+
+
+def get_tei_from_chunk(html):
+    html = f'<div class="chunk">{html}</div>'
+    return utils.transform_xml(html, 'ctrs_texts/tei.xslt').decode('utf-8')
+
+
+# -------------------------------------------------------------------
+
+
+def view_api_text_search_regions(request):
+    '''
+    Returns the regions and bounding boxes (annotation)
+    to be represented as a heatmap over the manuscript image.
+    '''
+
+    # TODO: GN remove hard-coded id
+    text_ids = request.GET.get('texts', '') or '520'
+    text_ids = text_ids.split(',')
+
+    annotations = utils.get_annotations_from_archetype()
+
+    hits = []
+    for region in utils.get_regions_with_unique_variants(text_ids):
+        annotation = annotations.get(region['key'], {})
+        rects = annotation.get('rects', [])
+        hit = {
+            'type': 'region',
+            'id': region['key'],
+            'attributes': {
+                'rects': rects,
+                'readings': region['readings'],
+            }
+        }
+        hits.append(hit)
+
+    ret = OrderedDict([
+        ['meta', {
+            'page': 1,
+            'page_count': 1,
+            'hit_count': len(hits),
+        }],
+        ['data', hits],
+    ])
+
+    return utils.get_jsonapi_response(ret, request)
+
 
 # -------------------------------------------------------------------
 
@@ -158,6 +256,7 @@ def view_api_text_search_sentences(request):
     text_ids = text_ids.split(',')
     sentence_number = request.GET.get('sn', '1')
     encoding_type = request.GET.get('et', 'transcription')
+    work_slug = request.GET.get('group', 'declaration').strip()
 
     encoded_texts = EncodedText.objects.filter(
         abstracted_text__id__in=text_ids,
@@ -169,63 +268,59 @@ def view_api_text_search_sentences(request):
 
     texts = []
     for encoded_text in encoded_texts:
+        text = encoded_text.abstracted_text
+
         sentence = utils.get_sentence_from_text(
             encoded_text, sentence_number
         )
 
-        html = render_to_string('ctrs_texts/search_sentence.html', {
-            'text': encoded_text.abstracted_text,
-            'sentence': sentence,
-        })
-
-        text_data = {
-            'html': html,
-        }
-        texts.append(text_data)
+        texts.append(get_sentence_data(
+            text, sentence, sentence_number, encoding_type, work_slug
+        ))
 
     ret = utils.get_page_response_from_list(texts, request)
 
-    return JsonResponse(ret)
+    return utils.get_jsonapi_response(ret, request)
 
 
-# -------------------------------------------------------------------
+def get_sentence_data(text, sentence, sentence_number, encoding_type,
+                      work_slug, sentence_code=None):
+    if sentence_code is None:
+        sentence_code = 's-' + sentence_number
+    if sentence_number is None:
+        sentence_number = sentence_code.split('-')[-1]
 
-
-def view_api_text_search_regions(request):
-    '''
-    '''
-
-    # TODO: GN remove hard-coded id
-    text_ids = request.GET.get('texts', '') or '520'
-    text_ids = text_ids.split(',')
-
-    annotations = utils.get_annotations_from_archetype()
-
-    hits = [{
-        'type': 'heatmap',
-        'id': 0,
-        'html': render_to_string('ctrs_texts/search_region.html', {}),
-        'regions': utils.get_regions_with_unique_variants(text_ids),
-        'annotations': annotations,
-    }]
-
+    sentence_id = f'{text.id}:{encoding_type}@{sentence_code}'
     ret = OrderedDict([
-        ['jsonapi', '1.0'],
-        ['meta', {
-            'page': 1,
-            'page_count': 1,
-            'hit_count': len(hits),
+        ['id', sentence_id],
+        ['type', 'sentence'],
+        ['links', {
+            'viewer': (
+                reverse('text_viewer') +
+                f'?group={work_slug}&blocks={sentence_id}'
+            )
         }],
-        ['data', hits],
+        ['attributes', {
+            'text': {
+                'id': text.id,
+                'type': text.type.slug,
+                'short_name': text.short_name,
+                'name': text.name,
+                'work_slug': work_slug,
+                'encoding_type': encoding_type,
+            },
+            'sentence': sentence,
+            'sentence_number': sentence_number,
+        }],
     ])
 
-    return JsonResponse(ret)
+    return ret
 
 
 def view_api_text_search_text(request):
-    q = request.GET.get('q', '')
-    if q:
-        q = q.strip()
+    q = request.GET.get('q', '').strip()
+
+    work_slug = request.GET.get('group', 'declaration').strip()
 
     text_ids = request.GET.get('texts', None)
     encoding_type = request.GET.get('et', 'transcription')
@@ -256,31 +351,23 @@ def view_api_text_search_text(request):
     highlight_pattern = re.compile(
         '({})(?=(?:[^>]|<[^>]*>)*$)'.format(escaped), re.I)
 
-    # major optimisation: load the template outside the loop
-    hit_template = get_template('ctrs_texts/search_sentence.html')
-
     sentences = []
     for encoded_text in encoded_texts:
-        for sentence in utils.search_text(encoded_text, q):
-            context = {
-                'text': encoded_text.abstracted_text,
-                'sentence': sentence,
-            }
-            html = hit_template.render(context)
+        text = encoded_text.abstracted_text
+        for sentence_code, sentence in utils.search_text(encoded_text, q):
 
             # highlight the search results
             if q:
-                html = highlight_pattern.sub(
-                    r'<span class="highlight">\1</span>', html)
+                sentence = highlight_pattern.sub(
+                    r'<span class="highlight">\1</span>', sentence)
 
-            sentence_data = {
-                'html': html,
-            }
-
-            sentences.append(sentence_data)
+            sentences.append(get_sentence_data(
+                text, sentence, None, encoding_type, work_slug, sentence_code
+            ))
 
     ret = utils.get_page_response_from_list(sentences, request)
 
     ret['meta']['q'] = q
 
-    return JsonResponse(ret)
+    # return JsonResponse(ret)
+    return utils.get_jsonapi_response(ret, request)
