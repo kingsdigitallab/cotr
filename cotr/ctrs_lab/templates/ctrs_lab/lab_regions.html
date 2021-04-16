@@ -19,8 +19,8 @@
 <div id="lab-regions" class="">
   <p>
     <span class="message-loading label warning" v-show="status !== 3">Loading results...</span>
-    <label for="resultsList">Parent:</label>
-    <select v-model="parent" id="resultsList">
+    Parent:
+    <select v-model="parent">
       <option v-for="text in texts" :value="text.attributes.siglum|lowercase" v-if="text.type != 'manuscript'">
         {{ text.attributes.siglum }}
       </option>
@@ -105,51 +105,55 @@
           Highlight omissions
         </label>
       </p>
-      <table :class="{'birds-eye-view': is_birds_eye_view_enabled}">
-        <thead>
-          <tr>
-            <th class="heading-rid">Region #</th>
-            <th class="heading-rid">Sent.</th>
-            <th v-for="source in regions_meta.sources">
-              {{ source.siglum }} ({{ source.siglum_parent }})
-            </th>
+      <div class="table-scroll">
+        <table :class="{'birds-eye-view': is_birds_eye_view_enabled}">
+          <thead>
+            <tr>
+              <th class="heading-rid">Region #</th>
+              <th class="heading-rid">Sent.</th>
+              <th v-for="source in regions_meta.sources">
+                {{ source.siglum }} ({{ source.siglum_parent }})
+              </th>
+            </tr>
+          </thead>
+          <tr v-for="region in regions" v-if="region.groups > 1">
+            <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">
+              {{ region.region }}
+            </a></td>
+            <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">
+              {{ region.sentence }}
+            </a></td>
+            <td v-for="reading in region.readings" :style="get_reading_style(reading, region)">
+              {{ reading.t }}
+            </td>
           </tr>
-        </thead>
-        <tr v-for="region in regions" v-if="region.groups > 1">
-          <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">
-            {{ region.region }}
-          </a></td>
-          <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">
-            {{ region.sentence }}
-          </a></td>
-          <td v-for="reading in region.readings" :style="get_reading_style(reading, region)">
-            {{ reading.t }}
-          </td>
-        </tr>
-      </table>
+        </table>
+      </div>
     </div>
 
     <div v-show="panel == 'matrix'" class="tabs-panel is-active">
-      <table :class="">
-        <thead>
-          <tr>
-            <th>
-              /
-            </th>
-            <th v-for="source in regions_meta.sources">
-              {{ source.siglum }} ({{ source.siglum_parent }})
-            </th>
+      <div class="table-scroll">
+        <table :class="">
+          <thead>
+            <tr>
+              <th>
+                /
+              </th>
+              <th v-for="source in regions_meta.sources">
+                {{ source.siglum }} ({{ source.siglum_parent }})
+              </th>
+            </tr>
+          </thead>
+          <tr v-for="(source, i) in regions_meta.sources">
+            <td>{{ source.siglum }} ({{ source.siglum_parent }})</td>
+            <td v-for="(source, j) in regions_meta.sources"
+                :style="get_diff_cell_style(i, j)"
+                :class="get_diff_cell_boundary_classes(i, j)">
+              {{ get_diff_cell_value(i, j) }}
+            </td>
           </tr>
-        </thead>
-        <tr v-for="(source, i) in regions_meta.sources">
-          <td>{{ source.siglum }} ({{ source.siglum_parent }})</td>
-          <td v-for="(source, j) in regions_meta.sources"
-              :style="get_diff_cell_style(i, j)"
-              :class="get_diff_cell_boundary_classes(i, j)">
-            {{ get_diff_cell_value(i, j) }}
-          </td>
-        </tr>
-      </table>
+        </table>
+      </div>
     </div>
 
     <div v-show="panel == 'help'" class="tabs-panel is-active">
