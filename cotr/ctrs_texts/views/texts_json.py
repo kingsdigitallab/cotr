@@ -200,7 +200,7 @@ def view_api_text_chunk(
 
 
 def get_tei_from_chunk(html):
-    html = f'<div class="chunk">{html}</div>'
+    html = f'<div>{html}</div>'
     return utils.transform_xml(html, 'ctrs_texts/tei.xslt').decode('utf-8')
 
 

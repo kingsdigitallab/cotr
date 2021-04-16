@@ -34,18 +34,22 @@
     </head>
   </xsl:template>
   <xsl:template match="p/span[@data-dpt='head']">
-    <xsl:apply-templates select="node()"/>
+    <xsl:apply-templates/>
   </xsl:template>
 
   <xsl:template match="p[span[@data-dpt='sn']]">
     <s n="{./span[@data-dpt='sn']}">
       <xsl:apply-templates select="./span[@data-dpt='sn']/@* | @*"/>
-      <xsl:apply-templates select="node()"/>
+      <xsl:apply-templates/>
     </s>
   </xsl:template>
   <xsl:template match="p/span[@data-dpt='sn']">
   </xsl:template>
 
+  <xsl:template match="em|span[@data-dpt-lang='vernacular']">
+    <!-- TODO: best way to encode vernacular? -->
+    <foreign xml:lang="ang"><xsl:apply-templates /></foreign>
+  </xsl:template>
 
   <!--
 'btnHeadingEmphasised': {'label': 'Heading (rubricated)', 'tei': '<head rend="emphasised">{}</head>'},
