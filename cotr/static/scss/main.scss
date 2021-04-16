@@ -148,6 +148,13 @@ small {
   font-size: .625em;
 }
 
+.small-icon {
+  svg {
+    fill: $dark-gray;
+    width: 14px;
+  }
+}
+
 .text-with-icon {
   svg {
     fill: $primary-color;
