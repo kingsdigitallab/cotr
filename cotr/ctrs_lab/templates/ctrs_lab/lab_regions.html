@@ -19,8 +19,8 @@
 <div id="lab-regions" class="">
   <p>
     <span class="message-loading label warning" v-show="status !== 3">Loading results...</span>
-    Parent:
-    <select v-model="parent">
+    <label for="resultsList">Parent:</label>
+    <select v-model="parent" id="resultsList">
       <option v-for="text in texts" :value="text.attributes.siglum|lowercase" v-if="text.type != 'manuscript'">
         {{ text.attributes.siglum }}
       </option>
