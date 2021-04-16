@@ -65,7 +65,7 @@ django-compressor==2.4
     #   django-libsass
 django-coverage-plugin==1.8.0
     # via -r requirements/local.in
-django-debug-toolbar==2.2
+django-debug-toolbar==2.2.1
     # via -r requirements/local.in
 django-environ==0.4.5
     # via -r requirements/./base.in
