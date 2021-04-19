@@ -63,7 +63,13 @@ def view_api_texts(request):
                 'group': text.group_id,
                 'siglum': text.short_name,
             }],
-            ['links', {'self': text.get_api_url(request)}]
+            ['links', {
+                'self': text.get_api_url(request),
+                'related': {
+                    'href': text.get_api_url(request) + '?format=tei',
+                    'title': 'TEI format',
+                }
+            }]
         ]
         text_data = OrderedDict(text_data)
         if text.manuscript:
@@ -162,15 +168,18 @@ def view_api_text_chunk(
         content_type += '; charset=utf-8'
 
         chunk = '\n\n'.join([
-            f'\n\n<!-- {et.abstracted_text.id}' +
-            f'{et.abstracted_text.type} ########## -->\n' +
+            f'\n\n <!-- {et.abstracted_text.get_top_parent().name} > ' +
+            f'{et.abstracted_text.id} ' +
+            f'({et.abstracted_text.type}) ########## -->\n\n' +
             utils.get_text_chunk(
                 et, view, region_type
             )
             for et in encoded_texts
         ])
 
-        text_type_name = 'translated'
+        text_type_name = 'english edition'
+        if encoded_text.type.slug == 'transcription':
+            text_type_name = 'latin edition'
 
         # get parents = version, work
         parents = []
@@ -200,7 +209,7 @@ def view_api_text_chunk(
 
 
 def get_tei_from_chunk(html):
-    html = f'<div>{html}</div>'
+    html = f'<body>{html}</body>'
     return utils.transform_xml(html, 'ctrs_texts/tei.xslt').decode('utf-8')
 
 

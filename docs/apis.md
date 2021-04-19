@@ -37,6 +37,12 @@ for the English translation. /whole/whole is just a fixed convention.
 
 https://cotr.ac.uk/api/texts/23/transcription/whole/whole/
 
+### TEI format
+
+To export a text in TEI, add `?format=tei` to the end of the link.
+
+https://cotr.ac.uk/api/texts/23/transcription/whole/whole/?format=tei
+
 ## Sentences matching a keyword
 
 The following request returns the 2nd page of the results containing 
