@@ -1075,8 +1075,10 @@ main {
 // GN: tried to style the link to the TEI download on the Texts list page
 // see text_tei_link.html
 .tei-link {
-  margin-left: 0.7rem;
   color: #888;
+  margin-left: 0.7rem;
+  vertical-align: -4px;
+  
   svg {
     width: 16px;
   }
