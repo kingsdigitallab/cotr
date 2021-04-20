@@ -122,6 +122,15 @@ long term storage alongside a plain text derivative for indexing and live search
 This approach has been used in many projects based on the Archetype framework; it is web-friendly and integrates very well with the
 rest of the rich editorial environment.
 
+The texts can be downloaded in TEI format with the [Web API](./apis.md).
+
+See separate [documentation of the few elements we have borrowed from TEI](./tei/cotr_tei.html).  
+This minimal [TEI schema is also available in ODD format](./tei/cotr_tei.odd).
+
+In our TEI export we have used a seg (type="unsettled") for the
+unsettled regions and the critical apparatus elements to express the 
+alternative readings at the Version and Work levels.
+
 ## System Architecture
 
 UML Deployment diagram:

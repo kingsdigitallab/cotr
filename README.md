@@ -7,11 +7,9 @@ a research project [funded by the AHRC - AH/P013759/1](https://gtr.ukri.org/proj
 [![MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Built with Cookiecutter Django](https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg)](https://github.com/kingsdigitallab/cookiecutter-django/)
 
-## [Research Software Documentation](./docs/rse.md)
+## [Research Software Documentation](https://kingsdigitallab.github.io/cotr/)
 
-## [Setup](./docs/setup.md)
-
-## Provenance
+## Code Provenance
 
 This repository was created from
 <https://github.com/kingsdigitallab/ctrs-django> in May 2020 while

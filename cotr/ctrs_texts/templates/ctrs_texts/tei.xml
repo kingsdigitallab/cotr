@@ -1,18 +1,16 @@
-<TEI version="3.3.0" xmlns="http://www.tei-c.org/ns/1.0">
-  <text>
-    {{ body|safe }}
-  </text>
+<TEI version="3.3.0" xmlns="http://www.tei-c.org/ns/1.0" xmlns:cotr="https://cotr.ac.uk">
   <teiHeader>
     <fileDesc>
       <titleStmt>
-        <title>{{ text.abstracted_text.short_name }}: {{ text.abstracted_text.name }} {{ text_type_name }}</title>
+        <title>{{ text.abstracted_text.name }} ({{ text.abstracted_text.short_name }}), {{ text_type_name }}</title>
         <editor>Dauvit Broun, John Reuben Davies</editor>
         <funder>Arts and Humanities Research Council (AHRC, UK)</funder>
         <principal>Dr Alice Taylor</principal>
       </titleStmt>
       <publicationStmt>
-        <p>First published on the website of the Community of the Realm (COTR) project.
-        {{ api_url }}</p>
+        <p>First published on the website of the Community of the Realm in Scotland, 1249-1424 (COTR) project.
+        {{ api_url }}
+        </p>
       </publicationStmt>
       <sourceDesc>
         <msDesc>
@@ -25,4 +23,7 @@
       </sourceDesc>
     </fileDesc>
   </teiHeader>
+  <text>
+    {{ body|safe }}
+  </text>
 </TEI>

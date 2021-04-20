@@ -135,12 +135,24 @@ i.icon {
   }
 }
 
+/* GF: fixing a bug in Foundation that prevents displaying the caret in Chrome */
+select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='32' height='24' viewBox='0 0 32 24'><polygon points='0,0 32,0 16,24' style='fill: rgb%28138, 138, 138%29'></polygon></svg>");
+}
+
 .short {
   max-width: 76%;
 }
 
 small {
   font-size: .625em;
+}
+
+.small-icon {
+  svg {
+    fill: $dark-gray;
+    width: 14px;
+  }
 }
 
 .text-with-icon {
@@ -335,6 +347,12 @@ table {
 
   th {
     background: lighten($primary-color, 65%);
+  }
+}
+
+.table-scroll {
+  table {
+    min-width: 100%;
   }
 }
 
@@ -1051,6 +1069,16 @@ main {
   &.work {
     background: scale-color($primary-color, $lightness: 75%);
     color: $black;
+  }
+}
+
+// GN: tried to style the link to the TEI download on the Texts list page
+// see text_tei_link.html
+.tei-link {
+  margin-left: 0.7rem;
+  color: #888;
+  svg {
+    width: 16px;
   }
 }
 
