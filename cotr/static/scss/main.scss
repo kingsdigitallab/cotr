@@ -1072,6 +1072,16 @@ main {
   }
 }
 
+// GN: tried to style the link to the TEI download on the Texts list page
+// see text_tei_link.html
+.tei-link {
+  margin-left: 0.7rem;
+  color: #888;
+  svg {
+    width: 16px;
+  }
+}
+
 // Using colour blind friendly palette for the versions
 
 .v1-text-id {

@@ -46,6 +46,9 @@
   </xsl:template>
 
   <xsl:template match="p[span[@data-dpt='sn']]">
+    <xsl:call-template name="p-sn" />
+  </xsl:template>
+  <xsl:template name="p-sn">
     <!-- 'btnSentenceNumber': {'label': 'Sentence Number', 'tei': '<sn>{}</sn>', 'color': TE_COLOR_EDITORIAL}, -->
     <s n="{./span[@data-dpt='sn']}">
       <xsl:apply-templates select="./span[@data-dpt='sn']/@n"/>
