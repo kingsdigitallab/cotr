@@ -1,0 +1,11 @@
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 384 512" style="enable-background:new 0 0 384 512;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#FFFFFF;}
+	.st1{font-family:'OpenSansCondensed-Bold';}
+	.st2{font-size:300px;}
+</style>
+<path d="M224,136V0H24C10.7,0,0,10.7,0,24v464c0,13.3,10.7,24,24,24h336c13.3,0,24-10.7,24-24V160H248C234.8,160,224,149.2,224,136z
+	 M377,105L279.1,7c-4.5-4.5-10.6-7-17-7H256v128h128v-6.1C384,115.6,381.5,109.5,377,105z"/>
+<text transform="matrix(1 0 0 1 18.3427 473.2484)" class="st0 st1 st2">TEI</text>
+</svg>
