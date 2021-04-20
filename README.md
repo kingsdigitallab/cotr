@@ -9,9 +9,9 @@ a research project [funded by the AHRC - AH/P013759/1](https://gtr.ukri.org/proj
 
 ## [Research Software Documentation](./docs/rse.md)
 
-## [Setup](./docs/setup.md)
+## [Software Setup](./docs/setup.md)
 
-## Provenance
+## Code Provenance
 
 This repository was created from
 <https://github.com/kingsdigitallab/ctrs-django> in May 2020 while

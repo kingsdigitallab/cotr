@@ -122,6 +122,8 @@ long term storage alongside a plain text derivative for indexing and live search
 This approach has been used in many projects based on the Archetype framework; it is web-friendly and integrates very well with the
 rest of the rich editorial environment.
 
+The texts can be downloaded in TEI format with the [Web API](./apis.md).
+
 ## System Architecture
 
 UML Deployment diagram:

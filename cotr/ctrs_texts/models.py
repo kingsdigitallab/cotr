@@ -420,3 +420,11 @@ class AbstractedText(NamedModel, ImportedModel):
                 'location': 'whole',
             }
         ))
+
+    def get_top_parent(self):
+        ret = self
+        while ret.group:
+            if ret == ret.group:
+                break
+            ret = ret.group
+        return ret

@@ -63,7 +63,13 @@ def view_api_texts(request):
                 'group': text.group_id,
                 'siglum': text.short_name,
             }],
-            ['links', {'self': text.get_api_url(request)}]
+            ['links', {
+                'self': text.get_api_url(request),
+                'related': {
+                    'href': text.get_api_url(request) + '?format=tei',
+                    'title': 'TEI format',
+                }
+            }]
         ]
         text_data = OrderedDict(text_data)
         if text.manuscript:
@@ -162,15 +168,18 @@ def view_api_text_chunk(
         content_type += '; charset=utf-8'
 
         chunk = '\n\n'.join([
-            f'\n\n<!-- {et.abstracted_text.id}' +
-            f'{et.abstracted_text.type} ########## -->\n' +
+            f'\n\n <!-- {et.abstracted_text.get_top_parent().name} > ' +
+            f'{et.abstracted_text.id} ' +
+            f'({et.abstracted_text.type}) ########## -->\n\n' +
             utils.get_text_chunk(
                 et, view, region_type
             )
             for et in encoded_texts
         ])
 
-        text_type_name = 'translated'
+        language = 'English'
+        if encoded_text.type.slug == 'transcription':
+            language = 'Latin'
 
         # get parents = version, work
         parents = []
@@ -184,13 +193,21 @@ def view_api_text_chunk(
             'ctrs_texts/tei.xml',
             {
                 'text': encoded_text,
-                'text_type_name': text_type_name,
+                'text_type_name': language + ' edition',
                 'api_url': encoded_text.get_api_url(request)+'?format=tei',
                 'work': parents[-1],
                 'body': get_tei_from_chunk(chunk),
             },
             content_type=content_type
         )
+        if format in ['tei']:
+            language
+            ret['Content-Disposition'] = (
+                'attachment; filename="cotr-' +
+                f'{encoded_text.abstracted_text.id}-' +
+                f'{encoded_text.abstracted_text.slug}-' +
+                f'{language.lower()}.xml"'
+            )
     else:
         raise Exception(
             'Invalid value for format parameter, use json, tei or html.'
@@ -200,8 +217,15 @@ def view_api_text_chunk(
 
 
 def get_tei_from_chunk(html):
-    html = f'<div>{html}</div>'
-    return utils.transform_xml(html, 'ctrs_texts/tei.xslt').decode('utf-8')
+    html = f'<body>{html}</body>'
+    ret = utils.transform_xml(html, 'ctrs_texts/tei.xslt').decode('utf-8')
+
+    # group sequences of <s> under <ab>
+    ret = re.sub(r'<s\b', '<ab><s', ret)
+    ret = re.sub(r'</s>', '</s></ab>', ret)
+    ret = re.sub(r'</ab>\s*<ab>', '', ret)
+
+    return ret
 
 
 # -------------------------------------------------------------------

@@ -21,16 +21,18 @@
           </span>
           {{ version.name }}
         </a>
+        {% include 'ctrs_texts/text_tei_link.html' with text=version %}
       </h4>
       <ul>
         {% for text in version.members.all %}
           {% if text.short_name != 'HM1' and text.short_name != 'HM2' %}
-            <li>
+            <li class="text-link">
               <a class="status-{{text.get_status.slug}}"
                  href="{% url 'text_viewer' %}?group={{work.slug}}&blocks={{text.id}}:transcription;">
                 <span class="label manuscript">{{ text.short_name }}</span>
                 {{ text.name }}
               </a>
+              {% include 'ctrs_texts/text_tei_link.html' with text=text %}
             </li>
           {% endif %}
         {% endfor %}

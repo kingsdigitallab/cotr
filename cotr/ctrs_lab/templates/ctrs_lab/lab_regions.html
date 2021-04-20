@@ -15,6 +15,12 @@
 {% endblock %}
 
 {% block main %}
+<p class="hide-for-large">
+  <span class="small-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"/></svg>
+  </span>
+  <em>Tables may contain more data than what is initially visible. Try scrolling vertically as well as horizontally.</em>
+</p>
 {% verbatim %}
 <div id="lab-regions" class="">
   <p>
@@ -105,51 +111,55 @@
           Highlight omissions
         </label>
       </p>
-      <table :class="{'birds-eye-view': is_birds_eye_view_enabled}">
-        <thead>
-          <tr>
-            <th class="heading-rid">Region #</th>
-            <th class="heading-rid">Sent.</th>
-            <th v-for="source in regions_meta.sources">
-              {{ source.siglum }} ({{ source.siglum_parent }})
-            </th>
+      <div class="table-scroll">
+        <table :class="{'birds-eye-view': is_birds_eye_view_enabled}">
+          <thead>
+            <tr>
+              <th class="heading-rid">Region #</th>
+              <th class="heading-rid">Sent.</th>
+              <th v-for="source in regions_meta.sources">
+                {{ source.siglum }} ({{ source.siglum_parent }})
+              </th>
+            </tr>
+          </thead>
+          <tr v-for="region in regions" v-if="region.groups > 1">
+            <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">
+              {{ region.region }}
+            </a></td>
+            <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">
+              {{ region.sentence }}
+            </a></td>
+            <td v-for="reading in region.readings" :style="get_reading_style(reading, region)">
+              {{ reading.t }}
+            </td>
           </tr>
-        </thead>
-        <tr v-for="region in regions" v-if="region.groups > 1">
-          <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">
-            {{ region.region }}
-          </a></td>
-          <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">
-            {{ region.sentence }}
-          </a></td>
-          <td v-for="reading in region.readings" :style="get_reading_style(reading, region)">
-            {{ reading.t }}
-          </td>
-        </tr>
-      </table>
+        </table>
+      </div>
     </div>
 
     <div v-show="panel == 'matrix'" class="tabs-panel is-active">
-      <table :class="">
-        <thead>
-          <tr>
-            <th>
-              /
-            </th>
-            <th v-for="source in regions_meta.sources">
-              {{ source.siglum }} ({{ source.siglum_parent }})
-            </th>
+      <div class="table-scroll">
+        <table :class="">
+          <thead>
+            <tr>
+              <th>
+                /
+              </th>
+              <th v-for="source in regions_meta.sources">
+                {{ source.siglum }} ({{ source.siglum_parent }})
+              </th>
+            </tr>
+          </thead>
+          <tr v-for="(source, i) in regions_meta.sources">
+            <td>{{ source.siglum }} ({{ source.siglum_parent }})</td>
+            <td v-for="(source, j) in regions_meta.sources"
+                :style="get_diff_cell_style(i, j)"
+                :class="get_diff_cell_boundary_classes(i, j)">
+              {{ get_diff_cell_value(i, j) }}
+            </td>
           </tr>
-        </thead>
-        <tr v-for="(source, i) in regions_meta.sources">
-          <td>{{ source.siglum }} ({{ source.siglum_parent }})</td>
-          <td v-for="(source, j) in regions_meta.sources"
-              :style="get_diff_cell_style(i, j)"
-              :class="get_diff_cell_boundary_classes(i, j)">
-            {{ get_diff_cell_value(i, j) }}
-          </td>
-        </tr>
-      </table>
+        </table>
+      </div>
     </div>
 
     <div v-show="panel == 'help'" class="tabs-panel is-active">
