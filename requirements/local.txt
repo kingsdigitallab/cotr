@@ -8,6 +8,8 @@
 
 alabaster==0.7.12
     # via sphinx
+anyascii==0.2.0
+    # via wagtail
 appdirs==1.4.4
     # via
     #   black
@@ -25,7 +27,7 @@ babel==2.9.0
     # via sphinx
 backcall==0.2.0
     # via ipython
-beautifulsoup4==4.6.0
+beautifulsoup4==4.8.2
     # via wagtail
 black==19.10b0
     # via -r requirements/local.in
@@ -71,6 +73,8 @@ django-environ==0.4.5
     # via -r requirements/./base.in
 django-extensions==2.2.8
     # via -r requirements/local.in
+django-filter==2.4.0
+    # via wagtail
 django-libsass==0.8
     # via -r requirements/./base.in
 django-model-utils==4.1.1
@@ -90,6 +94,7 @@ django==2.2.20
     #   -r requirements/./base.in
     #   django-appconf
     #   django-debug-toolbar
+    #   django-filter
     #   django-model-utils
     #   django-redis
     #   django-stubs
@@ -111,6 +116,8 @@ elasticsearch==7.12.0
     # via elasticsearch-dsl
 entrypoints==0.3
     # via flake8
+et-xmlfile==1.0.1
+    # via openpyxl
 factory-boy==2.12.0
     # via -r requirements/local.in
 faker==8.1.0
@@ -145,6 +152,8 @@ jinja2==2.11.3
     #   sphinx
 jsonschema==3.2.0
     # via -r requirements/./base.in
+l18n==2020.6.1
+    # via wagtail
 lazy-object-proxy==1.6.0
     # via astroid
 libsass==0.20.1
@@ -169,6 +178,8 @@ nodeenv==1.6.0
     # via pre-commit
 oauthlib==3.1.0
     # via requests-oauthlib
+openpyxl==3.0.7
+    # via tablib
 packaging==20.9
     # via
     #   pytest
@@ -243,7 +254,7 @@ pytz==2021.1
     #   babel
     #   django
     #   django-modelcluster
-    #   wagtail
+    #   l18n
 pyyaml==5.4.1
     # via pre-commit
 rcssmin==1.0.6
@@ -276,12 +287,14 @@ six==1.15.0
     #   elasticsearch-dsl
     #   html5lib
     #   jsonschema
+    #   l18n
     #   libsass
     #   python-dateutil
     #   virtualenv
-    #   wagtail
 snowballstemmer==2.1.0
     # via sphinx
+soupsieve==2.2.1
+    # via beautifulsoup4
 sphinx==2.4.2
     # via -r requirements/local.in
 sphinxcontrib-applehelp==1.0.2
@@ -300,6 +313,8 @@ sqlparse==0.4.1
     # via
     #   django
     #   django-debug-toolbar
+tablib[xls,xlsx]==3.0.0
+    # via wagtail
 termcolor==1.1.0
     # via pytest-sugar
 text-unidecode==1.3
@@ -334,7 +349,7 @@ urllib3==1.26.4
     #   requests
 virtualenv==20.4.3
     # via pre-commit
-wagtail==2.7.4
+wagtail==2.11.6
     # via -r requirements/./base.in
 wagtailmenus==3.0.2
     # via -r requirements/./base.in
@@ -350,10 +365,16 @@ werkzeug==1.0.0
     # via -r requirements/local.in
 whitenoise==5.2.0
     # via -r requirements/./base.in
-willow==1.3
+willow==1.4
     # via wagtail
 wrapt==1.12.1
     # via astroid
+xlrd==2.0.1
+    # via tablib
+xlsxwriter==1.3.9
+    # via wagtail
+xlwt==1.3.0
+    # via tablib
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
