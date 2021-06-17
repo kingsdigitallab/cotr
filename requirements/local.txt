@@ -334,7 +334,7 @@ urllib3==1.26.4
     #   requests
 virtualenv==20.4.3
     # via pre-commit
-wagtail==2.7.4
+wagtail==2.11.8
     # via -r requirements/./base.in
 wagtailmenus==3.0.2
     # via -r requirements/./base.in
