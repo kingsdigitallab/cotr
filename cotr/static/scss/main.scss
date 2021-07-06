@@ -21,9 +21,6 @@
  *  7.  Print
  *  8.  Digital edition global
  *
- *  TODO - Add:
- *      code (pre & code)
- *      blockquote
  */
 
 /* 1. Imports / Settings / Variables */
@@ -49,8 +46,6 @@ body {
   font-weight: 400;
   margin: 0;
 }
-
-blockquote {}
 
 .capitalize {
   text-transform: capitalize;
@@ -140,12 +135,24 @@ i.icon {
   }
 }
 
+/* GF: fixing a bug in Foundation that prevents displaying the caret in Chrome */
+select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='32' height='24' viewBox='0 0 32 24'><polygon points='0,0 32,0 16,24' style='fill: rgb%28138, 138, 138%29'></polygon></svg>");
+}
+
 .short {
   max-width: 76%;
 }
 
 small {
   font-size: .625em;
+}
+
+.small-icon {
+  svg {
+    fill: $dark-gray;
+    width: 14px;
+  }
 }
 
 .text-with-icon {
@@ -175,6 +182,11 @@ button,
   line-height: 1.75em;
   padding: 5px 10px;
 
+  &:active,
+  &:focus {
+    border: 1px solid $yellow;
+  }
+
   &.fullscreen {
     &:hover {
       background: lighten($primary-color, 50%);
@@ -187,11 +199,20 @@ button,
 
   &.secondary {
     background: lighten($secondary-color, 15%);
-    color: $primary-color
+    color: $primary-color;
+
+    &:focus,
+    &:hover {
+      background: lighten($secondary-color, 30%);
+    }
   }
 
   &.success {
-    background: $success-color;
+    background: lighten($success-color, 10%);
+
+    &:hover {
+      background: lighten($success-color, 20%);
+    }
   }
 }
 
@@ -232,16 +253,44 @@ button,
   }
 }
 
+.label-sticky {
+  position: absolute;
+  left: -60px;
+  top: 50px;
+  transform: rotate(90deg);
+
+  &.link {
+    svg {
+      fill: $dark-gray;
+      height: 12px;
+      width: 12px;
+    }
+  }
+}
+
+// Skip to main content
+
+.skip-link {
+  background: $primary-color;
+  color: #fff;
+  font-weight: 700;
+  left: 50%;
+  padding: 4px;
+  position: absolute;
+  transform: translateY(-100%);
+  transition: transform 0.3s;
+}
+
+.skip-link:focus {
+  transform: translateY(0%);
+}
+
 // 2.2 Forms
 
 // 2.3 Headings
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3,
+h4, h5, h6 {
   padding: .5em 0 .25em;
 }
 
@@ -272,9 +321,18 @@ a {
     border-bottom: 1px solid $secondary-color;
   }
 
+  &:active,
+  &:focus {
+    // background: lighten($primary-color, 40%);
+    // color: $primary-color !important;
+    border: 1px solid $yellow;
+  }
+
   &.decorate {
     border-bottom: 1px dotted $secondary-color;
   }
+
+
 }
 
 // 2.5 Tables
@@ -289,6 +347,12 @@ table {
 
   th {
     background: lighten($primary-color, 65%);
+  }
+}
+
+.table-scroll {
+  table {
+    min-width: 100%;
   }
 }
 
@@ -312,16 +376,29 @@ header {
   color: white;
 
   a {
+    &:active,
+    &:focus,
     &:hover {
-      color: $secondary-color;
+      color: lighten($secondary-color, 15%);
     }
   }
 }
 
 footer {
+  a {
+    &:hover {
+      background: transparent;
+      border-bottom: 1px solid lighten($secondary-color, 15%);
+    }
+  }
+
+  h3 {
+    font-size: rem-calc(25);
+  }
+
   svg {
     fill: $light-gray;
-    max-width: 24px;
+    width: 24px;
   }
 }
 
@@ -416,6 +493,13 @@ header {
     a {
       padding: .75rem .625rem;
     }
+
+    .active {
+      a {
+        color: darken($primary-color, 13%);
+        font-weight: 700;
+      }
+    }
   }
 
   &:first-child {
@@ -461,12 +545,6 @@ header {
     color: white;
     padding: .75rem .25rem;
   }
-
-  // .second-line {
-  //   li {
-  //     background: darken($primary-color, 3%);
-  //   }
-  // }
 }
 
 .top-nav {
@@ -484,7 +562,8 @@ main {
   }
 
   small {
-    color: scale-color($rich-black, $lightness: 20%);
+    color: lighten($rich-black, 20%);
+    // color: scale-color($rich-black, $lightness: 20%);
   }
 }
 
@@ -569,6 +648,24 @@ main {
 .sidebar {
   background: scale-color($primary-color, $lightness: 85%);
   border-left: 1px solid scale-color($primary-color, $lightness: 55%);
+
+  .is-parent-page {
+    color: $rich-black;
+    display: block;
+    font-family: $header-font-family;
+    font-size: 1.25rem;
+    height: 42px;
+    padding: .375rem 1rem .5rem;
+
+    &:hover {
+      background: scale-color($primary-color, $lightness: 70%);
+      text-decoration: none;
+    }
+
+    &.active {
+      background: scale-color($secondary-color, $lightness: 40%);
+    }
+  }
 
   .menu {
     .active {
@@ -659,6 +756,12 @@ footer {
   text-align: center;
   width: 100%;
   z-index: 1001;
+
+  a {
+    &:hover {
+      border-bottom: 0;
+    }
+  }
 }
 
 
@@ -713,6 +816,7 @@ main {
     overflow-wrap: break-word;
   }
 
+  h3,
   h4,
   h5 {
     padding: 0;
@@ -724,10 +828,10 @@ main {
   }
 
   .media-object {
-    h4 {
+    h3, h4 {
       font-size: 1.25rem;
       line-height: 1.25;
-      patting-top: .25rem;
+      padding-top: 0;
 
       small {
         font-size: 1rem;
@@ -884,10 +988,10 @@ main {
 
   .social {
     .media-object {
-      h4 {
+      h3, h4 {
         font-size: 1.25rem;
         line-height: 1.25;
-        patting-top: .25rem;
+        padding-top: 0;
 
         small {
           font-size: 1rem;
@@ -968,6 +1072,18 @@ main {
   }
 }
 
+// GN: tried to style the link to the TEI download on the Texts list page
+// see text_tei_link.html
+.tei-link {
+  color: #888;
+  margin-left: 0.7rem;
+  vertical-align: -4px;
+  
+  svg {
+    width: 16px;
+  }
+}
+
 // Using colour blind friendly palette for the versions
 
 .v1-text-id {
@@ -992,4 +1108,10 @@ main {
 
 .v6-text-id {
   border-left: 10px solid $reddish-purple;
+}
+
+//
+
+.pagination .page-number {
+  display: inline-block;
 }

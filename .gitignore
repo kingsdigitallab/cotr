@@ -262,7 +262,7 @@ Session.vim
 .netrwhist
 
 # Auto-generated tag files
-tags
+# tags
 
 
 ### Project template
@@ -290,3 +290,8 @@ arc-content.json
 
 # dev venv
 /venv
+
+# openapi
+.openapi-generator
+.openapi-generator-ignore
+

@@ -1,0 +1,29 @@
+<TEI version="3.3.0" xmlns="http://www.tei-c.org/ns/1.0" xmlns:cotr="https://cotr.ac.uk">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>{{ text.abstracted_text.name }} ({{ text.abstracted_text.short_name }}), {{ text_type_name }}</title>
+        <editor>Dauvit Broun, John Reuben Davies</editor>
+        <funder>Arts and Humanities Research Council (AHRC, UK)</funder>
+        <principal>Dr Alice Taylor</principal>
+      </titleStmt>
+      <publicationStmt>
+        <p>First published on the website of the Community of the Realm in Scotland, 1249-1424 (COTR) project.
+        {{ api_url }}
+        </p>
+      </publicationStmt>
+      <sourceDesc>
+        <msDesc>
+          <msIdentifier>
+            <settlement>{{ text.abstracted_text.manuscript.repository.city }}</settlement>
+            <institution>{{ text.abstracted_text.manuscript.repository.name }}</institution>
+            <idno>{{ text.abstracted_text.manuscript.shelfmark }}{% if text.abstracted_text.locus %}, {{ text.abstracted_text.locus }}{% endif %}</idno>
+          </msIdentifier>
+        </msDesc>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    {{ body|safe }}
+  </text>
+</TEI>

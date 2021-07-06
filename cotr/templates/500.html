@@ -60,14 +60,6 @@
     {% endcompress %}
 
     {% block footer_scripts %}{% endblock %}
-
-    {% compress js %}
-    <script src="{% static 'js/google_analytics.js' %}"></script>
-    <script>
-      ga('create', '{{ ds.GA_ID }}', 'auto');
-      ga('send', 'pageview');
-    </script>
-    {% endcompress %}
   </body>
 
 </html>

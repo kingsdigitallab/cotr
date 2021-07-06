@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% load staticfiles compress %}
+
+{% block meta_title %}Regions Viewer{% endblock %}
+
+{% block custom_css %}
+  <link rel="stylesheet" type="text/x-scss"
+        href="{% static 'ctrs_lab/lab_regions.scss' %}">
+  <link rel="stylesheet" type="text/x-scss"
+        href="{% static 'scss/digital-edition.scss' %}">
+{% endblock %}
+
+{% block title %}
+  <h2>Regions Viewer (prototype)</h2>
+{% endblock %}
+
+{% block main %}
+<p class="hide-for-large">
+  <span class="small-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"/></svg>
+  </span>
+  <em>Tables may contain more data than what is initially visible. Try scrolling vertically as well as horizontally.</em>
+</p>
+{% verbatim %}
+<div id="lab-regions" class="">
+  <p>
+    <span class="message-loading label warning" v-show="status !== 3">Loading results...</span>
+    Parent:
+    <select v-model="parent">
+      <option v-for="text in texts" :value="text.attributes.siglum|lowercase" v-if="text.type != 'manuscript'">
+        {{ text.attributes.siglum }}
+      </option>
+      <option value="custom">
+        Custom selection
+      </option>
+    </select>
+  </p>
+
+  <ul class="tabs" data-tabs>
+    <li v-for="(panel_label, panel_slug) in panels" :class="{'tabs-title': 1, 'is-active': panel==panel_slug}">
+      <a @click.prevent="panel = panel_slug" href="#">{{panel_label}}</a>
+    </li>
+  </ul>
+
+  <div class="tabs-content">
+    <div v-show="panel == 'settings'" class="tabs-panel is-active">
+      <p>
+        <label>
+          Similarity metric:
+          <select v-model="diff_method">
+            <option v-for="method in diff_methods" :value="method[0]">{{ method[1] }}</option>
+          </select>
+        </label>
+        <label>
+          Unit of comparison:
+          <select v-model="diff_unit">
+            <option v-for="unit in diff_units" :value="unit[0]">{{ unit[1] }}</option>
+          </select>
+        </label>
+      </p>
+
+      <hr>
+
+      <p v-show="parent!='custom'">
+        <em><a @click="parent = 'custom'">Select 'Custom'</a>
+          in the Parent dropdown above to enable selection of individual texts.</em>
+      </p>
+
+      <div class="text-list">
+        <p>Texts: (select: <a @click="on_select_all_texts(0)">all</a> | <a @click="on_select_all_texts(1)">none</a>)</p>
+        <template v-for="text in texts">
+          <template v-if="text.type == 'version'">
+            <ul class="menu vertical">
+              <li :class="">
+                <label>
+                  <input type="checkbox" v-model="text.selected"
+                    @change="on_tick_text(text)" :disabled="parent !== 'custom'">
+                  <span
+                    :class="'label secondary version ' + text.attributes.siglum.toLowerCase() + '-text-id'">{{ text.attributes.siglum }}</span>
+                  {{ text.attributes.name }}
+                </label>
+                <ul class="menu vertical">
+                  <template v-for="member in texts">
+                    <li :class="" v-if="member.attributes.group == text.id">
+                      <label>
+                        <input type="checkbox" v-model="member.selected"
+                          @change="on_tick_text(member)" :disabled="parent !== 'custom'">
+                        <span
+                          class="label secondary manuscript">{{ member.attributes.siglum }}</span>
+                        {{ member.attributes.name }}
+                      </label>
+                    </li>
+                  </template>
+                </ul>
+              </li>
+            </ul>
+          </template>
+        </template>
+      </div>
+
+    </div>
+
+    <div v-show="panel == 'table'" class="tabs-panel is-active">
+      <p>
+        <label>
+          <input type="checkbox" v-model="is_birds_eye_view_enabled">
+          Bird's eye view
+        </label>
+        <label>
+          <input type="checkbox" v-model="is_omission_highlighted">
+          Highlight omissions
+        </label>
+      </p>
+      <div class="table-scroll">
+        <table :class="{'birds-eye-view': is_birds_eye_view_enabled}">
+          <thead>
+            <tr>
+              <th class="heading-rid">Region #</th>
+              <th class="heading-rid">Sent.</th>
+              <th v-for="source in regions_meta.sources">
+                {{ source.siglum }} ({{ source.siglum_parent }})
+              </th>
+            </tr>
+          </thead>
+          <tr v-for="region in regions" v-if="region.groups > 1">
+            <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">
+              {{ region.region }}
+            </a></td>
+            <td><a :href="'/search/?texts='+(regions_meta.sources.map(s => s.id)).join(',')+'&sn='+region.sentence" target="_blank">
+              {{ region.sentence }}
+            </a></td>
+            <td v-for="reading in region.readings" :style="get_reading_style(reading, region)">
+              {{ reading.t }}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div v-show="panel == 'matrix'" class="tabs-panel is-active">
+      <div class="table-scroll">
+        <table :class="">
+          <thead>
+            <tr>
+              <th>
+                /
+              </th>
+              <th v-for="source in regions_meta.sources">
+                {{ source.siglum }} ({{ source.siglum_parent }})
+              </th>
+            </tr>
+          </thead>
+          <tr v-for="(source, i) in regions_meta.sources">
+            <td>{{ source.siglum }} ({{ source.siglum_parent }})</td>
+            <td v-for="(source, j) in regions_meta.sources"
+                :style="get_diff_cell_style(i, j)"
+                :class="get_diff_cell_boundary_classes(i, j)">
+              {{ get_diff_cell_value(i, j) }}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div v-show="panel == 'help'" class="tabs-panel is-active">
+      <h2>Introduction</h2>
+      <p>This is an experimental tool to make more visible variational patterns among the texts of the Dynamic Edition.</p>
+      <p>In particular it is designed to intuitively approach the following questions:</p>
+      <ol>
+        <li><strong>Outlier detection</strong>: which text disrupts the version or the work the most in a given area? I.e. who's the 'troublemaker'?</li>
+        <li><strong>Heterogeneity</strong>: how much do the texts disagree with each other in a given area?</li>
+        <li><strong>Clustering</strong>: which group of texts tend to agree with each other in a given area?</li>
+      </ol>
+      <p>This type of visualisation is very similar to established tabular representations of collation results [1].
+        To each column corresponds a text and each row represents an unsettled region.
+        The regions appear in the sequential order of the text.
+        Each cell contains the reading for a particular text in a given region</p>
+      <h2>What do the colors mean?</h2>
+      <p>In a row, the cells with identical readings have identical colors.
+        The most consensual readings are green and the most unique ones are blue. Any intermediate frequencies fall within that green-blue spectrum.
+        Also the more a reading differs from the others in the region the more red it looks.</p>
+      <p>Unlike some other tabular visualisations of collations, green and red here don't mean 'correct reading' and 'rejected reading' respectively.
+      Instead, in line with the principles of a Dynamic Edition, the colors encourage you to explore all alternatives impartially without the influence of a specific text.</p>
+      <h2>Difference with the Heatmap</h2>
+      <p>The <a href="/search/?rt=regions">Heatmap visualisation</a> is similar
+        in the sense that it shows the physical distribution (i.e. spatial projection on a facsimile of the manuscript)
+        of textual heterogeneity (question 2).
+        Both of them allow you to break free from the confines of a stemmatic branch by comparing texts across different versions.
+      This tabular visualisation however better facilitates comparative analysis by showing all the selected texts in parallel.
+      Another key difference is that the similarity measures on the heatmap are exclusively binary.</p>
+      <h2>Limitations</h2>
+      <p>In general, there are many ways to compare the variations among texts and each one can yield different results.
+        The coloring, underlying measures of similarity and many other implementation choices made here are full of caveats.
+      </p>
+      <p>We have used a non-binary similarity metric
+        (based on <a href="https://docs.python.org/3/library/difflib.html#difflib.SequenceMatcher.quick_ratio">Python's quick_ratio</a> method).
+        It calculates the proportion of character sequences in common between two readings.
+        That works generally well when comparing two words. But it is less reliable when readings include more words.
+        It is purely syntactic, with no concept of semantic.
+        So <i>magnificus</i> and <i>malificus</i> are considered 84% similar
+        whereas <i>uel</i> and <i>aut</i> very different (only 33% similarity).
+      </p>
+      <h3>Word embeddings</h3>
+      <p>
+        In an attempt to address this limitation, the prototype also offer a distance
+        based on word embeddings which is is supposed to capture some of the meaning of the words.
+        The results are not very convincing and sometimes counter-intuitive, probably because:
+        <ul>
+        <li>those embeddings are derived from Latin Wikipedia articles (i.e. mordern/standardised Latin with a lot of garbage data);</li>
+          <li>embeddings capture aboutness rather than similarity (so opposite words can be very 'close');</li>
+          <li>our embedding manipulations are very simple, more complex machine learning methods could better address this problem</li>
+        </ul>
+        According to our tests the comparison between the same pair of words can vary considerably depending
+        on the embedding models (trained on different corpora). Good quality medieval Latin embedding models are difficult to produce.
+        It is possible that our quick prototyping approach doesn't make justice to the word embedding approach
+        but we leave it here just as an illustration, accepting the possibility that the limitations might also
+        be due to us not giving it a fair chance.
+      (We've used the pre-trained <a href="https://fasttext.cc/docs/en/crawl-vectors.html">fastText model for Latin</a> and reduced its dimension from 100 to 30).
+      </p>
+      <h3>Unit of comparison</h3>
+      <p>
+        Another important limitation is the effect of word movement on the comparisons. If the same word is in different positions
+        in two different texts, our encoding model will produce two separate (and disconnected) unsettled regions.
+        Each one will have a high distance measure.
+        To mitigate that effect the prototype allows you to compare unsettled text by sentence rather than by region.
+      </p>
+      <h2>How to read the Difference Matrix?</h2>
+      <p>The difference matrix shows how different each text is every other text.
+      The number varies between 0 (identical) and 1 (most different among the selected group of texts).
+      The color varies from green (closer to 0) to red (closer to 1).
+      It's important to note that the meaning of 1 (and red) is different from what's used on the tabular visualisation.
+      1 or red is used for the most distant pair of texts, all the numbers between 0 and 1 are relative to that.
+      </p>
+      <p>Geoffroy Noël</p>
+
+      <hr>
+
+      <p>[1] Elisa Nury, "Visualizing Collation Results", Variants [Online], 14 | 2019, accessed 06 August 2020.
+        (<a href="https://doi.org/10.4000/variants.950">https://doi.org/10.4000/variants.950</a>)</p>
+    </div>
+
+    </div>
+  </div>
+</div>
+{% endverbatim %}
+{% endblock %}
+
+{% block footer_scripts %}
+  <script src="{% static 'vue/dist/vue.js' %}"></script>
+  <script src="{% static 'ctrs_lab/lab_regions.js' %}"></script>
+{% endblock %}

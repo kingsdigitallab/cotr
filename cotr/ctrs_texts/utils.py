@@ -2,12 +2,149 @@ import json
 import os
 import re
 from collections import Counter
+from difflib import SequenceMatcher
 
 import lxml.etree as ET
 from _collections import OrderedDict
 from django.conf import settings
+from django.http import JsonResponse, QueryDict
+from django.template.loader import get_template
 from django.utils.text import slugify
 from lxml import html
+
+
+class StringDiff:
+    """
+    Helper class to compare two strings efficiently
+    """
+
+    def __init__(self, method='difflib_quick_ratio'):
+        self.method = method
+        self.difflib_matcher = SequenceMatcher(lambda x: x in '…', '', '', False)
+        self._diff_cache = {}
+        self.embeddings = None
+        self.embeddings_dim = 0
+        self.read_embeddings()
+
+    def get_distance(self, s1, s2):
+        """Returns 0.0 if s1 == s2; 1.0 if totally different"""
+        if not(s1 and s2):
+            return 0
+        if 1:
+            # TODO: optimise
+            s1 = s1.lower()
+            s2 = s2.lower()
+        if s1 == s2:
+            return 0
+
+        ret = 1
+
+        if self.method != 'binary':
+            cache_key = s1 + '|' + s2
+            ret = self._diff_cache.get(cache_key, None)
+
+            if ret is None:
+                if self.embeddings is not None:
+                    ret = 1 - self.compare_with_embeddings(s1, s2)
+                else:
+                    self.difflib_matcher.set_seqs(s1, s2)
+
+                    if self.method == 'difflib_quick_ratio':
+                        ret = self.difflib_matcher.quick_ratio()
+                    elif self.method == 'difflib_ratio':
+                        ret = self.difflib_matcher.ratio()
+
+                    ret = 1 - ret
+
+                # add to cache
+                if ret is not None:
+                    self._diff_cache[cache_key] = ret
+                    self._diff_cache[s2+'|'+s1] = ret
+                    # print('{:0.2f} {} | {}'.format(ret, s1, s2))
+
+        return ret
+
+    def compare_with_embeddings(self, s1, s2):
+        import math
+
+        def norm(v):
+            return math.sqrt(sum([c * c for c in v]))
+
+        def cosim(v1, v2):
+            return (
+                sum([v1[i] * v2[i] for i in range(len(v1))])
+                / norm(v1) / norm(v2)
+            )
+
+        # split each string into tokens
+        vs = []
+        for s in [s1, s2]:
+            token_count = 0
+            tokens = re.findall(r'\w+', s)
+            v = [0] * self.embeddings_dim
+            for t in tokens:
+                embedding = self.embeddings.get(t, None)
+                if embedding:
+                    token_count += 1
+                    for i in range(self.embeddings_dim):
+                        v[i] += embedding[i]
+
+            if token_count:
+                v = [c/token_count for c in v]
+            else:
+                return 0
+
+            vs.append(v)
+
+        ret = cosim(vs[0], vs[1])
+
+        return ret
+
+    def read_embeddings(self):
+        if self.method.endswith('.json'):
+            path = os.path.join(
+                os.path.dirname(__file__),
+                '..', 'ctrs_lab', 'embeddings', self.method
+            )
+            import json
+            with open(path, 'rt') as fh:
+                self.embeddings = json.loads(fh.read())
+
+            for embedding in self.embeddings.values():
+                self.embeddings_dim = len(embedding)
+
+
+def get_regions_from_content_xml(content_xml, region_type='version'):
+    '''content_xml a lxml etree node for the text
+    For each region of type region_type, yields
+    {
+        'xml': the xml element for that region,
+        'text': the plain text content of that region,
+        'sentence': the sentence number/code,
+        'region': the id of the region,
+        'index': index of the region,
+    }
+    '''
+    reg_pattern = './/span[@data-dpt-group="' + region_type + '"]'
+    ri = 0
+    for para in content_xml.findall('.//p'):
+        number = ''
+        sentence_element = para.find('.//span[@data-dpt="sn"]')
+        if sentence_element is not None:
+            number = re.sub(
+                r'^s-(\d+)$', r'\1',
+                sentence_element.attrib.get('data-rid', '')
+            )
+
+        for reg in para.iterfind(reg_pattern):
+            yield {
+                'xml': reg,
+                'text': get_unicode_from_xml(reg, text_only=True).strip(),
+                'sentence': number,
+                'region': reg.attrib.get('data-rid', ''),
+                'index': ri,
+            }
+            ri += 1
 
 
 def get_xml_from_unicode(document, ishtml=False, add_root=False):
@@ -117,21 +254,30 @@ def get_sentence_from_text(encoded_text, sentence_number):
     ret = ''
 
     # ac-139 we remove all auxiliary sentences first
-    content = re.sub('<p[^>]+data-dpt-type="auxiliary".*?</p>',
-                     '', encoded_text.content)
+    content = re.sub(
+        '<p[^>]+data-dpt-type="auxiliary".*?</p>',
+        '',
+        encoded_text.content
+    )
 
     pattern = ''.join([
         r'(?usi)(<p>\s*<span[^>]+data-rid="s-',
         re.escape(str(sentence_number)),
-        r'".*?</p>)\s*(<p>\s*<span data-dpt="sn"|$)'
+        r'".*?</p>)\s*(<p>\s*<span data-dpt="[cs]n"|$)'
     ])
 
     match = re.search(pattern, content)
 
     if match:
-        ret = match.group(1)
+        ret = remove_separator_paragraphs(match.group(1))
 
     return ret
+
+
+def remove_separator_paragraphs(text_string):
+    '''Return the text_string without
+    separating paragraphs such as <p>___</p>'''
+    return re.sub(r'(?i)<p>[^a-z<]*</p>', '', text_string)
 
 
 def get_regions_with_unique_variants(text_ids):
@@ -150,9 +296,7 @@ def get_regions_with_unique_variants(text_ids):
         abstracted_text__short_name__in=['HM1'],
         type__slug='transcription'
     ):
-        content = get_xml_from_unicode(
-            encoded_text.content, ishtml=True, add_root=True
-        )
+        content = encoded_text.content_xml
         for wregion in content.findall(wpattern):
             key = slugify(get_unicode_from_xml(wregion, text_only=True))[:20]
             key = key or '∅'
@@ -165,63 +309,131 @@ def get_regions_with_unique_variants(text_ids):
                 'readings': OrderedDict()
             })
 
+    def ms_wreading_callback(
+        region_data, version_siglum, ms_siglum,
+        ms_index, ms_abstracted
+    ):
+        region_index = region_data['index']
+        reading = region_data['text']
+        if region_index < len(ret):
+            if reading not in ret[region_index]['readings']:
+                ret[region_index]['readings'][reading] = []
+            ret[region_index]['readings'][reading].append(
+                [version_siglum, ms_siglum]
+            )
+        else:
+            print('WARNING: w-region #{} of {} not found in {}'.format(
+                region_index, version_siglum, 'heatmap text (HM1)'
+            ))
+
+    parse_mss_wregions(text_ids, ms_wreading_callback)
+
+    return ret
+
+
+def parse_mss_wregions(text_ids, ms_wreading_callback):
+    '''
+    text_ids: a list of mss ids (AbstractedText)
+    wregions_callback: a callback with the signature:
+        (region_data, version_siglum, ms_siglum, ms_index)
+
+    region_data = see get_regions_from_content_xml()
+
+    For each MS in text_ids, the callback is called on all the wregion
+    of its parent version.
+    The callback is receives info about a wregion
+    where the + sign (nested vregion) has been replaced
+    with the reading from the MS.
+
+    e.g.
+        wregion i in Version = [abc [+:vregion j] cde]
+        vregion j in MS k    = [xyz]
+        => reading           = [abc xyz cde]
+        region_index         = i
+        ms_index             = k
+    '''
+
     # for each selected manuscript, get its parent w-regions
     # where all v-regions have been substituted with the content from the MS
+
+    # TODO: simplify the code
+
+    if not text_ids:
+        return
+
     vpattern = './/span[@data-dpt-group="version"]'
 
-    for encoded_text in EncodedText.objects.filter(
+    ms_index = 0
+
+    # get all the requested texts (encoded)
+    from ctrs_texts.models import EncodedText
+    encoded_texts = EncodedText.objects.filter(
         abstracted_text_id__in=text_ids,
         type__slug='transcription',
         abstracted_text__type__slug='manuscript',
-    ).order_by('abstracted_text__short_name'):
-        member_siglum = encoded_text.abstracted_text.short_name
+    ).order_by(
+       'abstracted_text__group__short_name',
+       'abstracted_text__short_name'
+    ).select_related('abstracted_text__group')
+
+    # get all their parents (encoded version)
+    encoded_parents = {
+        ep.abstracted_text_id: {
+            'encoded_text': ep,
+            'content_xml': ep.content_xml,
+        }
+        for ep in
+        EncodedText.objects.filter(
+            type__slug='transcription',
+            abstracted_text_id__in=[
+                et.abstracted_text.group_id for et in encoded_texts
+            ],
+        ).select_related('abstracted_text')
+    }
+    for ep in encoded_parents.values():
+        ep['vregions'] = [
+            vregion if vregion.clear(keep_tail=True) else vregion
+            for vregion in
+            ep['content_xml'].findall(vpattern)
+        ]
+
+        ep['wregions'] = list(get_regions_from_content_xml(ep['content_xml'], 'work'))
+
+    for encoded_text in encoded_texts:
+        ms_abstracted = encoded_text.abstracted_text
+        member_siglum = ms_abstracted.short_name
 
         # get vregions from member
         vregions = []
-        content = get_xml_from_unicode(
-            encoded_text.content, ishtml=True, add_root=True
-        )
+        content = encoded_text.content_xml
         for vregion in content.findall(vpattern):
             vregions.append(get_unicode_from_xml(vregion, text_only=True))
 
-        # print(vregions)
-
         # get parent
-        parent = EncodedText.objects.filter(
-            abstracted_text=encoded_text.abstracted_text.group,
-            type__slug='transcription',
-        ).first()
+        parent = encoded_parents[ms_abstracted.group_id]
 
-        content_parent = get_xml_from_unicode(
-            parent.content, ishtml=True, add_root=True
-        )
-        parent_siglum = parent.abstracted_text.short_name
+        parent_siglum = parent['encoded_text'].abstracted_text.short_name
 
         # replace vregion in parent with text from member
-        for i, vregion in enumerate(content_parent.findall(vpattern)):
+        for i, vregion in enumerate(parent['vregions']):
             if i < len(vregions):
-                vregion.clear(keep_tail=True)
                 vregion.text = vregions[i]
             else:
                 print('WARNING: v-region #{} of {} not found in {}'.format(
-                    i, encoded_text, parent)
+                    i, encoded_text, parent['encoded_text'])
                 )
 
         # get the text of all the wregions from parent
-        for i, wregion in enumerate(content_parent.findall(wpattern)):
-            if i < len(ret):
-                wreading = get_unicode_from_xml(wregion, text_only=True)
-                wreading = wreading.strip()
-                if wreading not in ret[i]['readings']:
-                    ret[i]['readings'][wreading] = []
-                ret[i]['readings'][wreading].append(
-                    [parent_siglum, member_siglum])
-            else:
-                print('WARNING: w-region #{} of {} not found in {}'.format(
-                    i, parent, 'heatmap text (HM1)')
-                )
+        for i, wregion in enumerate(parent['wregions']):
+            wregion['text'] = get_unicode_from_xml(
+                wregion['xml'], text_only=True
+            ).strip()
+            ms_wreading_callback(
+                wregion, parent_siglum, member_siglum,
+                ms_index, ms_abstracted
+            )
 
-    return ret
+        ms_index += 1
 
 
 def get_annotations_from_archetype():
@@ -274,7 +486,9 @@ def get_text_chunk(encoded_text, view, region_type):
     if view in ['histogram']:
         ret = get_text_viz_data(encoded_text, region_type)
     else:
-        ret = encoded_text.get_content_with_readings()
+        ret = remove_separator_paragraphs(
+            encoded_text.get_content_with_readings()
+        )
 
     return ret
 
@@ -372,9 +586,11 @@ def get_plain_text(encoded_text):
 def get_sentence_numbers(work=None):
     '''return all sentence numbers for the given work
     work is a an AbstractedText'''
-    ret = [str(n) for n in range(1, 28)]
+    # ret = [str(n) for n in range(1, 28)]
+    # if work and work.slug == 'regiam':
+    ret = []
 
-    if work.slug == 'regiam':
+    if work:
         encoded = work.encoded_texts.filter(type__slug='transcription').first()
         if encoded:
             ret = re.findall(
@@ -402,7 +618,6 @@ def get_page_response_from_list(alist, request):
     page = get_page_from_list(alist, request)
 
     return OrderedDict([
-        ['jsonapi', '1.0'],
         ['meta', {
             'page_count': page.paginator.num_pages,
             'hit_count': page.paginator.count,
@@ -418,3 +633,76 @@ def get_int(string, default=0):
         return int(string)
     except ValueError:
         return default
+
+
+def transform_xml(xml_str, xslt_template_path):
+    import lxml.etree as ET
+
+    dom = ET.XML(xml_str)
+    xslt_template = get_template(xslt_template_path)
+    xslt_str = xslt_template.render({})
+    xslt = ET.XML(xslt_str)
+    transform = ET.XSLT(xslt)
+    newdom = transform(dom)
+    ret = ET.tostring(newdom, pretty_print=True)
+    return ret
+
+
+def get_jsonapi_response(doc, request=None):
+    '''
+    Returns doc as a JsonResponse.
+    doc is a python dict that complies with jsonapi.org 1.0 format.
+    The jsonapi version is automatically added to the response.
+    Raises an exception if doc is not valid jsonapi format.
+    '''
+
+    # validate
+    import jsonschema
+    from jsonschema import validate
+    with open('jsonapi-schema.json', 'r') as fh:
+        schema = json.load(fh)
+    try:
+        validate(instance=doc, schema=schema)
+    except jsonschema.exceptions.ValidationError as err:
+        doc_js = json.dumps(doc, indent=2)
+        message = f'Invalid jsonapi: {err}\n\n{doc_js}'
+        raise Exception(message)
+
+    # add links (to self and pagination)
+    if request and 'links' not in doc:
+        doc['links'] = {
+            'self': request.build_absolute_uri()
+        }
+        if 'meta' in doc and 'page' in doc['meta']:
+            page = doc['meta']['page']
+            qs = request.META['QUERY_STRING']
+            qd = QueryDict(qs, mutable=True)
+            qd['page'] = 1
+            doc['links']['first'] = request.build_absolute_uri(
+                '?' + qd.urlencode())
+            qd['page'] = doc['meta']['page_count']
+            doc['links']['last'] = request.build_absolute_uri(
+                '?' + qd.urlencode())
+            if page > 1:
+                qd['page'] = page-1
+                doc['links']['prev'] = request.build_absolute_uri('?'+qd.urlencode())
+            if page < doc['meta']['page_count']:
+                qd['page'] = page+1
+                doc['links']['next'] = request.build_absolute_uri('?'+qd.urlencode())
+
+        doc.move_to_end('links', last=False)
+
+    # complete the doc
+    doc['jsonapi'] = {'version': '1.0'}
+    doc.move_to_end('jsonapi', last=False)
+
+    # response
+    ret = JsonResponse(
+        doc,
+        json_dumps_params=dict(indent=2),
+        content_type='application/vnd.api+json'
+    )
+
+    ret['Access-Control-Allow-Origin'] = '*'
+
+    return ret

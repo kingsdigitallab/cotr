@@ -1,0 +1,210 @@
+openapi: 3.0.1
+info:
+  title: COTR Web API
+  description: Community of the Realm - API (see jsonapi.org 1.0)
+  version: '1.0'
+servers:
+  - url: 'https://cotr.ac.uk'
+paths:
+  /api/texts/:
+    get:
+      summary: Get the metadata of all texts for a given work
+      operationId: getTexts
+      parameters:
+        - name: group
+          in: query
+          schema:
+            type: string
+          example: declaration
+          description: name of the work (declaration or regiam)
+      responses:
+        '200':
+          description: a list of texts and their metadata
+          content:
+            'application/vnd.api+json':
+              schema:
+                $ref: "#/components/schemas/TextsResponse"
+      servers:
+        - url: 'https://cotr.ac.uk'
+    servers:
+      - url: 'https://cotr.ac.uk'
+  /api/texts/{textSlug}/{view}/whole/whole/:
+    get:
+      summary: Get the XML content of a given text
+      operationId: getTextContent
+      parameters:
+        - name: textSlug
+          in: path
+          schema:
+            type: string
+          example: edinburgh-nls-ms-adv-3517-pp345346
+          description: slug of a text
+          required: true
+        - name: view
+          in: path
+          schema:
+            type: string
+          example: transcription
+          description: 'the type of encoding or edition: transcription for Latin or translation for English'
+          required: true
+      responses:
+        '200':
+          description: metadata an XML content of a text
+          content:
+            'application/vnd.api+json':
+              schema:
+                $ref: "#/components/schemas/TextContentResponse"
+      servers:
+        - url: 'https://cotr.ac.uk'
+        - url: 'http://localhost:8000'
+    servers:
+      - url: 'https://cotr.ac.uk'
+      - url: 'http://localhost:8000'
+components:
+  schemas:
+    TextsResponse:
+      type: object
+      properties:
+        jsonapi:
+          type: object
+          properties:
+            version:
+              type: string
+              example: 1.0
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              example: https://cotr.ac.uk/api/texts/?&group=declaration
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/TextMetadata"
+        meta:
+          type: object
+          properties:
+            sentence_numbers:
+              type: array
+              items:
+                type: string
+                example: 1
+      required:
+        - jsonapi
+        - links
+        - data
+        - meta
+    TextMetadata:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 20
+        type:
+          type: string
+          example: manuscript
+        attributes:
+          type: object
+          properties:
+            slug:
+              type: string
+              example: edinburgh-nls-ms-adv-3517-pp345346
+            name:
+              type: string
+              example: Edinburgh NLS MS Adv. 35.1.7 pp.345–346
+            group:
+              type: integer
+              format: int32
+              example: 40
+            siglum:
+              type: string
+              example: CA
+            city:
+              type: string
+              example: Edinburgh
+            repository:
+              type: string
+              example: NLS
+            shelfmark:
+              type: string
+              example: MS Adv. 35.1.7
+            locus:
+              type: string
+              example: pp.345–346
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              example: https://cotr.ac.uk/api/texts/edinburgh-nls-ms-adv-3517-pp345346/transcription/whole/whole/
+    TextContentResponse:
+      type: object
+      properties:
+        jsonapi:
+          type: object
+          properties:
+            version:
+              type: string
+              example: 1.0
+        meta:
+          type: object
+          properties:
+            page:
+              type: integer
+              format: int32
+              example: 1
+            page_count:
+              type: integer
+              format: int32
+              example: 1
+            hit_count:
+              type: integer
+              format: int32
+              example: 1
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/TextContent"
+    TextContent:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 40
+        type:
+          type: string
+          example: text_chunk
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              example: https://cotr.ac.uk/api/texts/edinburgh-nls-ms-adv-3517-pp345346/transcription/whole/whole/
+        attributes:
+          type: object
+          properties:
+            view:
+              type: string
+              example: transcription
+            unit:
+              type: string
+              example: whole
+            location:
+              type: string
+              example: whole
+            value_max:
+              type: integer
+              format: int32
+              example: 17
+            region_type:
+              type: string
+              example: version
+            description:
+              type: string
+              example: number of unsettled regions per sentence
+            can_show_non_standardised:
+              type: boolean
+            chunk:
+              type: string
+              example: <p>[...]</p>
+              description: the requested XML content for the given text
