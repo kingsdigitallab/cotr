@@ -22,7 +22,7 @@ def get_user_timeline(screen_name):
                       settings.TWITTER_CACHE_TIMEOUT)
         except TwythonError as e:
             logger.error(e)
-            raise e
+            #raise e
 
     return timeline
 
@@ -40,6 +40,6 @@ def authenticate():
             cache.set('twitter', twitter, settings.TWITTER_CACHE_TIMEOUT)
         except TwythonAuthError as e:
             logger.error(e)
-            raise e
+            #raise e
 
     return twitter
