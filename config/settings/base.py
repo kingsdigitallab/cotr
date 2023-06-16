@@ -5,7 +5,7 @@ Base settings to build other settings files upon.
 import os
 
 import environ
-from twitterhut.settings import *  # noqa
+#from twitterhut.settings import *  # noqa
 
 ROOT_DIR = (
     environ.Path(__file__) - 3
@@ -94,7 +94,7 @@ LOCAL_APPS = [
     'cms',
     'ctrs_texts',
     'ctrs_lab',
-    'twitterhut',
+#   'twitterhut',
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
