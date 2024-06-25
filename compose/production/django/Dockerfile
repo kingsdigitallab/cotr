@@ -12,6 +12,8 @@ RUN apt-get update \
   && apt-get install -y gettext \
   # LDAP dependencies
   && apt-get install -y libldap2-dev libsasl2-dev ldap-utils \
+  # for nvm install
+  && apt-get install -y wget \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
@@ -36,8 +38,18 @@ RUN chmod +x /start
 RUN chown django /start
 COPY --chown=django:django . /app
 
+# install npm
+SHELL ["/bin/bash", "--login", "-c"]
+WORKDIR /app
+RUN rm -rf node_modules && mkdir node_modules
+RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+RUN nvm install v16.15.1 
+# not sure why npm ci runs successfully but the starting container can't find node_modules!
+RUN npm ci
+
 # GN: Fix static & media volume permission
-RUN mkdir -p /app/cotr/media && chmod -R ugo+rwx /app/cotr/media && chown -R django:django /app/cotr/media
+# RUN chmod ugo+rwX . && chown django:django .
+# RUN mkdir -p /app/cotr/media /app/node_modules && chmod -R ugo+rwX /app/cotr/media /app/cotr/media /app/staticfiles /app/node_modules && chown -R django:django /app/cotr/media /app/staticfiles /app/node_modules
 
 USER django
 

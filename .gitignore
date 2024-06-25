@@ -295,3 +295,5 @@ arc-content.json
 .openapi-generator
 .openapi-generator-ignore
 
+# KDL
+/server
