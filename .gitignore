@@ -296,3 +296,4 @@ arc-content.json
 /server
 /volumes/cotr/media/
 /volumes/cotr/staticfiles/
+.vscode
