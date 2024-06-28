@@ -275,7 +275,7 @@ cotr/media/
 .env
 # Those files may contain secret config settings
 # do not add them to github
-.envs/*
+**/.envs/*
 .vagrant
 .volumes
 
