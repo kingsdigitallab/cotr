@@ -26,11 +26,14 @@
       </div>
     </header>
 
+    {% comment %}
+    {# disabled as the navigation calls cms_tag which access missing request on the context in case of 500 #}
     <nav>
       <div class="wrapper">
         {% include 'includes/navigation.html' %}
       </div>
     </nav>
+    {% endcomment %}
 
     <main>
       <div class="wrapper">

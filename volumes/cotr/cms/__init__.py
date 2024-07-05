@@ -1,1 +1,1 @@
-default_app_config = 'cotr.cms.apps.CmsConfig'
+default_app_config = 'cms.apps.CmsConfig'
