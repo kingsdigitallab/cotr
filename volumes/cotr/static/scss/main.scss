@@ -1115,3 +1115,9 @@ main {
 .pagination .page-number {
   display: inline-block;
 }
+
+.error-500 {
+  .avatar {
+    display: none;
+  }
+}

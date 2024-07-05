@@ -19,10 +19,10 @@
     {% endcompress %}
   </head>
 
-  <body>
+  <body class="error-500">
     <header>
       <div class="wrapper">
-        {% include 'includes/header.html' %}
+        <h1><a href="/">The community of the realm in Scotland, 1249–1424</a></h1>
       </div>
     </header>
 
@@ -39,12 +39,13 @@
       <div class="wrapper">
         {% block title %}<h1>500 Internal server error</h1>{% endblock %}
         {% block main %}
-        <p>Sorry, service temporarily unavailable.</p>
-        <p>It's possible our engineers are aware of the issue and already
-          working on fixing it, but if you can spare a minute to let us know
-          this is happening, we really appreciate it. Drop us an email at <a
-            href="mailto:kdl-support@kcl.ac.uk">kdl-support@kcl.ac.uk</a>.
-          <strong>Thank you</strong></p>
+          <p>Sorry, service temporarily unavailable.</p>
+          <p>It's likely our engineers are aware of the issue and already
+            working on fixing it, but if you can spare a minute to let us know
+            this is happening, we really appreciate it. Drop us an email at <a
+              href="mailto:kdl-support@kcl.ac.uk">kdl-support@kcl.ac.uk</a>.
+            <strong>Thank you</strong></p>
+          <p><a href="/">Back to the home page</a></p>
         {% endblock %}
       </div>
     </main>

@@ -22,7 +22,7 @@ services:
     env_file:
       - ../.envs/.shared
     volumes:
-      - ../volumes/cotr/static:/usr/share/nginx/static:ro
+      - ../volumes/cotr/staticfiles:/usr/share/nginx/static:ro
       - ../volumes/cotr/media:/usr/share/nginx/media:ro
     expose:
       - 8001
