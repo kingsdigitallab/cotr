@@ -1,0 +1,49 @@
+# PRECAUTION: avoid production dependencies that aren't in development
+
+pytz  # https://github.com/stub42/pytz
+python-slugify<5  # https://github.com/un33k/python-slugify
+rcssmin<2  # https://github.com/ndparker/rcssmin
+argon2-cffi<20  # https://github.com/hynek/argon2_cffi
+whitenoise<6  # https://github.com/evansd/whitenoise
+redis<4  # https://github.com/antirez/redis
+
+# Django
+# ------------------------------------------------------------------------------
+# TODO: Move to 3.2 (LTS) once we are sure Wagtail & all dependencies are supported
+django<2.3  # pyup: < 3.0  # https://www.djangoproject.com/
+django-environ<1  # https://github.com/joke2k/django-environ
+django-model-utils<5  # https://github.com/jazzband/django-model-utils
+django-compressor<3  # https://github.com/django-compressor/django-compressor
+django-redis<5  # https://github.com/niwinz/django-redis
+
+# Django REST Framework
+djangorestframework<4  # https://github.com/encode/django-rest-framework
+coreapi<3  # https://github.com/core-api/python-client
+
+# ctrs
+# ------------------------------------------------------------------------------
+django-libsass  # https://github.com/torchbox/django-libsass
+elasticsearch-dsl>=7.0.0,<8.0.0  # https://github.com/elastic/elasticsearch-dsl-py
+
+# TODO: move to 2.11 (LTS), https://docs.wagtail.io/en/stable/releases/upgrading.html#compatible-django-python-versions
+# once wagtailmenus supports it
+wagtail<2.8  # LTS https://github.com/wagtail/wagtail
+wagtailmenus<4  # https://github.com/rkhleics/wagtailmenus/
+
+twython<4  # https://twython.readthedocs.io
+lxml  # https://github.com/lxml/lxml/
+
+jsonschema
+
+# ---
+
+gunicorn==20.0.4  # https://github.com/benoitc/gunicorn
+psycopg2==2.8.4 --no-binary psycopg2  # https://github.com/psycopg/psycopg2
+
+# Django
+# ------------------------------------------------------------------------------
+django-anymail[mailgun]==7.0.0  # https://github.com/anymail/django-anymail
+
+# KDL
+# ------------------------------------------------------------------------------
+django-auth-ldap==2.1.0  # https://github.com/django-auth-ldap/django-auth-ldap

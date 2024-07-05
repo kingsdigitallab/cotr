@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# needed?
+cd /app
+tar xzf /node_modules.tar.gz
+
+python manage.py migrate
+python manage.py update_index
+# needed?
+python manage.py wagtail_update_index
+
+if [ "$PRODUCTION" = "True" ]; then
+    python manage.py collectstatic --no-input
+fi
+
+# needed?
+if [[ "${COMPRESS_OFFLINE}" == "True" ]]; then
+    python /app/manage.py compress
+fi
+
+# execute the provided command (from the 'command' property in Docker Compose)
+exec "$@"

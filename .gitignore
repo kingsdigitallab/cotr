@@ -293,7 +293,8 @@ arc-content.json
 .openapi-generator-ignore
 
 # KDL
+.vscode
 /server
 /volumes/cotr/media/
 /volumes/cotr/staticfiles/
-.vscode
+/volumes/local_postgres_data_backups/

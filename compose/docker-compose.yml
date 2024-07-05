@@ -1,0 +1,86 @@
+name: "cotr"
+
+services:
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:1.4
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    depends_on:
+      nginx:
+        condition: service_started
+
+  nginx:
+    build:
+      context: ..
+      dockerfile: ./compose/nginx/Dockerfile
+    environment:
+      VIRTUAL_PATH: "~^/(media|static)/"
+      VIRTUAL_PORT: 8001
+    env_file:
+      - ../.envs/.shared
+    volumes:
+      - ../volumes/cotr/static:/usr/share/nginx/static:ro
+      - ../volumes/cotr/media:/usr/share/nginx/media:ro
+    expose:
+      - 8001
+    depends_on:
+      django:
+        condition: service_healthy
+    restart: unless-stopped
+
+  django:
+    build:
+      context: ..
+      dockerfile: ./compose/django/Dockerfile
+    environment:
+      VIRTUAL_PATH: "/"
+      VIRTUAL_PORT: 8000
+    command:
+      [
+        "/usr/local/bin/gunicorn",
+        "config.wsgi",
+        "--bind",
+        "0.0.0.0:8000",
+        "--chdir=/app",
+        "--timeout",
+        "180",
+        "--forwarded-allow-ips='*'",
+      ]
+    env_file:
+      - ../.envs/.shared
+      - ../.envs/.django
+      - ../.envs/.postgres
+    volumes:
+      - ../volumes/cotr:/app
+    expose:
+      - 8000
+    restart: unless-stopped
+    healthcheck:
+      test: "cat /proc/net/tcp | grep 1F40 > /dev/null"
+      interval: 3s
+      timeout: 3s
+      retries: 100
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    build:
+      context: ..
+      dockerfile: ./compose/postgres/Dockerfile
+    volumes:
+      - ../volumes/local_postgres_data:/var/lib/postgresql/data:Z
+      - ../volumes/local_postgres_data_backups:/backups:z
+    env_file:
+      - ../.envs/.postgres
+    expose:
+      - 5432
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "django", "-U", "django_app"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
