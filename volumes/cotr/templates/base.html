@@ -98,7 +98,7 @@
 
     {% block footer_scripts %}{% endblock %}
 
-    {% if not ds.DEBUG %}
+    {% if not ds.DEBUG and ds.GA_ID %}
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async
       src="https://www.googletagmanager.com/gtag/js?id={{ ds.GA_ID }}">
