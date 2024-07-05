@@ -23,9 +23,6 @@ RUN apt-get update \
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
 
-#RUN addgroup --system django \
-#  && adduser --system --ingroup django django
-
 # Requirements are installed here to ensure they will be cached.
 COPY ./volumes/cotr/requirements.txt /tmp/requirements.txt
 RUN pip install -U pip \
@@ -34,12 +31,6 @@ RUN pip install -U pip \
 COPY ./compose/django/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint
 RUN chmod +x /entrypoint
-
-#COPY --chown=django:django . /app
-
-#RUN mkdir -p /app/tvof/media && chmod -R ugo+rwx /app/tvof/media && chown -R django:django /app/tvof/media
-
-# USER django
 
 WORKDIR /app
 
