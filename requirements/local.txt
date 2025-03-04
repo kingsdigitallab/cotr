@@ -131,7 +131,7 @@ ipdb==0.12.3
     # via -r requirements/local.in
 ipython-genutils==0.2.0
     # via traitlets
-ipython==7.22.0
+ipython==7.31.1
     # via ipdb
 isort==5.8.0
     # via pylint
