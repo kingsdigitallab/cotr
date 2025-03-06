@@ -108,7 +108,7 @@ pyrsistent==0.17.3
     # via jsonschema
 python-dateutil==2.8.1
     # via elasticsearch-dsl
-python-ldap==3.3.1
+python-ldap==3.4.0
     # via django-auth-ldap
 python-slugify==4.0.1
     # via -r requirements/./base.in
