@@ -12,7 +12,7 @@ attrs==20.3.0
     # via jsonschema
 beautifulsoup4==4.6.0
     # via wagtail
-certifi==2020.12.5
+certifi==2022.12.7
     # via
     #   elasticsearch
     #   requests
