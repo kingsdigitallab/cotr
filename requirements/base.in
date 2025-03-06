@@ -25,7 +25,7 @@ elasticsearch-dsl>=7.0.0,<8.0.0  # https://github.com/elastic/elasticsearch-dsl-
 
 # TODO: move to 2.11 (LTS), https://docs.wagtail.io/en/stable/releases/upgrading.html#compatible-django-python-versions
 # once wagtailmenus supports it
-wagtail<2.8  # LTS https://github.com/wagtail/wagtail
+wagtail<2.12  # LTS https://github.com/wagtail/wagtail
 wagtailmenus<4  # https://github.com/rkhleics/wagtailmenus/
 
 twython<4  # https://twython.readthedocs.io
