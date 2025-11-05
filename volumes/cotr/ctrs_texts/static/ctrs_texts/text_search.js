@@ -31,7 +31,11 @@ const ARCHETYPE_IMAGE_DIMENSIONS = [3212, 4392]
 // https://bl.ocks.org/mejackreed/raw/2724146adfe91233c74120b9056fba06/
 // https://bl.ocks.org/mejackreed/raw/2724146adfe91233c74120b9056fba06/app.js
 // https://github.com/mejackreed/Leaflet-IIIF/blob/master/leaflet-iiif.js#L45
-const LEAFLET_ZOOM_TRANSFORM = 3
+// const LEAFLET_ZOOM_TRANSFORM = 3
+// 2025/11/04: another magic number, find through tiral and error
+// after conversion of the iiif layer to zoomify layer.
+const LEAFLET_ZOOM_TRANSFORM = 5
+
 
 const TYPES_LABEL = {
   transcription: 'Latin',
@@ -331,16 +335,26 @@ $(() => {
         $(this).addClass('ctrs-initialised')
 
         let map = L.map(this, {
-          center: [0, 0],
+          center: [-100, 100],
           crs: L.CRS.Simple,
-          zoom: 0
+          zoom: 1
         })
         window.map = map
         map.annotation_loaded = false
 
+        // 2025/11/04 now using zoomify
+        /*
         let image_layer = L.tileLayer
           .iiif(this.getAttribute('data-leaflet-iiif'))
           .addTo(map)
+        */
+        let image_layer = L.tileLayer
+          .zoomify(this.getAttribute('data-leaflet-zoomify'), {
+            width: this.getAttribute('data-width'),
+            height: this.getAttribute('data-height'),
+            attribution: this.getAttribute('data-attribution')
+          }).addTo(map);
+
         window.image_layer = image_layer
 
         // Unfortunately I couldn't find an event for json loaded
@@ -476,10 +490,14 @@ $(() => {
   // returns coordinates from [x, y] point extracted from archetype geo_json
   function p2c(image_layer, p) {
     let map = image_layer._map
+    // let xy = [image_layer.x, image_layer.y]
+    let imageSize = image_layer._imageSize
+    imageSize = imageSize[imageSize.length-1]
+    let xy = [parseInt(imageSize.x), parseInt(imageSize.y)]
     return map.unproject(
       L.point(
-        (p[0] / ARCHETYPE_IMAGE_DIMENSIONS[0]) * image_layer.x,
-        image_layer.y - (p[1] / ARCHETYPE_IMAGE_DIMENSIONS[1]) * image_layer.y
+        (p[0] / ARCHETYPE_IMAGE_DIMENSIONS[0]) * xy[0],
+        (1 - (p[1] / ARCHETYPE_IMAGE_DIMENSIONS[1])) * xy[1]
       ),
       LEAFLET_ZOOM_TRANSFORM
     )

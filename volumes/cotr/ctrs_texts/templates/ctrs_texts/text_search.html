@@ -183,7 +183,7 @@
     </ul>
 
     <template v-if="facets.result_type == 'regions'">
-      <div class="heatmap" data-leaflet-iiif="https://loris.cch.kcl.ac.uk/ctrs/webroot/images/jp2/sp13-72.jp2/info.json">
+      <div class="heatmap" data-leaflet-iiif="https://loris.cch.kcl.ac.uk/ctrs/webroot/images/jp2/sp13-72.jp2/info.json" data-leaflet-zoomify="/static/images/mss/sp13-72/{g}/{z}-{x}-{y}.jpg" data-width="4497" data-height="6155" data-attribution="&copy; Photo: National Records of Scotland (NRS)">
       </div>
     </template>
     <template v-else>
@@ -247,6 +247,7 @@
 
 <script src="{% static 'leaflet/dist/leaflet.js' %}"></script>
 <script src="{% static 'leaflet-iiif/leaflet-iiif.js' %}"></script>
+<script src="{% static 'js/L.TileLayer.Zoomify.js' %}"></script>
 
 <script src="{% static 'ctrs_texts/text_search.js' %}"></script>
 {% endblock %}
